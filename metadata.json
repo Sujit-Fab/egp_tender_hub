@@ -1,0 +1,8 @@
+{
+  "name": "Remix: eGPTenderHub Analyst",
+  "description": "Professional procurement analysis tool for BPPA/PPR 2025 compliance checking and winning strategy generation.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}

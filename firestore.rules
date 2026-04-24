@@ -1,0 +1,185 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {userId}
+    // Fields:
+    //   - uid: string (required)
+    //   - email: string (required, email format)
+    //   - displayName: string (optional)
+    //   - photoURL: string (optional)
+    //   - role: string (required, enum: ['admin', 'user'])
+    //   - subscriptionTier: string (required, enum: ['free', 'pro', 'enterprise'])
+    //   - scansThisMonth: number (required)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: stds
+    // Document ID: {stdId}
+    // Fields:
+    //   - id: string (required)
+    //   - title: string (required)
+    //   - category: string (required, enum: ['Goods', 'Works', 'Physical Services'])
+    //   - method: string (required, enum: ['OTM', 'LTM', 'RFQ', 'DPM', 'Framework'])
+    //   - valueMin: number (required)
+    //   - valueMax: number (required)
+    //   - authorUid: string (required)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: analyses
+    // Document ID: {analysisId}
+    // Fields:
+    //   - id: string (required)
+    //   - tenderData: map (required)
+    //   - analysis: map (required)
+    //   - authorUid: string (required)
+    //   - createdAt: timestamp (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.authorUid;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+         (request.auth.token.email == "fab.sujit@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isEnterprise() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.subscriptionTier == 'enterprise';
+    }
+
+    function canScan() {
+      return isAuthenticated() &&
+             (isAdmin() || 
+              (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+               (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.subscriptionTier in ['pro', 'enterprise'] || 
+                (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.subscriptionTier == 'free' && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.scansThisMonth < 2))));
+    }
+
+    function isValidEmail(email) {
+      return email is string && (email == '' || email.matches('.*@.*\\..*'));
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidUser(data) {
+      return 'uid' in data && data.uid == request.auth.uid &&
+             'email' in data && isValidEmail(data.email) &&
+             'role' in data && data.role in ['admin', 'user'] &&
+             'subscriptionTier' in data && data.subscriptionTier in ['free', 'pro', 'enterprise'] &&
+             'scansThisMonth' in data && data.scansThisMonth is number && data.scansThisMonth >= 0;
+    }
+
+    function isValidSTD(data) {
+      return hasOnlyAllowedFields(['id', 'title', 'category', 'method', 'valueMin', 'valueMax', 'url', 'storagePath', 'authorUid', 'createdAt']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 100 &&
+             data.category in ['Goods', 'Works', 'Physical Services'] &&
+             data.method in ['OTM', 'LTM', 'RFQ', 'DPM', 'Framework'] &&
+             data.valueMin is number && data.valueMax is number &&
+             data.url is string &&
+             data.storagePath is string &&
+             data.authorUid == request.auth.uid &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidAnalysis(data) {
+      return hasOnlyAllowedFields(['id', 'tenderData', 'analysis', 'foreignPartnerInsights', 'authorUid', 'createdAt']) &&
+             data.tenderData is map &&
+             data.analysis is map &&
+             (!('foreignPartnerInsights' in data) || data.foreignPartnerInsights is map) &&
+             data.authorUid == request.auth.uid &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidPayment(data) {
+      return hasOnlyAllowedFields(['userId', 'email', 'tierRequested', 'amount', 'phoneNumber', 'trxId', 'status', 'timestamp']) &&
+             data.userId == request.auth.uid &&
+             data.email is string &&
+             data.tierRequested in ['pro', 'enterprise'] &&
+             data.amount is string &&
+             data.phoneNumber is string &&
+             data.trxId is string &&
+             data.status == 'pending' &&
+             data.timestamp is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data) && 
+                    (request.resource.data.role == 'user' || isAdmin()) &&
+                    (request.resource.data.subscriptionTier == 'free' || isAdmin()) &&
+                    (request.resource.data.scansThisMonth == 0 || isAdmin());
+      allow update: if isOwner(userId) && 
+                    (
+                      isAdmin() || 
+                      (
+                        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'subscriptionTier', 'uid', 'email']) &&
+                        (request.resource.data.scansThisMonth == ('scansThisMonth' in resource.data ? resource.data.scansThisMonth : 0) || 
+                         request.resource.data.scansThisMonth == ('scansThisMonth' in resource.data ? resource.data.scansThisMonth : 0) + 1)
+                      )
+                    );
+    }
+
+    match /stds/{stdId} {
+      allow read: if isAuthenticated(); // Allow all authenticated users to read STDs
+      allow create: if (isEnterprise() || isAdmin()) && isValidSTD(request.resource.data);
+      allow update: if (isDocOwner() || isAdmin()) && isValidSTD(request.resource.data);
+      allow delete: if isDocOwner() || isAdmin();
+    }
+
+    match /analyses/{analysisId} {
+      allow read: if isDocOwner() || isAdmin();
+      allow create: if isAuthenticated() && isValidAnalysis(request.resource.data) && canScan();
+      allow update: if (isDocOwner() || isAdmin()) && isValidAnalysis(request.resource.data);
+      allow delete: if isDocOwner() || isAdmin();
+    }
+
+    match /pending_payments/{paymentId} {
+      allow read: if isAuthenticated() && (request.auth.uid == resource.data.userId || isAdmin());
+      allow create: if isAuthenticated() && isValidPayment(request.resource.data);
+      allow update: if isAdmin(); // Only admins can approve/reject
+      allow delete: if isAdmin();
+    }
+
+    // Allow public read for connection testing
+    match /test/{docId} {
+      allow read: if true;
+    }
+
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}

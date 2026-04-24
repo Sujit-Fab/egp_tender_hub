@@ -1,0 +1,62 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Information about the authenticated user.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "The unique ID of the user." },
+        "email": { "type": "string", "format": "email", "description": "The user's email address." },
+        "displayName": { "type": "string", "description": "The user's display name." },
+        "photoURL": { "type": "string", "description": "The user's profile picture URL." },
+        "subscriptionTier": { "type": "string", "enum": ["free", "pro", "enterprise"], "description": "The user's subscription tier." },
+        "scansThisMonth": { "type": "number", "description": "Number of scans performed this month." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the user first logged in." }
+      },
+      "required": ["uid", "email"]
+    },
+    "STD": {
+      "title": "Standard Tender Document",
+      "description": "A template for tender evaluation.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "The unique ID of the STD." },
+        "title": { "type": "string", "description": "The name of the document (e.g., e-PG1)." },
+        "category": { "type": "string", "enum": ["Goods", "Works", "Physical Services"], "description": "The type of procurement." },
+        "method": { "type": "string", "enum": ["OTM", "LTM", "RFQ", "DPM", "Framework"], "description": "The procurement method." },
+        "valueMin": { "type": "number", "description": "Minimum value threshold." },
+        "valueMax": { "type": "number", "description": "Maximum value threshold." },
+        "authorUid": { "type": "string", "description": "The UID of the user who uploaded it." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the document was uploaded." }
+      },
+      "required": ["title", "category", "method", "valueMin", "valueMax", "authorUid"]
+    },
+    "TenderAnalysis": {
+      "title": "Tender Analysis Result",
+      "description": "The result of a scanned tender notice.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "The unique ID of the analysis." },
+        "tenderData": { "type": "object", "description": "The extracted tender data." },
+        "analysis": { "type": "object", "description": "The AI analysis result." },
+        "authorUid": { "type": "string", "description": "The UID of the user who performed the scan." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the scan was performed." }
+      },
+      "required": ["tenderData", "analysis", "authorUid"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Stores user profile information."
+    },
+    "/stds/{stdId}": {
+      "schema": "STD",
+      "description": "Stores global or user-specific STDs."
+    },
+    "/analyses/{analysisId}": {
+      "schema": "TenderAnalysis",
+      "description": "Stores tender analysis results for users."
+    }
+  }
+}
