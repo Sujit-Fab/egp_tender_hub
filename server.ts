@@ -16,7 +16,7 @@ async function startServer() {
 
   app.use(express.json({ limit: '50mb' }));
 
-  let initialKey = process.env.CUSTOM_GEMINI_KEY || process.env.GEMINI_API_KEY || "";
+  let initialKey = process.env.CUSTOM_API_KEY || process.env.GEMINI_API_KEY || "";
   initialKey = initialKey.trim();
   if (initialKey.startsWith('"') && initialKey.endsWith('"')) initialKey = initialKey.slice(1, -1);
   if (initialKey.startsWith("'") && initialKey.endsWith("'")) initialKey = initialKey.slice(1, -1);
@@ -99,8 +99,8 @@ async function startServer() {
 
   // Helper to ensure API key is available
   const checkAI = () => {
-    let key = process.env.CUSTOM_GEMINI_KEY || process.env.GEMINI_API_KEY;
-    if (!key) throw new Error("Server missing GEMINI_API_KEY or CUSTOM_GEMINI_KEY environment variable.");
+    let key = process.env.CUSTOM_API_KEY || process.env.GEMINI_API_KEY;
+    if (!key) throw new Error("Server missing GEMINI_API_KEY or CUSTOM_API_KEY environment variable.");
     key = key.trim();
     if (key.startsWith('"') && key.endsWith('"')) key = key.slice(1, -1);
     if (key.startsWith("'") && key.endsWith("'")) key = key.slice(1, -1);
@@ -119,7 +119,7 @@ async function startServer() {
       });
       res.json({ text: response.text, tokensUsed: response.usageMetadata?.totalTokenCount || 0 });
     } catch (e: any) {
-      let key = process.env.CUSTOM_GEMINI_KEY || process.env.GEMINI_API_KEY || "";
+      let key = process.env.CUSTOM_API_KEY || process.env.GEMINI_API_KEY || "";
       const maskedKey = key ? `${key.substring(0, 5)}...${key.substring(key.length - 4)} (Length: ${key.length})` : "NO KEY";
       console.error("API call failed! Error:", e.message);
       console.error("Key attempted:", maskedKey);
@@ -138,7 +138,7 @@ async function startServer() {
       });
       res.json({ text: response.text, tokensUsed: response.usageMetadata?.totalTokenCount || 0 });
     } catch (e: any) {
-      let key = process.env.CUSTOM_GEMINI_KEY || process.env.GEMINI_API_KEY || "";
+      let key = process.env.CUSTOM_API_KEY || process.env.GEMINI_API_KEY || "";
       const maskedKey = key ? `${key.substring(0, 5)}...${key.substring(key.length - 4)} (Length: ${key.length})` : "NO KEY";
       console.error("API Analyze failed! Error:", e.message);
       console.error("Key attempted:", maskedKey);
@@ -157,7 +157,7 @@ async function startServer() {
       });
       res.json({ text: response.text, tokensUsed: response.usageMetadata?.totalTokenCount || 0 });
     } catch (e: any) {
-      let key = process.env.CUSTOM_GEMINI_KEY || process.env.GEMINI_API_KEY || "";
+      let key = process.env.CUSTOM_API_KEY || process.env.GEMINI_API_KEY || "";
       const maskedKey = key ? `${key.substring(0, 5)}...${key.substring(key.length - 4)} (Length: ${key.length})` : "NO KEY";
       console.error("API QA failed! Error:", e.message);
       console.error("Key attempted:", maskedKey);
@@ -176,7 +176,7 @@ async function startServer() {
       });
       res.json({ text: response.text, tokensUsed: response.usageMetadata?.totalTokenCount || 0 });
     } catch (e: any) {
-      let key = process.env.CUSTOM_GEMINI_KEY || process.env.GEMINI_API_KEY || "";
+      let key = process.env.CUSTOM_API_KEY || process.env.GEMINI_API_KEY || "";
       const maskedKey = key ? `${key.substring(0, 5)}...${key.substring(key.length - 4)} (Length: ${key.length})` : "NO KEY";
       console.error("API Foreign failed! Error:", e.message);
       console.error("Key attempted:", maskedKey);

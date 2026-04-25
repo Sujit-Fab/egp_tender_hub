@@ -70,7 +70,7 @@ export const PrivacyPolicy = () => {
                 4. Contact Us
               </h2>
               <p className="text-slate-300 leading-relaxed">
-                If you have any questions about this privacy policy or our privacy practices, please contact us via our Support Desk within the application or email us directly at support@tenderready.com.bd.
+                If you have any questions about this privacy policy or our privacy practices, please contact us via our Support Desk within the application or email us directly at support@egptenderhub.com.
               </p>
             </section>
           </div>
