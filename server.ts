@@ -184,6 +184,64 @@ async function startServer() {
     }
   });
 
+  app.post("/api/support/send", async (req, res) => {
+    try {
+      const { userEmail, userName, subject, message } = req.body;
+
+      if (!subject || !message) {
+        return res.status(400).json({ error: "Subject and message are required" });
+      }
+
+      // Read from environment variables (fallback logic if missing)
+      const host = process.env.SMTP_HOST;
+      const user = process.env.SMTP_USER;
+      const pass = process.env.SMTP_PASS;
+
+      if (!host || !user || !pass) {
+        // If not configured, just return success so the frontend doesn't break,
+        // but log to console that email wasn't sent.
+        console.warn("SMTP credentials not configured. Email not sent.");
+        return res.json({ success: true, warning: "SMTP not configured" });
+      }
+
+      // dynamic import for nodemailer to avoid issues if not strictly needed
+      const nodemailer = await import("nodemailer");
+
+      const transporter = nodemailer.createTransport({
+        host: host,
+        port: Number(process.env.SMTP_PORT) || 465,
+        secure: Number(process.env.SMTP_PORT) === 465 || !process.env.SMTP_PORT, // true for 465, false for other ports
+        auth: {
+          user: user,
+          pass: pass,
+        },
+      });
+
+      const mailOptions = {
+        from: `"${userName || 'User'} via eGPTenderHub" <${user}>`,
+        to: user, // Send to the support inbox itself
+        replyTo: userEmail,
+        subject: `[Support Ticket] ${subject}`,
+        text: `From: ${userName || 'Unknown'} (${userEmail || 'No email'})\n\nSubject: ${subject}\n\nMessage:\n${message}`,
+        html: `
+          <div style="font-family: sans-serif; color: #333;">
+            <h2>New Support Ticket</h2>
+            <p><strong>From:</strong> ${userName || 'Unknown'} (${userEmail || 'No email'})</p>
+            <p><strong>Subject:</strong> ${subject}</p>
+            <hr />
+            <p style="white-space: pre-wrap;">${message}</p>
+          </div>
+        `,
+      };
+
+      await transporter.sendMail(mailOptions);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error sending email:", error);
+      res.status(500).json({ error: error.message || "Failed to send email" });
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({

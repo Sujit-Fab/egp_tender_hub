@@ -28,6 +28,23 @@ export const SupportDesk = ({ user, lang }: { user: User | null; lang: 'en' | 'b
         createdAt: serverTimestamp()
       });
 
+      // 2. Send email via Backend (Nodemailer)
+      const res = await fetch('/api/support/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userEmail: user.email,
+          userName: user.displayName,
+          subject,
+          message
+        })
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to send email notification');
+      }
+
       setSuccess(true);
       setSubject('');
       setMessage('');

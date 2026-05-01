@@ -1595,6 +1595,11 @@ export default function App() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (!user) {
+      alert(lang === 'bn' ? 'অনুগ্রহ করে স্ক্যান করার জন্য লগইন করুন।' : 'Please login to upload and scan tenders.');
+      return;
+    }
+
     if (user && userData) {
       let limit = 100000;
       if (userData.subscriptionTier === 'pro') limit = 1000000;
@@ -1617,7 +1622,7 @@ export default function App() {
         reader.readAsDataURL(file);
       });
       
-      const extracted = await extractTenderData(base64, file.type);
+      const extracted = await extractTenderData(base64, file.type, file);
       
       if (user && extracted.tokensUsed) {
         try {

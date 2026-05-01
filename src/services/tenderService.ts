@@ -70,16 +70,41 @@ async function extractTextFromPdf(base64: string): Promise<string> {
   return fullText;
 }
 
-export async function extractTenderData(fileBase64: string, mimeType: string): Promise<Partial<TenderData>> {
+export async function extractTenderData(fileBase64: string, mimeType: string, fileObj?: File): Promise<Partial<TenderData>> {
   let extractedText = "";
   let useLocalText = false;
   
   if (mimeType === 'application/pdf') {
     try {
-      extractedText = await extractTextFromPdf(fileBase64);
-      useLocalText = true;
+      if (fileObj) {
+        const formData = new FormData();
+        formData.append("pdf", fileObj);
+        
+        const res = await fetch('/api/pdf/extract', {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || `HTTP error ${res.status}`);
+        }
+        
+        const data = await res.json();
+        if (data.success && data.text) {
+          extractedText = data.text;
+          useLocalText = true;
+          console.log("Extracted PDF text via backend successfully. Length:", extractedText.length);
+        } else {
+          throw new Error(data.error || 'Unknown error during PDF extraction');
+        }
+      } else {
+        // Fallback to local parsing if fileObj is not available (e.g. some legacy call)
+        extractedText = await extractTextFromPdf(fileBase64);
+        useLocalText = true;
+      }
     } catch (e) {
-      console.warn("Local PDF extraction failed, parsing on server instead", e);
+      console.warn("PDF extraction failed, sending raw file to Gemini instead", e);
     }
   }
 
