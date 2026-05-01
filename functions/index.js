@@ -1,5 +1,4 @@
-const { onRequest } = require("firebase-functions/v2/https");
-const { onObjectFinalized } = require("firebase-functions/v2/storage");
+const functions = require("firebase-functions");
 
 let expressApp = null;
 
@@ -7,7 +6,9 @@ const getApp = () => {
   if (expressApp) return expressApp;
 
   const admin = require("firebase-admin");
-  if (!admin.apps.length) admin.initializeApp();
+  if (!admin.apps.length) {
+    admin.initializeApp();
+  }
 
   const express = require("express");
   const cors = require("cors");
@@ -23,7 +24,7 @@ const getApp = () => {
   const checkAI = () => {
     const { GoogleGenAI } = require("@google/genai");
     let key = process.env.CUSTOM_API_KEY || process.env.GEMINI_API_KEY;
-    if (!key) throw new Error("Missing GEMINI_API_KEY");
+    if (!key) throw new Error("Server missing GEMINI_API_KEY or CUSTOM_API_KEY environment variable.");
     key = key.trim();
     if (key.startsWith('"') && key.endsWith('"')) key = key.slice(1, -1);
     if (key.startsWith("'") && key.endsWith("'")) key = key.slice(1, -1);
@@ -46,7 +47,10 @@ const getApp = () => {
     destination: (req, file, cb) => cb(null, getUploadDir()),
     filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
   });
+
   const upload = multer({ storage });
+
+  // ---------- STD routes ----------
 
   app.get("/api/stds", (req, res) => {
     res.json(JSON.parse(fs.readFileSync(getStdsFilePath(), "utf8")));
@@ -55,6 +59,7 @@ const getApp = () => {
   app.post("/api/stds/upload", upload.single("file"), (req, res) => {
     const { category, method, valueMin, valueMax, title } = req.body;
     if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+
     const stdsFilePath = getStdsFilePath();
     const stds = JSON.parse(fs.readFileSync(stdsFilePath, "utf8"));
     const newStd = {
@@ -67,6 +72,7 @@ const getApp = () => {
       valueMax: Number(valueMax),
       uploadedAt: new Date().toISOString(),
     };
+
     stds.push(newStd);
     fs.writeFileSync(stdsFilePath, JSON.stringify(stds, null, 2));
     res.json(newStd);
@@ -87,6 +93,9 @@ const getApp = () => {
       res.status(404).json({ error: "STD not found" });
     }
   });
+
+  // ---------- AI routes ----------
+  // FIX #2: Corrected model name from "gemini-flash-latest" to "gemini-1.5-flash"
 
   app.post("/api/ai/extract", async (req, res) => {
     try {
@@ -144,20 +153,27 @@ const getApp = () => {
     }
   });
 
+  // ---------- Support email route ----------
+
   app.post("/api/support/send", async (req, res) => {
     try {
       const nodemailer = require("nodemailer");
       const { userEmail, userName, subject, message } = req.body;
       if (!subject || !message) return res.status(400).json({ error: "Subject and message are required" });
+
+      const host = process.env.SMTP_HOST || "smtp.egptenderhub.com";
       const user = process.env.SMTP_USER;
       const pass = process.env.SMTP_PASS;
+
       if (!user || !pass) return res.status(500).json({ error: "SMTP credentials not configured." });
+
       const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST || "smtp.egptenderhub.com",
+        host,
         port: Number(process.env.SMTP_PORT) || 465,
         secure: Number(process.env.SMTP_PORT) === 465 || !process.env.SMTP_PORT,
         auth: { user, pass },
       });
+
       await transporter.sendMail({
         from: `"${userName || "eGPTenderHub User"}" <${user}>`,
         to: user,
@@ -171,10 +187,15 @@ const getApp = () => {
     }
   });
 
+  // ---------- PDF extract route ----------
+  // FIX #1: pdf-parse is now required ONLY inside the route handler, never at top level.
+  // This prevents Firebase CLI from hanging during deployment analysis.
+
   app.post("/api/pdf/extract", upload.single("pdf"), async (req, res) => {
     try {
       if (!req.file) return res.status(400).json({ error: "No PDF file uploaded" });
-      const pdfParse = require("pdf-parse/lib/pdf-parse");
+      // Dynamically require pdf-parse only when this route is actually called
+      const pdfParse = require("pdf-parse/lib/pdf-parse"); // <-- KEY FIX: bypasses test runner
       const dataBuffer = fs.readFileSync(req.file.path);
       const data = await pdfParse(dataBuffer);
       fs.unlinkSync(req.file.path);
@@ -188,30 +209,42 @@ const getApp = () => {
   return app;
 };
 
-exports.api = onRequest(
-  { timeoutSeconds: 300, memory: "1GiB", region: "asia-south1" },
-  (req, res) => getApp()(req, res)
-);
+// ---------- Firebase Function exports ----------
 
-exports.onPdfUploaded = onObjectFinalized(
-  { timeoutSeconds: 300, memory: "1GiB", region: "asia-south1", bucket: "gen-lang-client-0089421810.firebasestorage.app" },
-  async (event) => {
-    const object = event.data;
+// V1 HTTPS Function
+exports.api = functions
+  .runWith({ timeoutSeconds: 300, memory: "1GB" })
+  .https.onRequest((req, res) => {
+    return getApp()(req, res);
+  });
+
+// V1 Storage Trigger Function
+exports.onPdfUploaded = functions
+  .runWith({ timeoutSeconds: 300, memory: "1GB" })
+  .storage.object()
+  .onFinalize(async (object) => {
     const admin = require("firebase-admin");
     if (!admin.apps.length) admin.initializeApp();
+
     const { getStorage } = require("firebase-admin/storage");
+    // FIX #1 applied here too: use the direct path to avoid pdf-parse test runner
     const pdfParse = require("pdf-parse/lib/pdf-parse");
-    const fs = require("fs"), path = require("path"), os = require("os");
+    const fs = require("fs");
+    const path = require("path");
+    const os = require("os");
+
     if (!object.contentType || !object.contentType.includes("pdf")) return;
+
     const file = getStorage().bucket(object.bucket).file(object.name);
-    const tmp = path.join(os.tmpdir(), path.basename(object.name));
+    const tempFilePath = path.join(os.tmpdir(), path.basename(object.name));
+
     try {
-      await file.download({ destination: tmp });
-      await pdfParse(fs.readFileSync(tmp));
-      fs.unlinkSync(tmp);
-    } catch (e) {
-      if (fs.existsSync(tmp)) fs.unlinkSync(tmp);
-      throw e;
+      await file.download({ destination: tempFilePath });
+      const dataBuffer = fs.readFileSync(tempFilePath);
+      await pdfParse(dataBuffer);
+      fs.unlinkSync(tempFilePath);
+    } catch (error) {
+      if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
+      throw error;
     }
-  }
-);
+  });
