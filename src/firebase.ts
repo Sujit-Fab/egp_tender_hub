@@ -14,7 +14,16 @@ export const storage = getStorage(app);
 export const googleProvider = new GoogleAuthProvider();
 
 // Auth Helpers
-export const loginWithGoogle = () => signInWithPopup(auth, googleProvider);
+export const loginWithGoogle = async () => {
+  try {
+    return await signInWithPopup(auth, googleProvider);
+  } catch (error: any) {
+    if (error.code === 'auth/popup-blocked') {
+      alert("Login popup was blocked. If you are in the AI Studio preview, please open the app in a new tab (button at the top right) or allow popups for this site.");
+    }
+    throw error;
+  }
+};
 export const logout = () => signOut(auth);
 
 // Error Handling Spec for Firestore Operations

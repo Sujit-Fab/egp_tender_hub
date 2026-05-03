@@ -22,7 +22,7 @@ const getApp = () => {
 
   const checkAI = () => {
     const { GoogleGenAI } = require("@google/genai");
-    let key = process.env.GEMINI_API_KEY || process.env.CUSTOM_API_KEY;
+    let key = process.env.CUSTOM_API_KEY || process.env.GEMINI_API_KEY;
     if (!key) throw new Error("Missing GEMINI_API_KEY");
     key = key.trim();
     if (key.startsWith('"') && key.endsWith('"')) key = key.slice(1, -1);
@@ -37,21 +37,20 @@ const getApp = () => {
   };
 
   const getStdsFilePath = () => {
-    const fp = path.join(os.tmpdir(), "stds.json");
-    if (!fs.existsSync(fp)) fs.writeFileSync(fp, JSON.stringify([]));
-    return fp;
+    const filepath = path.join(os.tmpdir(), "stds.json");
+    if (!fs.existsSync(filepath)) fs.writeFileSync(filepath, JSON.stringify([]));
+    return filepath;
   };
 
   const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, getUploadDir()),
     filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
   });
-
   const upload = multer({ storage });
 
-  app.get("/api/stds", (req, res) =>
-    res.json(JSON.parse(fs.readFileSync(getStdsFilePath(), "utf8")))
-  );
+  app.get("/api/stds", (req, res) => {
+    res.json(JSON.parse(fs.readFileSync(getStdsFilePath(), "utf8")));
+  });
 
   app.post("/api/stds/upload", upload.single("file"), (req, res) => {
     const { category, method, valueMin, valueMax, title } = req.body;
@@ -92,56 +91,56 @@ const getApp = () => {
   app.post("/api/ai/extract", async (req, res) => {
     try {
       const ai = checkAI();
-      const r = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
+      const response = await ai.models.generateContent({
+        model: "gemini-1.5-flash",
         contents: req.body.contents,
         config: { responseMimeType: "application/json" },
       });
-      res.json({ text: r.text, tokensUsed: r.usageMetadata?.totalTokenCount || 0 });
+      res.json({ text: response.text, tokensUsed: response.usageMetadata?.totalTokenCount || 0 });
     } catch (e) {
-      res.status(500).json({ error: e.message });
+      res.status(500).json({ error: e.message || "Extraction failed" });
     }
   });
 
   app.post("/api/ai/analyze", async (req, res) => {
     try {
       const ai = checkAI();
-      const r = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
+      const response = await ai.models.generateContent({
+        model: "gemini-1.5-flash",
         contents: req.body.prompt,
         config: { responseMimeType: "application/json" },
       });
-      res.json({ text: r.text, tokensUsed: r.usageMetadata?.totalTokenCount || 0 });
+      res.json({ text: response.text, tokensUsed: response.usageMetadata?.totalTokenCount || 0 });
     } catch (e) {
-      res.status(500).json({ error: e.message });
+      res.status(500).json({ error: e.message || "Analysis failed" });
     }
   });
 
   app.post("/api/ai/qa", async (req, res) => {
     try {
       const ai = checkAI();
-      const r = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
+      const response = await ai.models.generateContent({
+        model: "gemini-1.5-flash",
         contents: req.body.contents,
         config: { systemInstruction: req.body.systemInstruction },
       });
-      res.json({ text: r.text, tokensUsed: r.usageMetadata?.totalTokenCount || 0 });
+      res.json({ text: response.text, tokensUsed: response.usageMetadata?.totalTokenCount || 0 });
     } catch (e) {
-      res.status(500).json({ error: e.message });
+      res.status(500).json({ error: e.message || "QA failed" });
     }
   });
 
   app.post("/api/ai/foreign", async (req, res) => {
     try {
       const ai = checkAI();
-      const r = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
+      const response = await ai.models.generateContent({
+        model: "gemini-1.5-flash",
         contents: req.body.prompt,
         config: { responseMimeType: "application/json" },
       });
-      res.json({ text: r.text, tokensUsed: r.usageMetadata?.totalTokenCount || 0 });
+      res.json({ text: response.text, tokensUsed: response.usageMetadata?.totalTokenCount || 0 });
     } catch (e) {
-      res.status(500).json({ error: e.message });
+      res.status(500).json({ error: e.message || "Foreign insights failed" });
     }
   });
 
@@ -149,12 +148,10 @@ const getApp = () => {
     try {
       const nodemailer = require("nodemailer");
       const { userEmail, userName, subject, message } = req.body;
-      if (!subject || !message)
-        return res.status(400).json({ error: "Subject and message are required" });
+      if (!subject || !message) return res.status(400).json({ error: "Subject and message are required" });
       const user = process.env.SMTP_USER;
       const pass = process.env.SMTP_PASS;
-      if (!user || !pass)
-        return res.status(500).json({ error: "SMTP credentials not configured." });
+      if (!user || !pass) return res.status(500).json({ error: "SMTP credentials not configured." });
       const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST || "smtp.egptenderhub.com",
         port: Number(process.env.SMTP_PORT) || 465,
@@ -170,7 +167,7 @@ const getApp = () => {
       });
       res.json({ success: true, message: "Email sent successfully" });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message || "Failed to send email" });
     }
   });
 
@@ -183,7 +180,7 @@ const getApp = () => {
       fs.unlinkSync(req.file.path);
       res.json({ success: true, text: data.text });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message || "Failed to extract PDF" });
     }
   });
 
@@ -197,21 +194,14 @@ exports.api = onRequest(
 );
 
 exports.onPdfUploaded = onObjectFinalized(
-  {
-    timeoutSeconds: 300,
-    memory: "1GiB",
-    region: "asia-south1",
-    bucket: "gen-lang-client-0089421810.firebasestorage.app",
-  },
+  { timeoutSeconds: 300, memory: "1GiB", region: "asia-south1", bucket: "gen-lang-client-0089421810.firebasestorage.app" },
   async (event) => {
     const object = event.data;
     const admin = require("firebase-admin");
     if (!admin.apps.length) admin.initializeApp();
     const { getStorage } = require("firebase-admin/storage");
     const pdfParse = require("pdf-parse/lib/pdf-parse");
-    const fs = require("fs"),
-      path = require("path"),
-      os = require("os");
+    const fs = require("fs"), path = require("path"), os = require("os");
     if (!object.contentType || !object.contentType.includes("pdf")) return;
     const file = getStorage().bucket(object.bucket).file(object.name);
     const tmp = path.join(os.tmpdir(), path.basename(object.name));
