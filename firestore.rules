@@ -173,6 +173,12 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    match /support_tickets/{ticketId} {
+      allow create: if isAuthenticated();
+      allow read: if isAuthenticated() && request.auth.uid == resource.data.userId;
+      allow update, delete: if isAdmin();
+    }
+
     // Allow public read for connection testing
     match /test/{docId} {
       allow read: if true;
