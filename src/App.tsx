@@ -59,6 +59,7 @@ import { SupportDesk } from './components/SupportDesk';
 import { Blog } from './components/Blog';
 import { TermsAndConditions } from './components/TermsAndConditions';
 import { PaymentModal } from './components/PaymentModal';
+import { NoticeBoard } from './components/NoticeBoard';
 
 const AICreditWidget = ({ userData, lang, setView }: any) => {
   if (!userData) return null;
@@ -1366,7 +1367,7 @@ const LandingPage = ({ loginWithGoogle, lang, setView }: { loginWithGoogle: () =
 
 export default function App() {
   const [lang, setLang] = useState<'en' | 'bn'>('en');
-  const [view, setView] = useState<'landing' | 'dashboard' | 'library' | 'guide' | 'manage' | 'qna' | 'sop' | 'history' | 'pricing' | 'sor' | 'profile' | 'manual' | 'support' | 'blog' | 'terms'>('landing');
+  const [view, setView] = useState<'landing' | 'dashboard' | 'library' | 'guide' | 'manage' | 'qna' | 'sop' | 'history' | 'pricing' | 'sor' | 'profile' | 'manual' | 'support' | 'blog' | 'terms' | 'noticeboard'>('landing');
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<any>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -1869,6 +1870,15 @@ export default function App() {
                   )}
                 >
                   {lang === 'bn' ? 'ড্যাশবোর্ড' : 'Dashboard'}
+                </span>
+                <span 
+                  onClick={() => setView('noticeboard')}
+                  className={cn(
+                    "cursor-pointer transition-all py-5 border-b-2",
+                    view === 'noticeboard' ? "text-blue-600 dark:text-blue-400 border-blue-600 dark:border-blue-400" : "hover:text-slate-900 dark:hover:text-white border-transparent"
+                  )}
+                >
+                  {lang === 'bn' ? 'নোটিশ বোর্ড' : 'Notice Board'}
                 </span>
                 <span 
                   onClick={() => setView('history')}
@@ -2515,6 +2525,8 @@ export default function App() {
             <Blog lang={lang} />
           ) : view === 'terms' ? (
             <TermsAndConditions lang={lang} />
+          ) : view === 'noticeboard' ? (
+            <NoticeBoard lang={lang} />
           ) : (
             <ManageSTDs 
               uploadData={uploadData}
@@ -2644,6 +2656,7 @@ export default function App() {
           </button>
           
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xl rounded-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible focus-within:opacity-100 focus-within:visible transition-all flex flex-col overflow-hidden">
+            <span onClick={() => setView('noticeboard')} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><Newspaper className="w-4 h-4"/> Notice Board</span>
             <span onClick={() => setView('qna')} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><MessageSquare className="w-4 h-4"/> Q&A</span>
             <span onClick={() => setView('sop')} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><ClipboardCheck className="w-4 h-4"/> SOP Gen</span>
             <span onClick={() => setView('sor')} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><Calculator className="w-4 h-4"/> Estimates</span>
