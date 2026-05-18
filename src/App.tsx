@@ -1368,6 +1368,7 @@ const LandingPage = ({ loginWithGoogle, lang, setView }: { loginWithGoogle: () =
 export default function App() {
   const [lang, setLang] = useState<'en' | 'bn'>('en');
   const [view, setView] = useState<'landing' | 'dashboard' | 'library' | 'guide' | 'manage' | 'qna' | 'sop' | 'history' | 'pricing' | 'sor' | 'profile' | 'manual' | 'support' | 'blog' | 'terms' | 'noticeboard'>('landing');
+  const [activeMobileMenu, setActiveMobileMenu] = useState<'tools' | 'profile' | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<any>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -2511,7 +2512,7 @@ export default function App() {
               handleImageChange={handleImageChange}
             />
           ) : view === 'sor' ? (
-            <SoRCopilot lang={lang} />
+            <SoRCopilot lang={lang} userData={userData} />
           ) : view === 'profile' ? (
             <>
               <AICreditWidget userData={userData} lang={lang} setView={setView} />
@@ -2623,7 +2624,7 @@ export default function App() {
       {view !== 'landing' && (
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 z-50 px-2 py-2 flex items-center justify-around shadow-[0_-4px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_10px_rgba(0,0,0,0.3)] transition-colors duration-300">
         <button 
-          onClick={() => setView('dashboard')}
+          onClick={() => { setView('dashboard'); setActiveMobileMenu(null); }}
           className={cn(
             "flex flex-col items-center justify-center w-16 h-12 rounded-xl transition-colors",
             view === 'dashboard' ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
@@ -2633,7 +2634,7 @@ export default function App() {
           <span className="text-[10px] font-semibold">{lang === 'bn' ? 'হোম' : 'Home'}</span>
         </button>
         <button 
-          onClick={() => setView('history')}
+          onClick={() => { setView('history'); setActiveMobileMenu(null); }}
           className={cn(
             "flex flex-col items-center justify-center w-16 h-12 rounded-xl transition-colors",
             view === 'history' ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
@@ -2644,34 +2645,39 @@ export default function App() {
         </button>
         
         {/* Tools Menu Trigger for Mobile */}
-        <div className="relative group flex items-center justify-center z-50">
+        <div className="relative flex items-center justify-center z-50">
           <button 
+            onClick={() => setActiveMobileMenu(prev => prev === 'tools' ? null : 'tools')}
             className={cn(
               "flex flex-col items-center justify-center w-16 h-12 rounded-xl transition-colors outline-none",
-              ['qna', 'sop', 'sor', 'library', 'guide'].includes(view) ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+              ['qna', 'sop', 'sor', 'library', 'guide'].includes(view) || activeMobileMenu === 'tools' ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
             )}
           >
             <Wrench className="w-5 h-5 mb-1" />
             <span className="text-[10px] font-semibold">{lang === 'bn' ? 'টুলস' : 'Tools'}</span>
           </button>
           
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xl rounded-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible focus-within:opacity-100 focus-within:visible transition-all flex flex-col overflow-hidden">
-            <span onClick={() => setView('noticeboard')} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><Newspaper className="w-4 h-4"/> Notice Board</span>
-            <span onClick={() => setView('qna')} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><MessageSquare className="w-4 h-4"/> Q&A</span>
-            <span onClick={() => setView('sop')} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><ClipboardCheck className="w-4 h-4"/> SOP Gen</span>
-            <span onClick={() => setView('sor')} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><Calculator className="w-4 h-4"/> Estimates</span>
-            <span onClick={() => setView('guide')} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><BookOpen className="w-4 h-4"/> PPR Guide</span>
-            <span onClick={() => setView('library')} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><Building2 className="w-4 h-4"/> Library</span>
-            <span onClick={() => setView('manual')} className="px-4 py-3 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><BookOpen className="w-4 h-4"/> Manual</span>
+          <div className={cn(
+            "absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xl rounded-2xl transition-all flex flex-col overflow-hidden",
+            activeMobileMenu === 'tools' ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
+          )}>
+            <span onClick={() => { setView('noticeboard'); setActiveMobileMenu(null); }} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><Newspaper className="w-4 h-4"/> Notice Board</span>
+            <span onClick={() => { setView('qna'); setActiveMobileMenu(null); }} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><MessageSquare className="w-4 h-4"/> Q&A</span>
+            <span onClick={() => { setView('sop'); setActiveMobileMenu(null); }} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><ClipboardCheck className="w-4 h-4"/> SOP Gen</span>
+            <span onClick={() => { setView('sor'); setActiveMobileMenu(null); }} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><Calculator className="w-4 h-4"/> Estimates</span>
+            <span onClick={() => { setView('guide'); setActiveMobileMenu(null); }} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><BookOpen className="w-4 h-4"/> PPR Guide</span>
+            <span onClick={() => { setView('library'); setActiveMobileMenu(null); }} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><Building2 className="w-4 h-4"/> Library</span>
+            <span onClick={() => { setView('manual'); setActiveMobileMenu(null); }} className="px-4 py-3 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><BookOpen className="w-4 h-4"/> Manual</span>
           </div>
         </div>
 
         {/* Profile Menu Trigger for Mobile */}
-        <div className="relative group flex items-center justify-center z-50">
+        <div className="relative flex items-center justify-center z-50">
           <button 
+            onClick={() => setActiveMobileMenu(prev => prev === 'profile' ? null : 'profile')}
             className={cn(
               "flex flex-col items-center justify-center w-16 h-12 rounded-xl transition-colors outline-none",
-              ['profile', 'pricing', 'manage'].includes(view) ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+              ['profile', 'pricing', 'manage'].includes(view) || activeMobileMenu === 'profile' ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
             )}
           >
             {user ? (
@@ -2682,17 +2688,20 @@ export default function App() {
             <span className="text-[10px] font-semibold">{lang === 'bn' ? 'প্রোফাইল' : 'Profile'}</span>
           </button>
           
-          <div className="absolute bottom-full right-0 mb-2 w-48 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xl rounded-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible focus-within:opacity-100 focus-within:visible transition-all flex flex-col overflow-hidden">
+          <div className={cn(
+            "absolute bottom-full right-0 mb-2 w-48 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xl rounded-2xl transition-all flex flex-col overflow-hidden",
+            activeMobileMenu === 'profile' ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
+          )}>
             {user ? (
               <>
-                <span onClick={() => setView('profile')} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><Building2 className="w-4 h-4"/> Profile</span>
-                <span onClick={() => setView('pricing')} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><TrendingUp className="w-4 h-4"/> Pricing</span>
-                <span onClick={() => setView('manage')} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><Settings className="w-4 h-4"/> STDs</span>
-                <span onClick={() => setView('support')} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><LifeBuoy className="w-4 h-4"/> Support</span>
-                <span onClick={logout} className="px-4 py-3 text-sm text-red-600 active:bg-red-50 dark:active:bg-red-900/20 flex items-center gap-2 cursor-pointer"><X className="w-4 h-4"/> Logout</span>
+                <span onClick={() => { setView('profile'); setActiveMobileMenu(null); }} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><Building2 className="w-4 h-4"/> Profile</span>
+                <span onClick={() => { setView('pricing'); setActiveMobileMenu(null); }} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><TrendingUp className="w-4 h-4"/> Pricing</span>
+                <span onClick={() => { setView('manage'); setActiveMobileMenu(null); }} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><Settings className="w-4 h-4"/> STDs</span>
+                <span onClick={() => { setView('support'); setActiveMobileMenu(null); }} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><LifeBuoy className="w-4 h-4"/> Support</span>
+                <span onClick={() => { logout(); setActiveMobileMenu(null); }} className="px-4 py-3 text-sm text-red-600 active:bg-red-50 dark:active:bg-red-900/20 flex items-center gap-2 cursor-pointer"><X className="w-4 h-4"/> Logout</span>
               </>
             ) : (
-              <span onClick={loginWithGoogle} className="px-4 py-3 text-sm text-blue-600 font-bold active:bg-blue-50 dark:active:bg-blue-900/20 flex items-center gap-2 cursor-pointer"><UserIcon className="w-4 h-4"/> Login</span>
+              <span onClick={() => { loginWithGoogle(); setActiveMobileMenu(null); }} className="px-4 py-3 text-sm text-blue-600 font-bold active:bg-blue-50 dark:active:bg-blue-900/20 flex items-center gap-2 cursor-pointer"><UserIcon className="w-4 h-4"/> Login</span>
             )}
           </div>
         </div>

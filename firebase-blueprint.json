@@ -43,12 +43,33 @@
         "createdAt": { "type": "string", "format": "date-time", "description": "When the scan was performed." }
       },
       "required": ["tenderData", "analysis", "authorUid"]
+    },
+    "SorItem": {
+      "title": "Schedule of Rates Item",
+      "description": "An item in the SoR master database.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "The unique ID of the item." },
+        "item_no": { "type": "string", "description": "Item number/code." },
+        "chapter": { "type": "string", "description": "Chapter name." },
+        "category": { "type": "string", "description": "Category name." },
+        "description": { "type": "string", "description": "Item description." },
+        "unit": { "type": "string", "description": "Unit of measurement." },
+        "rates": { "type": "object", "description": "Rates for different zones." },
+        "authorUid": { "type": "string", "description": "The UID of the user who uploaded the item." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When it was uploaded." }
+      },
+      "required": ["item_no", "description", "unit", "rates", "authorUid"]
     }
   },
   "firestore": {
     "/users/{userId}": {
       "schema": "User",
       "description": "Stores user profile information."
+    },
+    "/users/{userId}/sorItems/{sorItemId}": {
+      "schema": "SorItem",
+      "description": "Stores custom SoR database items per user."
     },
     "/stds/{stdId}": {
       "schema": "STD",
