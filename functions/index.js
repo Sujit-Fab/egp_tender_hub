@@ -20,9 +20,113 @@ const getApp = () => {
   app.use(cors({ origin: true }));
   app.use(express.json({ limit: "50mb" }));
 
+  const Parser = require("rss-parser");
+  const cheerio = require("cheerio");
+  const axios = require("axios");
+
+  // Notice Board Cache (In-memory for Cloud Functions)
+  // Note: This cache is per-instance and will reset when the function scales or restarts
+  let cachedNotices = [];
+  let cacheTimestamp = 0;
+  const CACHE_DURATION = 1000 * 60 * 30; // 30 minutes
+
+  app.get("/api/notices", async (req, res) => {
+    try {
+      if (Date.now() - cacheTimestamp < CACHE_DURATION && cachedNotices.length > 0) {
+        return res.json(cachedNotices);
+      }
+
+      const notices = [];
+      const parser = new Parser();
+
+      // Fetch e-GP Daily Tenders (RSS)
+      try {
+        const dailyFeeds = await parser.parseURL("https://www.eprocure.gov.bd/RSS/DailyTender.xml");
+        dailyFeeds.items.forEach((item) => {
+          notices.push({
+            id: 'daily-' + item.guid,
+            title: item.title,
+            source: 'e-GP (Daily)',
+            date: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
+            link: item.link || "https://www.eprocure.gov.bd",
+            snippet: item.contentSnippet || "No description provided."
+          });
+        });
+      } catch (err) {
+        console.warn("Could not fetch e-GP Daily RSS");
+      }
+
+      // Fetch e-GP Weekly Tenders (RSS)
+      try {
+        const weeklyFeeds = await parser.parseURL("https://www.eprocure.gov.bd/RSS/WeeklyTender.xml");
+        weeklyFeeds.items.forEach((item) => {
+          notices.push({
+            id: 'weekly-' + item.guid,
+            title: item.title,
+            source: 'e-GP (Weekly)',
+            date: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
+            link: item.link || "https://www.eprocure.gov.bd",
+            snippet: item.contentSnippet || "No description provided."
+          });
+        });
+      } catch (err) {
+        console.warn("Could not fetch e-GP Weekly RSS");
+      }
+
+      // Fetch BPPA News (Scraping)
+      try {
+        const bppaResponse = await axios.get("https://www.bppa.gov.bd/media-communication/news.html");
+        const $ = cheerio.load(bppaResponse.data);
+        const newsItems = $("table tbody tr");
+        
+        newsItems.each((i, el) => {
+          const cols = $(el).find("td");
+          if (cols.length >= 3) {
+            const title = $(cols[0]).text().trim();
+            const rawDate = $(cols[2]).text().trim();
+            
+            let isoDate = new Date().toISOString();
+            if (rawDate) {
+              const parts = rawDate.split("/");
+              if (parts.length === 3) {
+                isoDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T00:00:00Z`).toISOString();
+              }
+            }
+
+            const readMoreLink = $(cols[1]).find("a").attr("href");
+            const link = readMoreLink 
+              ? (readMoreLink.startsWith("http") ? readMoreLink : `https://www.bppa.gov.bd${readMoreLink}`)
+              : "https://www.bppa.gov.bd/media-communication/news.html";
+
+            notices.push({
+              id: 'bppa-news-' + i,
+              title,
+              source: 'BPPA News',
+              date: isoDate,
+              link,
+              snippet: "Important procurement policy or board news from BPPA."
+            });
+          }
+        });
+      } catch (err) {
+        console.warn("Could not scrape BPPA News");
+      }
+
+      notices.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+      cachedNotices = notices;
+      cacheTimestamp = Date.now();
+      
+      res.json(cachedNotices);
+    } catch (error) {
+      console.error("Failed to fetch notices:", error);
+      res.status(500).json({ error: "Failed to fetch notices." });
+    }
+  });
+
   const checkAI = () => {
     const { GoogleGenAI } = require("@google/genai");
-    let key = process.env.GEMINI_API_KEY || process.env.CUSTOM_API_KEY;
+    let key = process.env.CUSTOM_API_KEY || process.env.GEMINI_API_KEY;
     if (!key) throw new Error("Missing GEMINI_API_KEY");
     key = key.trim();
     if (key.startsWith('"') && key.endsWith('"')) key = key.slice(1, -1);
@@ -37,21 +141,20 @@ const getApp = () => {
   };
 
   const getStdsFilePath = () => {
-    const fp = path.join(os.tmpdir(), "stds.json");
-    if (!fs.existsSync(fp)) fs.writeFileSync(fp, JSON.stringify([]));
-    return fp;
+    const filepath = path.join(os.tmpdir(), "stds.json");
+    if (!fs.existsSync(filepath)) fs.writeFileSync(filepath, JSON.stringify([]));
+    return filepath;
   };
 
   const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, getUploadDir()),
     filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
   });
-
   const upload = multer({ storage });
 
-  app.get("/api/stds", (req, res) =>
-    res.json(JSON.parse(fs.readFileSync(getStdsFilePath(), "utf8")))
-  );
+  app.get("/api/stds", (req, res) => {
+    res.json(JSON.parse(fs.readFileSync(getStdsFilePath(), "utf8")));
+  });
 
   app.post("/api/stds/upload", upload.single("file"), (req, res) => {
     const { category, method, valueMin, valueMax, title } = req.body;
@@ -92,56 +195,56 @@ const getApp = () => {
   app.post("/api/ai/extract", async (req, res) => {
     try {
       const ai = checkAI();
-      const r = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
+      const response = await ai.models.generateContent({
+        model: "gemini-1.5-flash",
         contents: req.body.contents,
         config: { responseMimeType: "application/json" },
       });
-      res.json({ text: r.text, tokensUsed: r.usageMetadata?.totalTokenCount || 0 });
+      res.json({ text: response.text, tokensUsed: response.usageMetadata?.totalTokenCount || 0 });
     } catch (e) {
-      res.status(500).json({ error: e.message });
+      res.status(500).json({ error: e.message || "Extraction failed" });
     }
   });
 
   app.post("/api/ai/analyze", async (req, res) => {
     try {
       const ai = checkAI();
-      const r = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
+      const response = await ai.models.generateContent({
+        model: "gemini-1.5-flash",
         contents: req.body.prompt,
         config: { responseMimeType: "application/json" },
       });
-      res.json({ text: r.text, tokensUsed: r.usageMetadata?.totalTokenCount || 0 });
+      res.json({ text: response.text, tokensUsed: response.usageMetadata?.totalTokenCount || 0 });
     } catch (e) {
-      res.status(500).json({ error: e.message });
+      res.status(500).json({ error: e.message || "Analysis failed" });
     }
   });
 
   app.post("/api/ai/qa", async (req, res) => {
     try {
       const ai = checkAI();
-      const r = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
+      const response = await ai.models.generateContent({
+        model: "gemini-1.5-flash",
         contents: req.body.contents,
         config: { systemInstruction: req.body.systemInstruction },
       });
-      res.json({ text: r.text, tokensUsed: r.usageMetadata?.totalTokenCount || 0 });
+      res.json({ text: response.text, tokensUsed: response.usageMetadata?.totalTokenCount || 0 });
     } catch (e) {
-      res.status(500).json({ error: e.message });
+      res.status(500).json({ error: e.message || "QA failed" });
     }
   });
 
   app.post("/api/ai/foreign", async (req, res) => {
     try {
       const ai = checkAI();
-      const r = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
+      const response = await ai.models.generateContent({
+        model: "gemini-1.5-flash",
         contents: req.body.prompt,
         config: { responseMimeType: "application/json" },
       });
-      res.json({ text: r.text, tokensUsed: r.usageMetadata?.totalTokenCount || 0 });
+      res.json({ text: response.text, tokensUsed: response.usageMetadata?.totalTokenCount || 0 });
     } catch (e) {
-      res.status(500).json({ error: e.message });
+      res.status(500).json({ error: e.message || "Foreign insights failed" });
     }
   });
 
@@ -149,12 +252,10 @@ const getApp = () => {
     try {
       const nodemailer = require("nodemailer");
       const { userEmail, userName, subject, message } = req.body;
-      if (!subject || !message)
-        return res.status(400).json({ error: "Subject and message are required" });
+      if (!subject || !message) return res.status(400).json({ error: "Subject and message are required" });
       const user = process.env.SMTP_USER;
       const pass = process.env.SMTP_PASS;
-      if (!user || !pass)
-        return res.status(500).json({ error: "SMTP credentials not configured." });
+      if (!user || !pass) return res.status(500).json({ error: "SMTP credentials not configured." });
       const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST || "smtp.egptenderhub.com",
         port: Number(process.env.SMTP_PORT) || 465,
@@ -170,7 +271,7 @@ const getApp = () => {
       });
       res.json({ success: true, message: "Email sent successfully" });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message || "Failed to send email" });
     }
   });
 
@@ -183,7 +284,7 @@ const getApp = () => {
       fs.unlinkSync(req.file.path);
       res.json({ success: true, text: data.text });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message || "Failed to extract PDF" });
     }
   });
 
@@ -197,21 +298,14 @@ exports.api = onRequest(
 );
 
 exports.onPdfUploaded = onObjectFinalized(
-  {
-    timeoutSeconds: 300,
-    memory: "1GiB",
-    region: "asia-south1",
-    bucket: "gen-lang-client-0089421810.firebasestorage.app",
-  },
+  { timeoutSeconds: 300, memory: "1GiB", region: "asia-south1", bucket: "gen-lang-client-0089421810.firebasestorage.app" },
   async (event) => {
     const object = event.data;
     const admin = require("firebase-admin");
     if (!admin.apps.length) admin.initializeApp();
     const { getStorage } = require("firebase-admin/storage");
     const pdfParse = require("pdf-parse/lib/pdf-parse");
-    const fs = require("fs"),
-      path = require("path"),
-      os = require("os");
+    const fs = require("fs"), path = require("path"), os = require("os");
     if (!object.contentType || !object.contentType.includes("pdf")) return;
     const file = getStorage().bucket(object.bucket).file(object.name);
     const tmp = path.join(os.tmpdir(), path.basename(object.name));
