@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Calculator, Search, FileText, CheckCircle2, ChevronRight, Upload, Plus, Trash2, Download, ShoppingCart } from 'lucide-react';
-import sorData from '../data/pwd_sor_2022_sample.json';
+import { Calculator, Search, FileText, CheckCircle2, ChevronRight, Upload, Plus, Trash2, Download, ShoppingCart, Loader2, Database, AlertCircle } from 'lucide-react';
+import * as XLSX from 'xlsx';
+import defaultSorData from '../data/pwd_sor_2022_sample.json';
 import { cn } from '../lib/utils';
 import ReactMarkdown from 'react-markdown';
+import { findBestMatch } from 'string-similarity';
+import localforage from 'localforage';
+import { auth, db, collection, writeBatch, doc, serverTimestamp, getDocs, onSnapshot } from '../firebase';
 
 interface SoRCopilotProps {
   lang: 'en' | 'bn';
+  userData?: any;
 }
 
 type ZoneType = 'Dhaka_Mymensingh' | 'Chattogram_Sylhet' | 'Khulna_Barisal_Gopalgonj' | 'Rajshahi_Rangpur';
@@ -27,14 +32,88 @@ interface CartItem {
   rates: Record<ZoneType, number>;
 }
 
-export const SoRCopilot: React.FC<SoRCopilotProps> = ({ lang }) => {
-  const [activeTab, setActiveTab] = useState<'search' | 'estimate' | 'boq'>('search');
+export const SoRCopilot: React.FC<SoRCopilotProps> = ({ lang, userData }) => {
+  const [activeTab, setActiveTab] = useState<'search' | 'estimate' | 'boq' | 'database'>('search');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   
+  const [globalSorData, setGlobalSorData] = useState<any[]>([]);
+  const [userSorData, setUserSorData] = useState<any[]>([]);
+  const [sorData, setSorData] = useState<any[]>(defaultSorData);
+  const [isLoadingDB, setIsLoadingDB] = useState(true);
+
+  useEffect(() => {
+    let unsubUser: (() => void) | undefined;
+    let unsubGlobal: (() => void) | undefined;
+    
+    const unsubAuth = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setIsLoadingDB(true);
+        // Listen to global DB
+        const globalSorRef = collection(db, 'globalSorItems');
+        unsubGlobal = onSnapshot(globalSorRef, (snapshot) => {
+          setGlobalSorData(snapshot.docs.map(doc => doc.data()));
+        }, (err) => {
+          console.error("Failed to load global DB", err);
+          handleFirestoreError(err, OperationType.GET, 'globalSorItems');
+        });
+
+        try {
+          const userSorRef = collection(db, 'users', user.uid, 'sorItems');
+          unsubUser = onSnapshot(userSorRef, (snapshot) => {
+            setUserSorData(snapshot.docs.map(doc => doc.data()));
+            setIsLoadingDB(false);
+          }, (err) => {
+            console.error("Failed to load custom DB from Firestore", err);
+            handleFirestoreError(err, OperationType.GET, `users/${user.uid}/sorItems`);
+            setIsLoadingDB(false);
+          });
+        } catch (err) {
+          console.error("Error setting up Firestore listener", err);
+          setIsLoadingDB(false);
+        }
+      } else {
+        setGlobalSorData([]);
+        setUserSorData([]);
+        setIsLoadingDB(false);
+        if (unsubGlobal) {
+          unsubGlobal();
+          unsubGlobal = undefined;
+        }
+        if (unsubUser) {
+          unsubUser();
+          unsubUser = undefined;
+        }
+      }
+    });
+
+    return () => {
+      unsubAuth();
+      if (unsubGlobal) unsubGlobal();
+      if (unsubUser) unsubUser();
+    };
+  }, []);
+
+  useEffect(() => {
+    const map = new Map<string, any>();
+    // 1. Base PWD SoR
+    defaultSorData.forEach(item => map.set(item.item_no, item));
+    // 2. Global SoR Overrides/Additions
+    globalSorData.forEach(item => map.set(item.item_no, item));
+    // 3. User SoR Overrides/Additions
+    userSorData.forEach(item => map.set(item.item_no, item));
+    
+    setSorData(Array.from(map.values()));
+  }, [globalSorData, userSorData]);
+
   // Cart state
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedZone, setSelectedZone] = useState<ZoneType>('Dhaka_Mymensingh');
+  
+  // Auto-BoQ state
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
   
   // Extract unique categories
   const categories = ['All', ...Array.from(new Set(sorData.map(item => item.category)))];
@@ -88,6 +167,270 @@ export const SoRCopilot: React.FC<SoRCopilotProps> = ({ lang }) => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsProcessing(true);
+    setUploadMessage(null);
+    
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const bstr = evt.target?.result;
+        const wb = XLSX.read(bstr, { type: 'binary' });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        // Convert with header row
+        const rawData = XLSX.utils.sheet_to_json(ws);
+        
+        let newItemsFound = 0;
+        let finalCart = [...cart];
+        
+        rawData.forEach((rawRow: any) => {
+            const row: any = {};
+            for (const key in rawRow) {
+                if (key) {
+                   row[key.trim().toLowerCase()] = rawRow[key];
+                }
+            }
+
+            // Check common column names in e-GP spreadsheets
+            const itemNo = row['item no'] || row['item number'] || row['item'] || row['item no.'] || row['item code'];
+            const itemCode = row['item code (if any)'] || row['item code'] || row['code'];
+            const description = row['description of item'] || row['description'] || row['item description'];
+            const quantityVal = row['quantity'] || row['qty'] || row['total quantity'];
+            
+            const quantity = parseFloat(quantityVal) || 0;
+            
+            if (quantity > 0) {
+                let matchedItem = undefined;
+
+                // 1. Try to match by item_code (from e-GP) against sorData.item_no
+                if (itemCode && String(itemCode).trim() !== '' && String(itemCode).trim().toUpperCase() !== 'N/A') {
+                    const formattedItemCode = String(itemCode).trim();
+                    matchedItem = sorData.find(s => String(s.item_no) === formattedItemCode || s.item_code === formattedItemCode);
+                }
+
+                // 2. If no match, try to match by item_no (from e-GP) against sorData.item_no
+                // We only do this if itemNo seems like a proper PWD code (contains a dot/dash) or length > 2
+                // Otherwise it will falsely match serial numbers like "1", "2"
+                if (!matchedItem && itemNo && String(itemNo).trim() !== '' && String(itemNo).trim().toUpperCase() !== 'N/A') {
+                    const formattedItemNo = String(itemNo).trim();
+                    if (/[\.\-]/.test(formattedItemNo) || formattedItemNo.length > 2) {
+                        matchedItem = sorData.find(s => String(s.item_no) === formattedItemNo);
+                    }
+                }
+
+                // 3. If no match, try to fuzzy match by description
+                if (!matchedItem && description && String(description).trim() !== '') {
+                    const formattedDesc = String(description).trim().toLowerCase();
+                    matchedItem = sorData.find(s => {
+                        const sDesc = String(s.description).toLowerCase();
+                        return sDesc === formattedDesc || 
+                            (formattedDesc.length > 20 && sDesc.includes(formattedDesc)) || 
+                            (sDesc.length > 20 && formattedDesc.includes(sDesc));
+                    });
+
+                    // 4. Advanced similarity matching using Dice Coefficient (string-similarity)
+                    if (!matchedItem) {
+                        const descriptions = sorData.map(s => String(s.description).toLowerCase());
+                        const match = findBestMatch(formattedDesc, descriptions);
+                        
+                        // Set a threshold (e.g., 0.25 which means a reasonable match for long e-GP descriptions)
+                        if (match.bestMatch.rating > 0.25) {
+                            matchedItem = sorData[match.bestMatchIndex];
+                        }
+                    }
+                }
+                
+                if (matchedItem) {
+                    newItemsFound++;
+                    const existingIndex = finalCart.findIndex(c => c.item_no === matchedItem?.item_no);
+                    if (existingIndex < 0) {
+                        finalCart.push({
+                            id: Math.random().toString(36).substr(2, 9),
+                            item_no: matchedItem.item_no,
+                            description: description ? String(description).trim() : matchedItem.description,
+                            unit: matchedItem.unit,
+                            rates: matchedItem.rates,
+                            quantity
+                        });
+                    } else {
+                        finalCart[existingIndex] = {
+                            ...finalCart[existingIndex],
+                            quantity: finalCart[existingIndex].quantity + quantity
+                        };
+                    }
+                }
+            }
+        });
+        
+        if (newItemsFound > 0) {
+            setCart(finalCart);
+            setUploadMessage({ type: 'success', text: `Successfully extracted ${newItemsFound} items from the BoQ/Excel file and added them to your estimate.` });
+            setTimeout(() => {
+                setActiveTab('estimate');
+            }, 2000);
+        } else {
+            setUploadMessage({ type: 'error', text: 'Could not find any matching PWD SoR 2022 items in the uploaded file. Ensure columns have "Item No" and "Quantity".' });
+        }
+      } catch (err) {
+        setUploadMessage({ type: 'error', text: 'Error parsing file. Please upload a valid Excel or CSV file.' });
+      } finally {
+        setIsProcessing(false);
+      }
+    };
+    reader.readAsBinaryString(file);
+  };
+
+  const dbInputRef = useRef<HTMLInputElement>(null);
+  const globalDbInputRef = useRef<HTMLInputElement>(null);
+  const [isDBProcessing, setIsDBProcessing] = useState(false);
+  const [dbUploadMessage, setDbUploadMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
+
+  const handleDBUpload = async (e: React.ChangeEvent<HTMLInputElement>, isGlobal: boolean = false) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsDBProcessing(true);
+    setDbUploadMessage(null);
+    
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const bstr = evt.target?.result;
+        const wb = XLSX.read(bstr, { type: 'binary' });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const rawData = XLSX.utils.sheet_to_json(ws);
+        
+        let validItems: any[] = [];
+        
+        rawData.forEach((rawRow: any) => {
+            const row: any = {};
+            for (const key in rawRow) {
+                if (key) {
+                   row[key.trim().toLowerCase()] = rawRow[key];
+                }
+            }
+
+            const itemNo = row['item no'] || row['item number'] || row['item'] || row['item no.'] || row['item code'];
+            const description = row['description of item'] || row['description'] || row['item description'] || row['item_description'];
+            const unit = row['unit'] || row['measurement unit'] || row['measure'] || 'Nos';
+            
+            // Getting Rates
+            const getNum = (v: any) => parseFloat(v) || 0;
+            const fallbackRate = getNum(row['rate']) || getNum(row['unit price']) || getNum(row['price']) || getNum(row['unit price in figures (bdt)']) || 0;
+            
+            const dhaka = getNum(row['dhaka']) || getNum(row['dhaka_mymensingh']) || getNum(row['dhaka rate']) || fallbackRate;
+            const chattogram = getNum(row['chattogram']) || getNum(row['chattogram_sylhet']) || getNum(row['chattogram rate']) || fallbackRate;
+            const khulna = getNum(row['khulna']) || getNum(row['khulna_barisal_gopalgonj']) || getNum(row['khulna rate']) || fallbackRate;
+            const rajshahi = getNum(row['rajshahi']) || getNum(row['rajshahi_rangpur']) || getNum(row['rajshahi rate']) || fallbackRate;
+
+            if (itemNo || description) {
+               validItems.push({
+                   item_no: itemNo ? String(itemNo).trim() : `Custom-${Math.random().toString(36).substr(2, 5)}`,
+                   chapter: isGlobal ? 'PWD Standard/Global Upload' : 'Custom User Upload',
+                   category: isGlobal ? 'PWD DB' : 'User Custom DB',
+                   description: description ? String(description).trim() : 'No Description',
+                   unit: String(unit).trim(),
+                   rates: {
+                       Dhaka_Mymensingh: dhaka,
+                       Chattogram_Sylhet: chattogram,
+                       Khulna_Barisal_Gopalgonj: khulna,
+                       Rajshahi_Rangpur: rajshahi
+                   }
+               });
+            }
+        });
+        
+        if (validItems.length > 0) {
+            const user = auth.currentUser;
+            if (user) {
+              const BATCH_SIZE = 400; // Safe limit under 500
+              const targetRef = isGlobal 
+                ? collection(db, 'globalSorItems') 
+                : collection(db, 'users', user.uid, 'sorItems');
+              
+              const chunks = [];
+              for (let i = 0; i < validItems.length; i += BATCH_SIZE) {
+                  chunks.push(validItems.slice(i, i + BATCH_SIZE));
+              }
+
+              for (const chunk of chunks) {
+                  const batch = writeBatch(db);
+                  for (const item of chunk) {
+                      const newDocRef = doc(targetRef); // Auto-generate ID
+                      batch.set(newDocRef, {
+                          id: newDocRef.id,
+                          item_no: item.item_no,
+                          chapter: item.chapter,
+                          category: item.category,
+                          description: item.description,
+                          unit: item.unit,
+                          rates: item.rates,
+                          authorUid: user.uid,
+                          createdAt: serverTimestamp()
+                      });
+                  }
+                  await batch.commit();
+              }
+              setDbUploadMessage({ type: 'success', text: `Successfully saved ${validItems.length} items to your cloud DB (${isGlobal ? 'Global' : 'Personal'}).` });
+            } else {
+              setDbUploadMessage({ type: 'error', text: 'You must be logged in to save SoR data.' });
+            }
+        } else {
+            setDbUploadMessage({ type: 'error', text: 'No valid rows found. Ensure you have "Item No", "Description", and "Rate" columns.' });
+        }
+      } catch (err) {
+        console.error(err);
+        setDbUploadMessage({ type: 'error', text: 'Error parsing DB file. Please upload Excel or CSV.' });
+      } finally {
+        setIsDBProcessing(false);
+      }
+    };
+    reader.readAsBinaryString(file);
+    if (e.target) e.target.value = '';
+  };
+
+  const clearMasterDB = async () => {
+    setIsDBProcessing(true);
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const userSorRef = collection(db, 'users', user.uid, 'sorItems');
+        const snapshot = await getDocs(userSorRef);
+        
+        let batch = writeBatch(db);
+        let count = 0;
+        
+        for (const document of snapshot.docs) {
+          batch.delete(document.ref);
+          count++;
+          if (count === 400) {
+            await batch.commit();
+            batch = writeBatch(db);
+            count = 0;
+          }
+        }
+        
+        if (count > 0) {
+          await batch.commit();
+        }
+        
+        setDbUploadMessage({ type: 'success', text: 'Cleared custom SoR documents. Reverted back to default demo PWD DB.' });
+      } else {
+        setDbUploadMessage({ type: 'error', text: 'You must be logged in.' });
+      }
+    } catch (e) {
+      console.error(e);
+      setDbUploadMessage({ type: 'error', text: 'Failed to reset DB.' });
+    } finally {
+      setIsDBProcessing(false);
+    }
   };
 
   // Calculations
@@ -150,7 +493,17 @@ export const SoRCopilot: React.FC<SoRCopilotProps> = ({ lang }) => {
           )}
         >
           <FileText className="w-4 h-4" />
-          {lang === 'bn' ? 'অটো-BoQ (শীঘ্রই আসছে)' : 'Auto-BoQ (Coming Soon)'}
+          {lang === 'bn' ? 'অটো-BoQ' : 'Auto-BoQ'}
+        </button>
+        <button 
+          onClick={() => setActiveTab('database')}
+          className={cn(
+            "px-6 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2",
+            activeTab === 'database' ? "bg-white text-blue-600 shadow-sm" : "text-slate-600 hover:text-slate-900"
+          )}
+        >
+          <Database className="w-4 h-4" />
+          {lang === 'bn' ? 'মাস্টার ডাটাবেস প্রস্তুত' : 'Manage Data'}
         </button>
       </div>
 
@@ -380,27 +733,141 @@ export const SoRCopilot: React.FC<SoRCopilotProps> = ({ lang }) => {
             )}
           </div>
         </div>
-      ) : (
+      ) : activeTab === 'boq' ? (
         <div className="bg-blue-50 bg-opacity-50 border-2 border-dashed border-blue-200 rounded-3xl p-12 text-center flex flex-col items-center justify-center">
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleFileUpload} 
+            accept=".xlsx, .xls, .csv" 
+            className="hidden" 
+          />
           <div className="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-6">
             <Upload className="w-10 h-10" />
           </div>
           <h2 className="text-2xl font-bold text-slate-900 mb-3">
-            {lang === 'bn' ? 'অটোমেটিক BoQ এস্টিমেশন' : 'Automated BoQ Estimation'}
+            {lang === 'bn' ? 'অটোমেটিক BoQ এস্টিমেশন' : 'Automated BoQ Estimation (Excel/CSV)'}
           </h2>
-          <p className="text-slate-600 max-w-lg mb-8 leading-relaxed">
+          <p className="text-slate-600 max-w-lg mb-6 leading-relaxed">
             {lang === 'bn' 
-              ? 'এখানে আপনার টেন্ডারের ফাঁকা BoQ (PDF) ফাইল আপলোড করলে আমাদের AI ইঞ্জিন অটোমেটিকভাবে সরকারি PWD SoR 2022 রেট অনুযায়ী একটি সম্পূর্ণ এস্টিমেট শট তৈরি করে দিবে। এই ফিচারটি বর্তমানে ডেভেলপমেন্ট পর্যায়ে আছে।' 
-              : 'Upload a blank tender BoQ PDF here, and our AI engine will automatically cross-reference items with the PWD SoR 2022 dataset to generate a fully priced estimation sheet. This feature is currently in development phase.'}
+              ? 'এখানে আপনার টেন্ডারের ফাঁকা BoQ (Excel/CSV) ফাইল আপলোড করুন। আমাদের সিস্টেম অটোমেটিকভাবে আইটেম নম্বর এবং পরিমাণ এক্সট্রেক্ট করে PWD SoR 2022 রেট অনুযায়ী একটি সম্পূর্ণ এস্টিমেট শট তৈরি করে দিবে।' 
+              : 'Upload a tender BoQ Excel or CSV file. The system will automatically parse "Item No" and "Quantity" columns to cross-reference items with the PWD SoR 2022 dataset to generate a fully priced estimation sheet.'}
           </p>
+          
+          {uploadMessage && (
+            <div className={cn(
+                "mb-6 px-4 py-3 rounded-lg text-sm font-medium w-full max-w-md",
+                uploadMessage.type === 'success' ? "bg-green-100 text-green-800 border border-green-200" : "bg-red-100 text-red-800 border border-red-200"
+            )}>
+              {uploadMessage.text}
+            </div>
+          )}
+
           <div className="flex gap-4">
-             <button disabled className="bg-slate-200 text-slate-400 px-6 py-3 rounded-xl font-bold opacity-70 cursor-not-allowed">
-              Upload BoQ PDF
+             <button 
+               onClick={() => fileInputRef.current?.click()}
+               disabled={isProcessing} 
+               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold transition-colors flex items-center gap-2"
+             >
+              {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
+              {lang === 'bn' ? (isProcessing ? 'প্রসেসিং হচ্ছে...' : 'এখান থেকে ফাইল আপলোড করুন') : (isProcessing ? 'Processing...' : 'Upload Excel / CSV')}
              </button>
-             <button onClick={() => setActiveTab('search')} className="bg-white border-2 border-slate-200 text-slate-700 px-6 py-3 rounded-xl font-bold hover:border-slate-300">
+             <button onClick={() => setActiveTab('search')} className="bg-white border-2 border-slate-200 text-slate-700 px-6 py-3 rounded-xl font-bold hover:border-slate-300 transition-colors">
               Return to Search
              </button>
           </div>
+        </div>
+      ) : (
+        <div className="bg-white border border-slate-200 rounded-3xl p-8 space-y-8">
+           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                  {lang === 'bn' ? 'মাস্টার ডাটাবেস প্রস্তুত' : 'Manage Master DB (SoR)'}
+                </h2>
+                <p className="text-slate-500 max-w-2xl text-sm leading-relaxed">
+                  {lang === 'bn' 
+                  ? 'আপনার কাছে সম্পূর্ণ PWD রেট শিডিউলের এক্সেল ফাইল থাকলে, সেটি এখানে আপলোড করুন। এর ফলে সার্চ এবং অটো-BoQ তে আপনার সব আইটেম পাওয়া যাবে।' 
+                  : 'Upload your own comprehensive Schedule of Rates (SoR) in Excel/CSV format to train the system. The system will use your uploaded rates for all searches and BoQ estimates moving forward.'}
+                </p>
+              </div>
+              <div className="bg-blue-50 text-blue-800 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 border border-blue-100">
+                <Database className="w-4 h-4" />
+                {sorData.length} Items Loaded
+              </div>
+           </div>
+
+           <div className="grid md:grid-cols-2 gap-8">
+              <div className="border border-slate-200 rounded-2xl p-6 bg-slate-50 relative overflow-hidden group">
+                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <Database className="w-24 h-24 text-blue-600" />
+                 </div>
+                 <h3 className="text-lg font-bold text-slate-900 mb-2 relative z-10">Upload Custom/Global Database</h3>
+                 <p className="text-sm text-slate-600 mb-6 relative z-10 leading-relaxed">
+                    Excel/CSV columns must contain: <strong>Item No</strong>, <strong>Description</strong>, and <strong>Rate</strong>. (Optional: Unit, Dhaka Rate, Chattogram Rate, etc.)
+                 </p>
+                 
+                 <input 
+                    type="file" 
+                    ref={dbInputRef} 
+                    onChange={(e) => handleDBUpload(e, false)} 
+                    accept=".xlsx, .xls, .csv" 
+                    className="hidden" 
+                 />
+                 <input 
+                    type="file" 
+                    ref={globalDbInputRef} 
+                    onChange={(e) => handleDBUpload(e, true)} 
+                    accept=".xlsx, .xls, .csv" 
+                    className="hidden" 
+                 />
+
+                 {dbUploadMessage && (
+                    <div className={cn(
+                        "mb-4 px-4 py-3 rounded-lg text-sm font-medium",
+                        dbUploadMessage.type === 'success' ? "bg-green-100 text-green-800 border border-green-200" : "bg-red-100 text-red-800 border border-red-200"
+                    )}>
+                      {dbUploadMessage.text}
+                    </div>
+                 )}
+
+                 <div className="space-y-3 relative z-10">
+                   <button 
+                     onClick={() => dbInputRef.current?.click()}
+                     disabled={isDBProcessing} 
+                     className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 w-full shadow-sm"
+                   >
+                    {isDBProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                    {isDBProcessing ? 'Parsing File...' : 'Upload Personal DB Override'}
+                   </button>
+                   
+                   {(userData?.role === 'admin' || auth.currentUser?.email === 'fab.sujit@gmail.com') && (
+                     <button 
+                       onClick={() => globalDbInputRef.current?.click()}
+                       disabled={isDBProcessing} 
+                       className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 w-full shadow-sm"
+                     >
+                      {isDBProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Database className="w-4 h-4" />}
+                      {isDBProcessing ? 'Parsing File...' : 'Upload Global PWD DB (Admin)'}
+                     </button>
+                   )}
+                 </div>
+              </div>
+
+              <div className="border border-slate-200 rounded-2xl p-6 relative overflow-hidden">
+                 <h3 className="text-lg font-bold text-slate-900 mb-2">Revert / Reset</h3>
+                 <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+                    If you uploaded a faulty file or want to revert back to the default built-in PWD sample database, click the reset button below.
+                 </p>
+                 
+                 <button 
+                   onClick={clearMasterDB}
+                   className="bg-white border-2 border-slate-200 text-red-600 hover:bg-red-50 hover:border-red-200 px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 w-full mt-auto"
+                 >
+                  <Trash2 className="w-4 h-4" />
+                  Reset to Default DB
+                 </button>
+              </div>
+           </div>
         </div>
       )}
     </motion.div>

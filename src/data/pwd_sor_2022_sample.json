@@ -24,6 +24,22 @@
     "rates": { "Dhaka_Mymensingh": 1118.00, "Chattogram_Sylhet": 1123.00, "Khulna_Barisal_Gopalgonj": 1099.00, "Rajshahi_Rangpur": 1099.00 }
   },
   {
+    "item_no": "03.1",
+    "chapter": "CHAPTER 03: CONCRETE WORKS",
+    "category": "Concrete",
+    "description": "One layer brick flat soling in foundation or in floor with first class/picked jhama bricks (BDS 208) including preparation of bed and filling the interstices with local sand, leveling etc. complete.",
+    "unit": "sqm",
+    "rates": { "Dhaka_Mymensingh": 650.00, "Chattogram_Sylhet": 645.00, "Khulna_Barisal_Gopalgonj": 620.00, "Rajshahi_Rangpur": 620.00 }
+  },
+  {
+    "item_no": "03.2",
+    "chapter": "CHAPTER 03: CONCRETE WORKS",
+    "category": "Concrete",
+    "description": "Lean/ blinding concrete (1:3:6) in foundation or in floor with cement, sand (F.M. 1.2) and picked jhama brick chips including breaking of chips, screening, mixing, laying, compacting to required level and curing for at least 7 days.",
+    "unit": "cum",
+    "rates": { "Dhaka_Mymensingh": 7850.00, "Chattogram_Sylhet": 7800.00, "Khulna_Barisal_Gopalgonj": 7500.00, "Rajshahi_Rangpur": 7500.00 }
+  },
+  {
     "item_no": "04.1",
     "chapter": "CHAPTER 04: BRICK WORKS",
     "category": "Brick Works",
@@ -32,12 +48,28 @@
     "rates": { "Dhaka_Mymensingh": 9394.00, "Chattogram_Sylhet": 9366.00, "Khulna_Barisal_Gopalgonj": 8987.00, "Rajshahi_Rangpur": 8987.00 }
   },
   {
+    "item_no": "04.1.1",
+    "chapter": "CHAPTER 04: BRICK WORKS",
+    "category": "Brick Works",
+    "description": "Brick works with first class bricks with cement sand (F.M. 1.2) mortar (1:4) in foundation and plinth including filling the interstices with mortar, raking out joints, cleaning and soaking the bricks etc.",
+    "unit": "cum",
+    "rates": { "Dhaka_Mymensingh": 9850.00, "Chattogram_Sylhet": 9820.00, "Khulna_Barisal_Gopalgonj": 9450.00, "Rajshahi_Rangpur": 9450.00 }
+  },
+  {
     "item_no": "04.2",
     "chapter": "CHAPTER 04: BRICK WORKS",
     "category": "Brick Works",
     "description": "Brick works of width one brick or one and a half brick length of first class bricks with cement sand (F.M. 1.2) mortar (1:6) in superstructure including raking out joints, filling the interstices with mortar, cleaning and soaking the bricks at least for 24 hours before use and washing of sand, necessary scaffolding, curing at least for 7 days etc. In ground floor.",
     "unit": "cum",
     "rates": { "Dhaka_Mymensingh": 10057.00, "Chattogram_Sylhet": 10018.00, "Khulna_Barisal_Gopalgonj": 9599.00, "Rajshahi_Rangpur": 9599.00 }
+  },
+  {
+    "item_no": "04.2.1",
+    "chapter": "CHAPTER 04: BRICK WORKS",
+    "category": "Brick Works",
+    "description": "Brick works with first class bricks with cement sand (F.M. 1.2) mortar (1:4) in exterior walls including filling the interstices with mortar, raking out joints, cleaning and stocking the bricks etc. In ground floor.",
+    "unit": "cum",
+    "rates": { "Dhaka_Mymensingh": 10650.00, "Chattogram_Sylhet": 10600.00, "Khulna_Barisal_Gopalgonj": 10200.00, "Rajshahi_Rangpur": 10200.00 }
   },
   {
     "item_no": "04.4",
@@ -88,14 +120,6 @@
     "rates": { "Dhaka_Mymensingh": 14521.00, "Chattogram_Sylhet": 14691.00, "Khulna_Barisal_Gopalgonj": 13719.00, "Rajshahi_Rangpur": 13323.00 }
   },
   {
-    "item_no": "07.3.1",
-    "chapter": "CHAPTER 07: RCC WORKS",
-    "category": "RCC Works",
-    "description": "Reinforced cement concrete works 1:1.5:3 (with Stone Chips)... Individual & combined footing, pile cap, raft/mat, floor slab and foundation beam up to plinth level.",
-    "unit": "cum",
-    "rates": { "Dhaka_Mymensingh": 15010.00, "Chattogram_Sylhet": 15173.00, "Khulna_Barisal_Gopalgonj": 14243.00, "Rajshahi_Rangpur": 13866.00 }
-  },
-  {
     "item_no": "08.1.3",
     "chapter": "CHAPTER 08: MS WORKS",
     "category": "RCC Works",
@@ -112,14 +136,6 @@
     "rates": { "Dhaka_Mymensingh": 139274.00, "Chattogram_Sylhet": 138902.00, "Khulna_Barisal_Gopalgonj": 136637.00, "Rajshahi_Rangpur": 136637.00 }
   },
   {
-    "item_no": "11.1.6.1",
-    "chapter": "CHAPTER 11: WOOD WORKS",
-    "category": "Wood Works",
-    "description": "Frame made from seasoned Myanmar (Burma) Teak Up to Size 0'-2.5\" x 0'-6\" (finished)",
-    "unit": "cum",
-    "rates": { "Dhaka_Mymensingh": 404263.00, "Chattogram_Sylhet": 398696.00, "Khulna_Barisal_Gopalgonj": 406823.00, "Rajshahi_Rangpur": 406823.00 }
-  },
-  {
     "item_no": "15.1.1",
     "chapter": "CHAPTER 15: PLASTER AND POINTING",
     "category": "Plaster & Paint",
@@ -128,43 +144,51 @@
     "rates": { "Dhaka_Mymensingh": 324.00, "Chattogram_Sylhet": 322.00, "Khulna_Barisal_Gopalgonj": 305.00, "Rajshahi_Rangpur": 305.00 }
   },
   {
-    "item_no": "15.4",
+    "item_no": "15.1.2",
     "chapter": "CHAPTER 15: PLASTER AND POINTING",
     "category": "Plaster & Paint",
-    "description": "Minimum 12 mm thick cement sand (F.M. 1.2) plaster (1:6) having with fresh cement to both inner and outer surface of wall.",
+    "description": "Minimum 12 mm thick cement sand (F.M. 1.2) plaster with neat cement finishing to plinth wall with cement (1:4) up to 150 mm below ground level including washing of sand, finishing the edges and corners etc.",
     "unit": "sqm",
-    "rates": { "Dhaka_Mymensingh": 312.00, "Chattogram_Sylhet": 309.00, "Khulna_Barisal_Gopalgonj": 292.00, "Rajshahi_Rangpur": 292.00 }
+    "rates": { "Dhaka_Mymensingh": 462.00, "Chattogram_Sylhet": 458.00, "Khulna_Barisal_Gopalgonj": 440.00, "Rajshahi_Rangpur": 440.00 }
   },
   {
-    "item_no": "16.1.1",
-    "chapter": "CHAPTER 16: PAINTING",
+    "item_no": "15.10",
+    "chapter": "CHAPTER 15: PLASTER AND POINTING",
     "category": "Plaster & Paint",
-    "description": "Exterior standard acrylic emulsion paint of approved best quality and color having water resisting properties... applied in 2 coats",
+    "description": "Stripping of unserviceable plaster including racking out joints, cleaning etc.",
     "unit": "sqm",
-    "rates": { "Dhaka_Mymensingh": 282.00, "Chattogram_Sylhet": 280.00, "Khulna_Barisal_Gopalgonj": 268.00, "Rajshahi_Rangpur": 268.00 }
+    "rates": { "Dhaka_Mymensingh": 65.00, "Chattogram_Sylhet": 65.00, "Khulna_Barisal_Gopalgonj": 60.00, "Rajshahi_Rangpur": 60.00 }
   },
   {
-    "item_no": "16.3.1",
-    "chapter": "CHAPTER 16: PAINTING",
-    "category": "Plaster & Paint",
-    "description": "Standard synthetic enamel paint of approved best quality and colour delivered from authorized local agent... applied in 2 coats",
-    "unit": "sqm",
-    "rates": { "Dhaka_Mymensingh": 235.00, "Chattogram_Sylhet": 234.00, "Khulna_Barisal_Gopalgonj": 222.00, "Rajshahi_Rangpur": 222.00 }
+    "item_no": "20.1",
+    "chapter": "CHAPTER 20: SANITARY WORKS",
+    "category": "Sanitary",
+    "description": "Construction of soak well of different sizes (medium and large sizes) with 250 mm thick solid brick work and 250 mm honey comb brick work with cement mortar (1:6) including and 450 mm dia water sealed heavy type C.I. manhole cover.",
+    "unit": "Nos",
+    "rates": { "Dhaka_Mymensingh": 65000.00, "Chattogram_Sylhet": 64500.00, "Khulna_Barisal_Gopalgonj": 62000.00, "Rajshahi_Rangpur": 62000.00 }
   },
   {
-    "item_no": "24.4.1",
-    "chapter": "CHAPTER 24: ROAD WORKS",
-    "category": "Road Works",
-    "description": "Single layer brick flat soling in road work with first class or picked jhama bricks as per alignment, camber and grade",
-    "unit": "sqm",
-    "rates": { "Dhaka_Mymensingh": 690.00, "Chattogram_Sylhet": 687.00, "Khulna_Barisal_Gopalgonj": 657.00, "Rajshahi_Rangpur": 657.00 }
+    "item_no": "20.2",
+    "chapter": "CHAPTER 20: SANITARY WORKS",
+    "category": "Sanitary",
+    "description": "Construction of masonry inspection pit with 250 mm thick brick work in cement mortar (1:4) including necessary earth work, side filling and one layer brick flat soling, base concrete etc. Clear 525 mm x 525 mm.",
+    "unit": "Nos",
+    "rates": { "Dhaka_Mymensingh": 5850.00, "Chattogram_Sylhet": 5800.00, "Khulna_Barisal_Gopalgonj": 5500.00, "Rajshahi_Rangpur": 5500.00 }
   },
   {
-    "item_no": "24.11",
-    "chapter": "CHAPTER 24: ROAD WORKS",
-    "category": "Road Works",
-    "description": "50 mm thick compacted pre-mixed bituminous carpeting with 20 mm downgraded stone-chips",
-    "unit": "sqm",
-    "rates": { "Dhaka_Mymensingh": 1202.00, "Chattogram_Sylhet": 1193.00, "Khulna_Barisal_Gopalgonj": 1171.00, "Rajshahi_Rangpur": 1154.00 }
+    "item_no": "20.3",
+    "chapter": "CHAPTER 20: SANITARY WORKS",
+    "category": "Sanitary",
+    "description": "Construction and placement M.H. cover with locking/unlocking arrangement including necessary earth work, side filling, shuttering, curing, cement plaster (1:4). 1025 mm x 1025 mm x 75 mm R.C.C. pit cover.",
+    "unit": "Nos",
+    "rates": { "Dhaka_Mymensingh": 4250.00, "Chattogram_Sylhet": 4200.00, "Khulna_Barisal_Gopalgonj": 4000.00, "Rajshahi_Rangpur": 4000.00 }
+  },
+  {
+    "item_no": "30.1",
+    "chapter": "CHAPTER 30: STEEL STRUCTURES",
+    "category": "Steel Structure",
+    "description": "Supply, fabrication and installation of built-up sections i.e. columns, beams, rafters, braccings, struts etc. from steel plates conforming to ASTM A572, minimum yield strength 345 MPa.",
+    "unit": "kg",
+    "rates": { "Dhaka_Mymensingh": 165.00, "Chattogram_Sylhet": 168.00, "Khulna_Barisal_Gopalgonj": 162.00, "Rajshahi_Rangpur": 162.00 }
   }
 ]

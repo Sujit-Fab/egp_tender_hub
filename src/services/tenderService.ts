@@ -48,66 +48,7 @@ export interface AnalysisResult {
   tokensUsed?: number;
 }
 
-async function extractTextFromPdf(base64: string): Promise<string> {
-  const binaryString = window.atob(base64);
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  
-  const loadingTask = pdfjsLib.getDocument({ data: bytes });
-  const pdf = await loadingTask.promise;
-  let fullText = '';
-  
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const textContent = await page.getTextContent();
-    const pageText = textContent.items.map((item: any) => item.str).join(' ');
-    fullText += pageText + '\n';
-  }
-  
-  return fullText;
-}
-
 export async function extractTenderData(fileBase64: string, mimeType: string, fileObj?: File): Promise<Partial<TenderData>> {
-  let extractedText = "";
-  let useLocalText = false;
-  
-  if (mimeType === 'application/pdf') {
-    try {
-      if (fileObj) {
-        const formData = new FormData();
-        formData.append("pdf", fileObj);
-        
-        const res = await fetch('/api/pdf/extract', {
-          method: 'POST',
-          body: formData
-        });
-        
-        if (!res.ok) {
-          const errData = await res.json().catch(() => ({}));
-          throw new Error(errData.error || `HTTP error ${res.status}`);
-        }
-        
-        const data = await res.json();
-        if (data.success && data.text) {
-          extractedText = data.text;
-          useLocalText = true;
-          console.log("Extracted PDF text via backend successfully. Length:", extractedText.length);
-        } else {
-          throw new Error(data.error || 'Unknown error during PDF extraction');
-        }
-      } else {
-        // Fallback to local parsing if fileObj is not available (e.g. some legacy call)
-        extractedText = await extractTextFromPdf(fileBase64);
-        useLocalText = true;
-      }
-    } catch (e) {
-      console.warn("PDF extraction failed, sending raw file to Gemini instead", e);
-    }
-  }
-
   const prompt = `
     You are a professional procurement data extractor. Analyze the provided tender notice document and extract the following details with high precision:
 
@@ -123,7 +64,8 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
       * consultantType: "Firm" or "Individual".
       * paymentType: "Lump-Sum" or "Time-Based".
     - Outsourcing: For Physical Services, determine if it involves "Hiring Service Personnel through Outsourcing Policy" (isOutsourcing: true) or other physical services like maintenance, cleaning, etc. (isOutsourcing: false).
-    - Development Partner Funded: Set to true if the notice mentions funding from World Bank, ADB, JICA, or other international agencies.${useLocalText ? '' : '\n    - Full Text: Provide a comprehensive extraction of all text content from the notice for further analysis.'}
+    - Development Partner Funded: Set to true if the notice mentions funding from World Bank, ADB, JICA, or other international agencies.
+    - Full Text: Provide a comprehensive extraction of all text content from the notice for further analysis.
 
     Return the response strictly in JSON format:
     {
@@ -134,13 +76,33 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
       "consultantType": "Firm" | "Individual",
       "paymentType": "Lump-Sum" | "Time-Based",
       "isOutsourcing": boolean,
-      "isDPFunded": boolean${useLocalText ? '' : ',\n      "fullText": "string"'}
+      "isDPFunded": boolean,
+      "fullText": "string"
     }
   `;
 
-  const contents: any = useLocalText 
-    ? [{ parts: [{ text: prompt + "\n\nDocument Text:\n" + extractedText }] }]
-    : [
+  try {
+    let resData;
+    
+    // Optimized Cloud flow if we have the file object and it's a PDF
+    if (fileObj && mimeType === 'application/pdf') {
+      const formData = new FormData();
+      formData.append("pdf", fileObj);
+      formData.append("prompt", prompt);
+      
+      const res = await fetch('/api/ai/extract-file', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP error ${res.status}`);
+      }
+      resData = await res.json();
+    } else {
+      // Fallback to Base64 flow for images or when File object is missing
+      const contents = [
         {
           parts: [
             { text: prompt },
@@ -148,27 +110,28 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
           ]
         }
       ];
+      
+      const response = await fetch('/api/ai/extract', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents })
+      });
 
-  try {
-    const response = await fetch('/api/ai/extract', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || "Extraction failed on server.");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Extraction failed on server.");
+      }
+      resData = await response.json();
     }
     
-    const resData = await response.json();
-    
-    if (!resData.text) {
-      throw new Error("AI returned an empty response. Please try again with a clearer document.");
+    let text = resData.text.trim();
+    if (text.startsWith("```json")) {
+      text = text.replace(/^```json\n?/, "").replace(/\n?```$/, "").trim();
+    } else if (text.startsWith("```")) {
+      text = text.replace(/^```\n?/, "").replace(/\n?```$/, "").trim();
     }
 
-    const result = JSON.parse(resData.text);
-    console.log("Extracted Result:", result);
+    const result = JSON.parse(text);
     return {
       title: result.title || "",
       nature: result.nature || "Works",
@@ -178,7 +141,7 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
       paymentType: result.paymentType,
       isOutsourcing: result.isOutsourcing || false,
       isDPFunded: result.isDPFunded || false,
-      fullText: useLocalText ? extractedText : (result.fullText || ""),
+      fullText: result.fullText || "",
       tokensUsed: resData.tokensUsed || 0
     };
   } catch (error: any) {
@@ -331,7 +294,13 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
     }
     
     const resData = await response.json();
-    const result = JSON.parse(resData.text || "{}");
+    let text = (resData.text || "{}").trim();
+    if (text.startsWith("```json")) {
+      text = text.replace(/^```json\n?/, "").replace(/\n?```$/, "").trim();
+    } else if (text.startsWith("```")) {
+      text = text.replace(/^```\n?/, "").replace(/\n?```$/, "").trim();
+    }
+    const result = JSON.parse(text);
     
     return {
       stdUsed: result.stdUsed || std,

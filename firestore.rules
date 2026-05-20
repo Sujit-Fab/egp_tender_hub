@@ -131,6 +131,16 @@ service cloud.firestore {
              data.timestamp is timestamp;
     }
 
+    function isValidSorItem(data) {
+      return hasOnlyAllowedFields(['item_no', 'chapter', 'category', 'description', 'unit', 'rates', 'authorUid', 'createdAt']) &&
+             data.item_no is string &&
+             data.description is string &&
+             data.unit is string &&
+             data.rates is map &&
+             data.authorUid == request.auth.uid &&
+             data.createdAt is timestamp;
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
@@ -150,6 +160,13 @@ service cloud.firestore {
                          request.resource.data.scansThisMonth == ('scansThisMonth' in resource.data ? resource.data.scansThisMonth : 0) + 1)
                       )
                     );
+      
+      match /sorItems/{sorItemId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidSorItem(request.resource.data);
+        allow update: if isOwner(userId) && isValidSorItem(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
     }
 
     match /stds/{stdId} {
@@ -173,9 +190,20 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    match /support_tickets/{ticketId} {
+      allow create: if isAuthenticated();
+      allow read: if isAuthenticated() && request.auth.uid == resource.data.userId;
+      allow update, delete: if isAdmin();
+    }
+
     // Allow public read for connection testing
     match /test/{docId} {
       allow read: if true;
+    }
+
+    match /globalSorItems/{sorItemId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAdmin();
     }
 
     match /{path=**} {

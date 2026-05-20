@@ -1,20 +1,27 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User } from 'firebase/auth';
-import { initializeFirestore, doc, collection, setDoc, getDoc, getDocs, query, where, onSnapshot, serverTimestamp, getDocFromServer, deleteDoc, FirestoreError, updateDoc, addDoc, increment } from 'firebase/firestore';
+import { getFirestore, doc, collection, setDoc, getDoc, getDocs, query, where, onSnapshot, serverTimestamp, getDocFromServer, deleteDoc, FirestoreError, updateDoc, addDoc, increment, writeBatch } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import firebaseConfig from '../firebase-applet-config.json';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = initializeFirestore(app, {
-  experimentalForceLongPolling: true
-}, firebaseConfig.firestoreDatabaseId);
+export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const storage = getStorage(app);
 export const googleProvider = new GoogleAuthProvider();
 
 // Auth Helpers
-export const loginWithGoogle = () => signInWithPopup(auth, googleProvider);
+export const loginWithGoogle = async () => {
+  try {
+    return await signInWithPopup(auth, googleProvider);
+  } catch (error: any) {
+    if (error.code === 'auth/popup-blocked') {
+      alert("Login popup was blocked. If you are in the AI Studio preview, please open the app in a new tab (button at the top right) or allow popups for this site.");
+    }
+    throw error;
+  }
+};
 export const logout = () => signOut(auth);
 
 // Error Handling Spec for Firestore Operations
@@ -89,5 +96,5 @@ async function testConnection() {
 }
 testConnection();
 
-export { doc, collection, setDoc, getDoc, getDocs, query, where, onSnapshot, serverTimestamp, onAuthStateChanged, deleteDoc, ref, uploadBytes, getDownloadURL, deleteObject, updateDoc, addDoc, increment };
+export { doc, collection, setDoc, getDoc, getDocs, query, where, onSnapshot, serverTimestamp, onAuthStateChanged, deleteDoc, ref, uploadBytes, getDownloadURL, deleteObject, updateDoc, addDoc, increment, writeBatch };
 export type { User };
