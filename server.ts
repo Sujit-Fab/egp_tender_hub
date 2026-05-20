@@ -126,15 +126,14 @@ async function startServer() {
     try {
       const ai = checkAI();
       const { contents } = req.body;
-      const response = await ai
-        .getGenerativeModel({ model: "gemini-1.5-flash" })
-        .generateContent({
-          contents,
-          generationConfig: { responseMimeType: "application/json" },
-        });
+      const response = await ai.models.generateContent({
+        model: "gemini-1.5-flash",
+        contents,
+        config: { responseMimeType: "application/json" },
+      });
       res.json({
-        text: response.response.text(),
-        tokensUsed: response.response.usageMetadata?.totalTokenCount || 0,
+        text: response.text,
+        tokensUsed: response.usageMetadata?.totalTokenCount || 0,
       });
     } catch (e: any) {
       let key = process.env.CUSTOM_API_KEY || process.env.GEMINI_API_KEY || "";
@@ -347,7 +346,14 @@ async function startServer() {
       }
 
       const notices: any[] = [];
-      const parser = new Parser();
+      const parser = new Parser({
+        customFields: {
+          item: ['description', 'pubDate', 'link', 'title']
+        },
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
+      });
 
       // Fetch e-GP Daily Tenders (RSS)
       try {

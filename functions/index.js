@@ -37,7 +37,14 @@ const getApp = () => {
       }
 
       const notices = [];
-      const parser = new Parser();
+      const parser = new Parser({
+        customFields: {
+          item: ['description', 'pubDate', 'link', 'title']
+        },
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
+      });
 
       // Fetch e-GP Daily Tenders (RSS)
       try {
@@ -203,6 +210,57 @@ const getApp = () => {
       res.json({ text: response.text, tokensUsed: response.usageMetadata?.totalTokenCount || 0 });
     } catch (e) {
       res.status(500).json({ error: e.message || "Extraction failed" });
+    }
+  });
+
+  app.post("/api/ai/extract-file", upload.single("pdf"), async (req, res) => {
+    try {
+      const file = req.file;
+      if (!file) return res.status(400).json({ error: "No file uploaded" });
+
+      const { GoogleGenAI } = require("@google/genai");
+      let key = process.env.CUSTOM_API_KEY || process.env.GEMINI_API_KEY;
+      if (!key) throw new Error("API key missing.");
+      key = key.trim();
+      if (key.startsWith('"') && key.endsWith('"')) key = key.slice(1, -1);
+      if (key.startsWith("'") && key.endsWith("'")) key = key.slice(1, -1);
+      
+      const ai = new GoogleGenAI({ apiKey: key });
+
+      const uploadResult = await ai.files.upload({
+        file: file.path,
+        config: {
+          mimeType: file.mimetype,
+          displayName: file.originalname,
+        },
+      });
+
+      console.log(`Uploaded file ${uploadResult.displayName} as: ${uploadResult.uri}`);
+
+      const { prompt } = req.body;
+      const result = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: [
+          {
+            fileData: {
+              mimeType: uploadResult.mimeType,
+              fileUri: uploadResult.uri,
+            },
+          },
+          { text: prompt },
+        ],
+      });
+
+      if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+
+      res.json({
+        text: result.text,
+        tokensUsed: result.usageMetadata?.totalTokenCount || 0,
+      });
+    } catch (e) {
+      console.error("File extraction failed:", e);
+      if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      res.status(500).json({ error: e.message || "File extraction failed" });
     }
   });
 

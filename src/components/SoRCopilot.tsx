@@ -55,7 +55,6 @@ export const SoRCopilot: React.FC<SoRCopilotProps> = ({ lang, userData }) => {
           setGlobalSorData(snapshot.docs.map(doc => doc.data()));
         }, (err) => {
           console.error("Failed to load global DB", err);
-          handleFirestoreError(err, OperationType.GET, 'globalSorItems');
         });
 
         try {
@@ -65,7 +64,6 @@ export const SoRCopilot: React.FC<SoRCopilotProps> = ({ lang, userData }) => {
             setIsLoadingDB(false);
           }, (err) => {
             console.error("Failed to load custom DB from Firestore", err);
-            handleFirestoreError(err, OperationType.GET, `users/${user.uid}/sorItems`);
             setIsLoadingDB(false);
           });
         } catch (err) {
