@@ -239,7 +239,7 @@ const getApp = () => {
 
       const { prompt } = req.body;
       const result = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-1.5-flash",
         contents: [
           {
             fileData: {
