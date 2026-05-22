@@ -42,16 +42,10 @@ async function startServer() {
     fs.mkdirSync(uploadDir);
   }
 
-  const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, "uploads/");
-    },
-    filename: (req, file, cb) => {
-      cb(null, Date.now() + "-" + file.originalname);
-    },
+  const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 20 * 1024 * 1024 }
   });
-
-  const upload = multer({ storage });
 
   const stdsFilePath = path.join(process.cwd(), "stds.json");
   if (!fs.existsSync(stdsFilePath)) {
@@ -76,7 +70,7 @@ async function startServer() {
     const newStd = {
       id: Date.now().toString(),
       title: title || file.originalname,
-      filename: file.filename,
+      filename: file.originalname,
       category,
       method,
       valueMin: Number(valueMin),
@@ -96,10 +90,6 @@ async function startServer() {
     const stdToDelete = stds.find((s: any) => s.id === id);
 
     if (stdToDelete) {
-      const filePath = path.join(uploadDir, stdToDelete.filename);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
       stds = stds.filter((s: any) => s.id !== id);
       fs.writeFileSync(stdsFilePath, JSON.stringify(stds, null, 2));
       res.json({ success: true });
@@ -158,18 +148,8 @@ async function startServer() {
 
       const ai = new GoogleGenAI({ apiKey: key });
 
-      // Upload to Gemini File API
-      const uploadResult = await ai.files.upload({
-        file: file.path,
-        config: {
-          mimeType: file.mimetype,
-          displayName: file.originalname,
-        },
-      });
-
-      console.log(
-        `Uploaded file ${uploadResult.displayName} as: ${uploadResult.uri}`,
-      );
+      // Convert in-memory buffer to base64
+      const base64Data = file.buffer.toString("base64");
 
       const { prompt } = req.body;
 
@@ -177,17 +157,18 @@ async function startServer() {
         model: "gemini-1.5-flash",
         contents: [
           {
-            fileData: {
-              mimeType: uploadResult.mimeType,
-              fileUri: uploadResult.uri,
-            },
+            parts: [
+              {
+                inlineData: {
+                  mimeType: file.mimetype,
+                  data: base64Data,
+                },
+              },
+              { text: prompt },
+            ],
           },
-          { text: prompt },
         ],
       });
-
-      // Clean up local file
-      fs.unlinkSync(file.path);
 
       res.json({
         text: result.text,
