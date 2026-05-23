@@ -139,10 +139,10 @@ const getApp = () => {
     return filepath;
   };
 
-  // ── FIX: memoryStorage — no disk writes ─────────────────────────────────────
+  // ── multer memoryStorage for other file uploads ──────────────────────────────
   const upload = multer({
     storage: multer.memoryStorage(),
-    limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+    limits: { fileSize: 20 * 1024 * 1024 },
   });
 
   // ── STD routes ───────────────────────────────────────────────────────────────
@@ -199,29 +199,23 @@ const getApp = () => {
     }
   });
 
-  // ── FIX: extract-file uses buffer + inlineData (no file path) ───────────────
-  app.post("/api/ai/extract-file", upload.single("pdf"), async (req, res) => {
+  // ── FIX: extract-file now accepts JSON with base64 — NO multipart ────────────
+  app.post("/api/ai/extract-file", async (req, res) => {
     try {
-      const file = req.file;
-      if (!file) {
-        console.error("No file in request");
-        return res.status(400).json({ error: "No file uploaded" });
+      const { fileData, mimeType, prompt } = req.body;
+
+      if (!fileData) {
+        console.error("No fileData in request body");
+        return res.status(400).json({ error: "No file data provided" });
       }
-
-      console.log(`File received: ${file.originalname}, size: ${file.size}, type: ${file.mimetype}`);
-
-      const { GoogleGenAI } = require("@google/genai");
-      const ai = new GoogleGenAI({ apiKey: getApiKey() });
-
-      // Convert memory buffer to base64 — works in serverless environment
-      const base64Data = file.buffer.toString("base64");
-
-      const { prompt } = req.body;
       if (!prompt) {
         return res.status(400).json({ error: "No prompt provided" });
       }
 
-      console.log("Sending to Gemini API...");
+      console.log(`File received as base64, type: ${mimeType}, size: ~${Math.round(fileData.length * 0.75 / 1024)}KB`);
+
+      const { GoogleGenAI } = require("@google/genai");
+      const ai = new GoogleGenAI({ apiKey: getApiKey() });
 
       const result = await ai.models.generateContent({
         model: "gemini-1.5-flash",
@@ -230,8 +224,8 @@ const getApp = () => {
             parts: [
               {
                 inlineData: {
-                  mimeType: file.mimetype,
-                  data: base64Data,
+                  mimeType: mimeType,
+                  data: fileData,
                 },
               },
               { text: prompt },
@@ -322,7 +316,7 @@ const getApp = () => {
     }
   });
 
-  // ── FIX: pdf/extract uses buffer directly ───────────────────────────────────
+  // ── pdf/extract uses buffer directly ─────────────────────────────────────────
   app.post("/api/pdf/extract", upload.single("pdf"), async (req, res) => {
     try {
       if (!req.file) return res.status(400).json({ error: "No PDF file uploaded" });
@@ -338,7 +332,7 @@ const getApp = () => {
   return app;
 };
 
-// ── Firebase exports ─────────────────────────────────────────────────────────
+// ── Firebase exports ──────────────────────────────────────────────────────────
 exports.api = onRequest(
   {
     timeoutSeconds: 300,
