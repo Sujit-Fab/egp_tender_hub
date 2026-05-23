@@ -1,4 +1,3 @@
-import { GoogleGenAI } from "@google/genai";
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
 
@@ -83,23 +82,35 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
 
   try {
     let resData;
-    
-    // Optimized Cloud flow if we have the file object and it's a PDF
+
+    // ✅ FIX: Send as base64 JSON instead of FormData to avoid multipart/busboy issues in Firebase
     if (fileObj && mimeType === 'application/pdf') {
-      const formData = new FormData();
-      formData.append("pdf", fileObj);
-      formData.append("prompt", prompt);
-      
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result.split(',')[1]); // extract base64 part only
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(fileObj);
+      });
+
       const res = await fetch('/api/ai/extract-file', {
         method: 'POST',
-        body: formData
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileData: base64,
+          mimeType: mimeType,
+          prompt: prompt
+        })
       });
-      
+
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.error || `HTTP error ${res.status}`);
       }
       resData = await res.json();
+
     } else {
       // Fallback to Base64 flow for images or when File object is missing
       const contents = [
@@ -110,7 +121,7 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
           ]
         }
       ];
-      
+
       const response = await fetch('/api/ai/extract', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -123,7 +134,7 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
       }
       resData = await response.json();
     }
-    
+
     let text = resData.text.trim();
     if (text.startsWith("```json")) {
       text = text.replace(/^```json\n?/, "").replace(/\n?```$/, "").trim();
@@ -156,10 +167,10 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
 
   // Find the most relevant STD based on uploaded docs
   let std = "";
-  const matchingStd = uploadedStds.find(s => 
-    s.category === data.nature && 
-    s.method === data.method && 
-    data.value >= s.valueMin && 
+  const matchingStd = uploadedStds.find(s =>
+    s.category === data.nature &&
+    s.method === data.method &&
+    data.value >= s.valueMin &&
     data.value <= s.valueMax
   );
 
@@ -292,7 +303,7 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.error || "Analysis failed on server.");
     }
-    
+
     const resData = await response.json();
     let text = (resData.text || "{}").trim();
     if (text.startsWith("```json")) {
@@ -301,7 +312,7 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
       text = text.replace(/^```\n?/, "").replace(/\n?```$/, "").trim();
     }
     const result = JSON.parse(text);
-    
+
     return {
       stdUsed: result.stdUsed || std,
       score: result.score ?? 0,
