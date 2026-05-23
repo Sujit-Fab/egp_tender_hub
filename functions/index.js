@@ -189,7 +189,7 @@ const getApp = () => {
     try {
       const ai = checkAI();
       const response = await ai.models.generateContent({
-        model: "model: "gemini-2.0-flash"",
+        model: "gemini-2.0-flash",
         contents: req.body.contents,
         config: { responseMimeType: "application/json" },
       });
@@ -218,7 +218,7 @@ const getApp = () => {
       const ai = new GoogleGenAI({ apiKey: getApiKey() });
 
       const result = await ai.models.generateContent({
-        model: "model: "gemini-2.0-flash"",
+        model: "gemini-2.0-flash",
         contents: [
           {
             parts: [
@@ -250,7 +250,7 @@ const getApp = () => {
     try {
       const ai = checkAI();
       const response = await ai.models.generateContent({
-        model: "model: "gemini-2.0-flash"",
+        model: "gemini-2.0-flash",
         contents: req.body.prompt,
         config: { responseMimeType: "application/json" },
       });
@@ -264,7 +264,7 @@ const getApp = () => {
     try {
       const ai = checkAI();
       const response = await ai.models.generateContent({
-        model: "model: "gemini-2.0-flash"",
+        model: "gemini-2.0-flash",
         contents: req.body.contents,
         config: { systemInstruction: req.body.systemInstruction },
       });
@@ -278,7 +278,7 @@ const getApp = () => {
     try {
       const ai = checkAI();
       const response = await ai.models.generateContent({
-        model: "model: "gemini-2.0-flash"",
+        model: "gemini-2.0-flash",
         contents: req.body.prompt,
         config: { responseMimeType: "application/json" },
       });
