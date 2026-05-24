@@ -132,58 +132,58 @@ const getApp = () => {
     return new GoogleGenAI({ apiKey: getApiKey() });
   };
 
-  // ── STD helpers ──────────────────────────────────────────────────────────────
-  const getStdsFilePath = () => {
-    const filepath = path.join(os.tmpdir(), "stds.json");
-    if (!fs.existsSync(filepath)) fs.writeFileSync(filepath, JSON.stringify([]));
-    return filepath;
-  };
-
-  // ── multer memoryStorage for other file uploads ──────────────────────────────
+    // ── multer memoryStorage for other file uploads ──────────────────────────────
   const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 20 * 1024 * 1024 },
   });
 
-  // ── STD routes ───────────────────────────────────────────────────────────────
-  app.get("/api/stds", (req, res) => {
-    res.json(JSON.parse(fs.readFileSync(getStdsFilePath(), "utf8")));
-  });
-
-  app.post("/api/stds/upload", upload.single("file"), (req, res) => {
-    const { category, method, valueMin, valueMax, title } = req.body;
-    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-    const stdsFilePath = getStdsFilePath();
-    const stds = JSON.parse(fs.readFileSync(stdsFilePath, "utf8"));
-    const newStd = {
-      id: Date.now().toString(),
-      title: title || req.file.originalname,
-      filename: req.file.originalname,
-      category,
-      method,
-      valueMin: Number(valueMin),
-      valueMax: Number(valueMax),
-      uploadedAt: new Date().toISOString(),
-    };
-    stds.push(newStd);
-    fs.writeFileSync(stdsFilePath, JSON.stringify(stds, null, 2));
-    res.json(newStd);
-  });
-
-  app.delete("/api/stds/:id", (req, res) => {
-    const { id } = req.params;
-    const stdsFilePath = getStdsFilePath();
-    let stds = JSON.parse(fs.readFileSync(stdsFilePath, "utf8"));
-    const stdToDelete = stds.find((s) => s.id === id);
-    if (stdToDelete) {
-      stds = stds.filter((s) => s.id !== id);
-      fs.writeFileSync(stdsFilePath, JSON.stringify(stds, null, 2));
-      res.json({ success: true });
-    } else {
-      res.status(404).json({ error: "STD not found" });
+ // ── STD routes (Firestore) ───────────────────────────────────────────────────
+  app.get("/api/stds", async (req, res) => {
+    try {
+      const db = admin.firestore();
+      const snapshot = await db.collection("stds").orderBy("uploadedAt", "desc").get();
+      const stds = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      res.json(stds);
+    } catch (e) {
+      res.status(500).json({ error: e.message || "Failed to fetch STDs" });
     }
   });
 
+  app.post("/api/stds/upload", upload.single("file"), async (req, res) => {
+    try {
+      const { category, method, valueMin, valueMax, title } = req.body;
+      if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+      const db = admin.firestore();
+      const newStd = {
+        title: title || req.file.originalname,
+        filename: req.file.originalname,
+        category,
+        method,
+        valueMin: Number(valueMin),
+        valueMax: Number(valueMax),
+        uploadedAt: new Date().toISOString(),
+      };
+      const docRef = await db.collection("stds").add(newStd);
+      res.json({ id: docRef.id, ...newStd });
+    } catch (e) {
+      res.status(500).json({ error: e.message || "Failed to upload STD" });
+    }
+  });
+
+  app.delete("/api/stds/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const db = admin.firestore();
+      const docRef = db.collection("stds").doc(id);
+      const doc = await docRef.get();
+      if (!doc.exists) return res.status(404).json({ error: "STD not found" });
+      await docRef.delete();
+      res.json({ success: true });
+    } catch (e) {
+      res.status(500).json({ error: e.message || "Failed to delete STD" });
+    }
+  });
   // ── AI text routes ───────────────────────────────────────────────────────────
   app.post("/api/ai/extract", async (req, res) => {
     try {
