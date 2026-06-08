@@ -1,10 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", "Noto Sans Bengali", ui-sans-serif, system-ui, sans-serif;
+  --color-headings-navy: #0d2b40;
+  --color-accent-blue: #2f86b3;
+  --color-pass-green: #1f9d6b;
+  --color-fail-red: #d24b4b;
 }
 
 @layer base {
@@ -15,42 +19,180 @@
 
 @layer utilities {
   @media print {
-    header, nav, footer, .lg\:col-span-4, .print\:hidden, .no-print, .md\:hidden.fixed {
-      display: none !important;
+    @page {
+      size: A4;
+      margin: 14mm;
     }
-    .lg\:col-span-8 {
+
+    /* Print only the report */
+    body * {
+      visibility: hidden;
+    }
+
+    #analysisReport, #analysisReport * {
+      visibility: visible;
+    }
+
+    #analysisReport {
+      position: absolute;
+      left: 0;
+      top: 0;
       width: 100% !important;
-      grid-column: span 12 / span 12 !important;
-    }
-    body, .min-h-screen, main {
+      margin: 0 !important;
+      padding: 0 !important;
       background: white !important;
-      color: black !important;
+      color: #0d2b40 !important;
     }
-    /* Neutralize dark mode styles for printing */
-    .dark * {
-      background-color: white !important;
-      color: black !important;
-      border-color: #e2e8f0 !important;
+
+    /* Hide print/download actions, nav, sidebar, etc. */
+    #analysisReport .no-print,
+    #analysisReport .no-print *,
+    .no-print,
+    .no-print * {
+      display: none !important;
+      visibility: hidden !important;
+      height: 0 !important;
+      width: 0 !important;
+      overflow: hidden !important;
+      padding: 0 !important;
+      margin: 0 !important;
     }
-    .bg-slate-50, .bg-blue-50, .bg-emerald-50, .bg-red-50, 
-    .bg-emerald-100, .bg-red-100, .bg-blue-600 {
-      /* Keep specific accent backgrounds for printing */
+
+    /* Force background colors & borders to print */
+    * {
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
-    .rounded-2xl, .rounded-3xl {
-      border-radius: 8px !important;
-      border: 1px solid #cbd5e1 !important;
-      box-shadow: none !important;
-    }
-    .print-avoid-break {
-      page-break-inside: avoid;
-      break-inside: avoid;
-    }
-    .print-container {
+
+    /* Neutralize dark mode for printing */
+    :root, .dark, .dark * {
       background: white !important;
-      margin: 0 !important;
-      padding: 0 !important;
+      background-color: white !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: none !important;
+      text-shadow: none !important;
+    }
+
+    /* Stop responsive breakpoints from collapsing layouts at A4 width */
+    #analysisReport .grid.grid-cols-1.md\:grid-cols-2 {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 1.5rem !important;
+    }
+
+    #analysisReport .grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3 {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr 1fr !important;
+      gap: 1rem !important;
+    }
+
+    #analysisReport .lg\:col-span-2 {
+      grid-column: span 2 / span 2 !important;
+    }
+
+    /* Keep each criterion card as a two-column row */
+    #analysisReport .flex-col.md\:flex-row {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: stretch !important;
+      justify-content: space-between !important;
+      gap: 1.5rem !important;
+      width: 100% !important;
+    }
+
+    #analysisReport .flex-1.flex.flex-col.justify-between.space-y-2 {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      flex: 1 1 auto !important;
+    }
+
+    /* Right requirement/you-have box panel width */
+    #analysisReport .flex.md\:flex-col.gap-2 {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0.5rem !important;
+      width: 150px !important;
+      min-width: 150px !important;
+      max-width: 150px !important;
+      flex-shrink: 0 !important;
+    }
+
+    /* Preserve custom styled panels */
+    .bg-emerald-50, .dark .bg-emerald-50, .bg-emerald-50\/10, .dark .bg-emerald-50\/10 {
+      background-color: #f0fdf4 !important;
+      color: #166534 !important;
+      border: 1px solid #bbf7d0 !important;
+    }
+    .bg-red-50, .dark .bg-red-50, .dark .bg-red-950\/30, .bg-red-50\/10, .dark .bg-red-50\/10 {
+      background-color: #fef2f2 !important;
+      color: #991b1b !important;
+      border: 1px solid #fecaca !important;
+    }
+    .bg-amber-50, .dark .bg-amber-50, .bg-amber-50\/10, .dark .bg-amber-50\/10 {
+      background-color: #fffbeb !important;
+      color: #92400e !important;
+      border: 1px solid #fef3c7 !important;
+    }
+    .bg-blue-50, .dark .bg-blue-50, .bg-blue-50\/10, .dark .bg-blue-50\/10, .bg-indigo-50, .dark .bg-indigo-50 {
+      background-color: #eff6ff !important;
+      color: #1e40af !important;
+      border: 1px solid #bfdbfe !important;
+    }
+    .bg-slate-50, .dark .bg-slate-800\/50, .bg-slate-50\/10, .dark .bg-slate-50\/10 {
+      background-color: #f8fafc !important;
+      color: #334155 !important;
+      border: 1px solid #e2e8f0 !important;
+    }
+
+    .border, .border-slate-200, .dark .border-slate-800 {
+      border: 1px solid #cbd5e1 !important;
+    }
+
+    /* Custom theme color classes */
+    .text-headings-navy { color: #0d2b40 !important; }
+    .bg-headings-navy { background-color: #0d2b40 !important; }
+    .text-accent-blue { color: #2f86b3 !important; }
+    .bg-accent-blue { background-color: #2f86b3 !important; }
+    .text-pass-green { color: #1f9d6b !important; }
+    .bg-pass-green { background-color: #1f9d6b !important; }
+    .border-pass-green { border-color: #1f9d6b !important; }
+    .text-fail-red { color: #d24b4b !important; }
+    .bg-fail-red { background-color: #d24b4b !important; }
+    .border-fail-red { border-color: #d24b4b !important; }
+    .bg-\[\#f2f7fa\] { background-color: #f2f7fa !important; }
+    .bg-\[\#fffaf3\] { background-color: #fffaf3 !important; }
+
+    /* Avoid splitting cards/sections across pages */
+    #analysisReport .print-avoid-break,
+    #analysisReport > div,
+    #analysisReport section,
+    #analysisReport [class*="rounded-2xl"],
+    #analysisReport [id*="box"],
+    #analysisReport [class*="rounded-3xl"] {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+
+    .space-y-6 > * + * {
+      margin-top: 1.5rem !important;
+    }
+
+    #winning-strategy-box, [id*="strategy"] {
+      background-color: #fffaf3 !important;
+      color: #0d2b40 !important;
+      border: 1px solid #fef3c7 !important;
+      border-radius: 12px !important;
+      padding: 1.5rem !important;
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+    }
+    #winning-strategy-box h2, #winning-strategy-box h3, [id*="strategy"] h3 {
+      color: #0d2b40 !important;
+    }
+    #winning-strategy-box .prose, [id*="strategy"] .prose {
+      color: #0d2b40 !important;
     }
   }
 }
