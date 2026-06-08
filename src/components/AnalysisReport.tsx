@@ -36,7 +36,8 @@ export interface ReportInfo {
 
 interface Props {
   result: AnalysisResult;
-  info: ReportInfo;
+  /** Optional tender meta box. If omitted, the meta box is hidden. */
+  info?: ReportInfo;
   lang: 'en' | 'bn';
   /** Optional: called when the "Update Profile" link is clicked (hidden in print). */
   onUpdateProfile?: () => void;
@@ -103,6 +104,7 @@ const AnalysisReport: React.FC<Props> = ({ result, info, lang, onUpdateProfile }
           </p>
         </div>
 
+        {info && (
         <div className="bg-[#f2f7fa] dark:bg-slate-900/60 p-5 rounded-2xl border border-sky-100/60 dark:border-slate-800 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6">
             <div className="space-y-0.5">
@@ -141,6 +143,7 @@ const AnalysisReport: React.FC<Props> = ({ result, info, lang, onUpdateProfile }
             <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500">PPR 2025 compliant</span>
           </div>
         </div>
+        )}
       </div>
 
       {/* Two Cards Side by Side */}
