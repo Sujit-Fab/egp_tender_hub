@@ -2075,15 +2075,15 @@ export default function App() {
                            <div className="space-y-3 flex-1">
                              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700/50">
                                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Liquid Assets</span>
-                               <span className="font-bold text-slate-900 dark:text-white">৳{Number(companyProfile.liquidAssets || 0).toLocaleString()}</span>
+                               <span className="font-bold text-slate-900 dark:text-white">৳{companyProfile.liquidAssets} L</span>
                              </div>
                              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700/50">
                                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Similar Exp.</span>
-                               <span className="font-bold text-slate-900 dark:text-white">৳{Number(companyProfile.similarWorkExperience || 0).toLocaleString()}</span>
+                               <span className="font-bold text-slate-900 dark:text-white">৳{companyProfile.similarWorkExperience} L</span>
                              </div>
                              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700/50">
                                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tender Cap.</span>
-                               <span className="font-bold text-slate-900 dark:text-white">৳{Number(companyProfile.tenderCapacity || 0).toLocaleString()}</span>
+                               <span className="font-bold text-slate-900 dark:text-white">৳{companyProfile.tenderCapacity} L</span>
                              </div>
                            </div>
                            <div className="mt-5 flex items-center justify-between text-sm font-bold text-blue-600 dark:text-blue-400">
@@ -2194,7 +2194,72 @@ export default function App() {
                   )}
 
                   {result && !loading && (
-                      <AnalysisReport result={result} lang={lang} onUpdateProfile={() => setView('profile')} />
+                      (() => {
+                        const tenderInfo = (() => {
+                          const text = (formData?.fullText || scannedText || '');
+                          if (!text || text.trim().length < 40) return undefined; // no tender document -> hide meta box
+
+                          // Tender ID (typically 6 digits)
+                          let tenderId = 'Not specified';
+                          const idMatch = text.match(/Tender ID\s*[:：]\s*(\d+)/i) ||
+                                          text.match(/Tender ID\s+(\d+)/i) ||
+                                          text.match(/আইডি\s*[:：]\s*(\d+)/) ||
+                                          text.match(/ID\s*[:：]\s*(\d+)/i);
+                          if (idMatch) tenderId = idMatch[1];
+                          else {
+                            const sixDigits = text.substring(0, 2000).match(/\b\d{6}\b/);
+                            if (sixDigits) tenderId = sixDigits[0];
+                          }
+
+                          // Reference + Date
+                          let refNo = '';
+                          const refMatch = text.match(/(?:Invitation|Memo|Ref)\s*(?:No|)\s*[:.\s]+([^\n,;]+)/i) ||
+                                           text.match(/স্মারক\s*নম্বর\s*[:.\s]+([^\n,;]+)/) ||
+                                           text.match(/সূত্র\s*[:.\s]+([^\n,;]+)/);
+                          if (refMatch) refNo = refMatch[1].trim();
+                          let dateStr = '';
+                          const dateMatch = text.match(/(?:Date|তারিখ)\s*[:.\s]+([0-9\-\/A-Za-z ]+)/i);
+                          if (dateMatch) dateStr = dateMatch[1].trim();
+                          const refAndDate = refNo ? (dateStr ? `${refNo} (${dateStr})` : refNo) : 'Not specified';
+
+                          // Procuring Entity
+                          let procuringEntity = 'Not specified';
+                          const peMatch = text.match(/(?:Procuring|Executive|Superintending|Chief)\s+Engineer[^\n]+/i) ||
+                                          text.match(/(?:Procuring\s+Entity|PE)\s*[:.\s]+([^\n]+)/i) ||
+                                          text.match(/দপ্তর\/সংস্থা\s*[:.\s]+([^\n]+)/) ||
+                                          text.match(/নির্বাহী\s+প্রকৌশলী[^\n]+/);
+                          if (peMatch) {
+                            procuringEntity = peMatch[0].trim();
+                            if (procuringEntity.toLowerCase().includes('entity:')) {
+                              procuringEntity = procuringEntity.split(/entity:/i)[1].trim();
+                            }
+                          }
+
+                          // Brief
+                          const brief = formData?.title || result?.tenderSubject || 'Not specified';
+
+                          // Closing
+                          let closing = 'Not specified';
+                          const closingMatch = text.match(/(?:Closing|Opening)\s*(?:Date|Time|)\s*[:.\s]+([0-9\-\/A-Za-z :]+)/i) ||
+                                               text.match(/বন্ধের\s*তারিখ\s*[:.\s]+([^\n]+)/);
+                          if (closingMatch) closing = closingMatch[1].trim();
+
+                          // Tender Security
+                          let security = 'Not specified';
+                          const securityMatch = text.match(/(?:Security|জামানত)\s*[:.\s]+(?:BDT|Tk\.|৳)?\s*([0-9,]+)/i) ||
+                                                text.match(/(?:Tender Security|বিজনেস জামানত)[^\n]+/i);
+                          if (securityMatch) {
+                            security = securityMatch[0].trim();
+                            if (security.toLowerCase().includes('security:')) {
+                              security = security.split(/security:/i)[1].trim();
+                            }
+                          }
+
+                          return { tenderId, refAndDate, procuringEntity, brief, closing, security };
+                        })();
+
+                        return <AnalysisReport result={result} info={tenderInfo} lang={lang} onUpdateProfile={() => setView('profile')} />;
+                      })()
                   )}
                 </AnimatePresence>
               </div>
