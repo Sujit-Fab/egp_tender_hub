@@ -140,7 +140,7 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
       * paymentType: "Lump-Sum" or "Time-Based".
     - Outsourcing: For Physical Services, determine if it involves "Hiring Service Personnel through Outsourcing Policy" (isOutsourcing: true) or other physical services like maintenance, cleaning, etc. (isOutsourcing: false).
     - Development Partner Funded: Set to true if the notice mentions funding from World Bank, ADB, JICA, or other international agencies.
-    - Full Text: Provide a comprehensive extraction of all text content from the notice for further analysis.
+    - Full Text: Reproduce the COMPLETE text of the document VERBATIM — every clause, number, date and threshold exactly as written. Do NOT summarize, paraphrase, shorten or omit anything (especially qualification/financial clause values such as experience years, turnover, similar-contract values, liquid assets, supply capacity). This raw text drives the clause-by-clause analysis, so completeness and exactness are critical.
 
     Return the response strictly in JSON format:
     {
@@ -411,8 +411,10 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
     supply/production capacity, liquid assets, etc.):
       1. Search the tender (ITT clauses and the Tender Data Sheet) for an EXPLICITLY STATED value tied
          to that clause.
-      2. If a stated value exists, USE IT. Set the source to "stated", record the clause reference, and quote
-         the exact snippet of text it came from in the comparison reason.
+      2. If a stated value exists, USE THAT EXACT NUMBER — copy it verbatim from the text. NEVER substitute a
+         "typical", "standard" or default value (e.g. do NOT output 5 years when the text says 3 years, or
+         7,50,000 when the text says 25,00,000). Set the source to "stated", record the clause reference, and
+         quote the exact snippet of text it came from in the comparison reason.
       3. ONLY if no value is stated anywhere, compute the documented fallback formula, set the source to
          "derived", and record which formula you used.
       4. A formula must NEVER override a stated value. If you output a derived value while a stated value
@@ -495,7 +497,7 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
     ========================================================================
     Before returning JSON, verify all of the following:
       (a) Every product/licence you mention is consistent with "tenderSubject"; nothing foreign appears.
-      (b) Under EVERY criterion in the "criteria" list, you MUST include the exact matching TDS/ITT source text line as a "Snippet:" quote (evidence / traceability). Format this exactly as 'Snippet: "exact quoted text..."' as part of the 'note' property. This is a mandatory requirement for ALL criteria.
+      (b) Under EVERY criterion, the "Snippet:" MUST be copied VERBATIM (character-for-character) from the provided "Tender Notice Text" — it is evidence, never a paraphrase. NEVER invent, paraphrase, or place an assumed/derived number inside a Snippet. If the provided text contains NO line matching this criterion (i.e. the value is derived, not stated), you MUST write exactly: Snippet: "Not stated in the provided document — requirement derived from standard PPR 2025 guidelines." and that criterion's source MUST be "derived". A fabricated or paraphrased quote is a critical error.
       (c) No criterion that does not appear in the tender is included in the "criteria" list.
       (d) All monetary values are integer BDT (no Lac/Crore words, no commas, no ৳).
       (e) "estimatedValue" is null unless explicitly stated in the document.
