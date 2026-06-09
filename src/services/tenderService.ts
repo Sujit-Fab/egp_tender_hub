@@ -225,6 +225,27 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
     }
 
     const result = JSON.parse(text);
+
+    // Get the COMPLETE verbatim text via server-side pdf-parse. Gemini's JSON "fullText" truncates/paraphrases
+    // long documents and drops clause numbers; pdf-parse returns the full text layer, so stated thresholds
+    // (experience years, turnover, liquid assets, contract values, supply capacity, etc.) survive for accurate analysis.
+    let verbatimText = "";
+    if (fileObj && mimeType === 'application/pdf') {
+      try {
+        const fd = new FormData();
+        fd.append('pdf', fileObj);
+        const rawRes = await fetch('/api/pdf/extract', { method: 'POST', body: fd });
+        if (rawRes.ok) {
+          const rawData = await rawRes.json();
+          const rawText = (rawData && rawData.text) ? String(rawData.text).trim() : "";
+          // Use raw text only if substantive; scanned/image PDFs yield little, so fall back to the model text.
+          if (rawText.length > 200) verbatimText = rawText;
+        }
+      } catch (e) {
+        console.warn("pdf-parse raw text fetch failed; using model fullText instead.", e);
+      }
+    }
+
     return {
       title: result.title || "",
       nature: result.nature || "Works",
@@ -234,7 +255,7 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
       paymentType: result.paymentType,
       isOutsourcing: result.isOutsourcing || false,
       isDPFunded: result.isDPFunded || false,
-      fullText: result.fullText || "",
+      fullText: verbatimText || result.fullText || "",
       tokensUsed: resData.tokensUsed || 0
     };
   } catch (error: any) {
