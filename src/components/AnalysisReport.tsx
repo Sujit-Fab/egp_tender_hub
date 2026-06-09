@@ -214,8 +214,9 @@ const AnalysisReport: React.FC<Props> = ({ result, info, lang, onUpdateProfile }
           </div>
 
           <div className="space-y-3">
-            {result.companyMatch.map((match: any, idx: number) => {
+            {result.companyMatch.filter((m: any) => m.met !== 'EXCLUDED').map((match: any, idx: number) => {
               const isMet = match.met === true;
+              const isData = match.met === 'data-needed';
 
               let plainNote = match.reason || '';
               let snippetText = '';
@@ -235,7 +236,7 @@ const AnalysisReport: React.FC<Props> = ({ result, info, lang, onUpdateProfile }
                   key={idx}
                   className={cn(
                     'flex flex-col md:flex-row md:items-stretch justify-between gap-6 p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm transition-all print-avoid-break',
-                    isMet ? 'border-l-4 border-l-pass-green' : 'border-l-4 border-l-fail-red'
+                    isMet ? 'border-l-4 border-l-pass-green' : isData ? 'border-l-4 border-l-[#f59e0b]' : 'border-l-4 border-l-fail-red'
                   )}
                 >
                   <div className="flex-1 flex flex-col justify-between space-y-2">
@@ -245,6 +246,10 @@ const AnalysisReport: React.FC<Props> = ({ result, info, lang, onUpdateProfile }
                         {isMet ? (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-pass-green/10 text-pass-green border border-pass-green/20">
                             ✓ {lang === 'bn' ? 'মেলেছে' : 'MET'}
+                          </span>
+                        ) : isData ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-[#fef3c7] text-[#b45309] border border-[#fcd34d]">
+                            ⚠ {lang === 'bn' ? 'তথ্য প্রয়োজন' : 'DATA NEEDED'}
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-fail-red/10 text-fail-red border border-fail-red/20">
@@ -276,7 +281,7 @@ const AnalysisReport: React.FC<Props> = ({ result, info, lang, onUpdateProfile }
                     </div>
                     <div className={cn(
                       'border p-2.5 rounded-xl text-center flex-1 md:flex-initial',
-                      isMet ? 'bg-pass-green/5 border-pass-green/20 text-pass-green' : 'bg-fail-red/5 border-fail-red/20 text-fail-red'
+                      isMet ? 'bg-pass-green/5 border-pass-green/20 text-pass-green' : isData ? 'bg-[#fffbeb] border-[#fde68a] text-[#b45309]' : 'bg-fail-red/5 border-fail-red/20 text-fail-red'
                     )}>
                       <span className="text-[9px] font-black uppercase tracking-wider block mb-0.5 opacity-85">
                         {lang === 'bn' ? 'আপনার আছে' : 'YOU HAVE'}

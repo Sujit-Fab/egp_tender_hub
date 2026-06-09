@@ -2075,15 +2075,15 @@ export default function App() {
                            <div className="space-y-3 flex-1">
                              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700/50">
                                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Liquid Assets</span>
-                               <span className="font-bold text-slate-900 dark:text-white">৳{companyProfile.liquidAssets} L</span>
+                               <span className="font-bold text-slate-900 dark:text-white">৳{Number(companyProfile.liquidAssets || 0).toLocaleString()}</span>
                              </div>
                              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700/50">
                                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Similar Exp.</span>
-                               <span className="font-bold text-slate-900 dark:text-white">৳{companyProfile.similarWorkExperience} L</span>
+                               <span className="font-bold text-slate-900 dark:text-white">৳{Number(companyProfile.similarWorkExperience || 0).toLocaleString()}</span>
                              </div>
                              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700/50">
                                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tender Cap.</span>
-                               <span className="font-bold text-slate-900 dark:text-white">৳{companyProfile.tenderCapacity} L</span>
+                               <span className="font-bold text-slate-900 dark:text-white">৳{Number(companyProfile.tenderCapacity || 0).toLocaleString()}</span>
                              </div>
                            </div>
                            <div className="mt-5 flex items-center justify-between text-sm font-bold text-blue-600 dark:text-blue-400">
