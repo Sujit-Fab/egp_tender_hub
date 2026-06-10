@@ -303,6 +303,15 @@ export function classifyCriterion(c: Criterion): CriterionStatus {
     }
   }
 
+  // A present value whose compliance the AI left UNCONFIRMED (satisfied is neither true nor false)
+  // must NOT be assumed compliant. This guards non-numeric checks — licences, certificates and
+  // documents (e.g. a VAT/Trade licence that is present but whose required validity/currency is
+  // unknown). Honesty policy: never assume compliance. Mandatory -> DATA_NEEDED, optional -> N/A.
+  // Numeric criteria are excluded here because the numeric comparison above is authoritative.
+  if (c.kind !== 'numeric' && c.satisfied !== true && c.satisfied !== false) {
+    return c.mandatory ? 'DATA_NEEDED' : 'NOT_APPLICABLE';
+  }
+
   // Value present but for the WRONG product/category -> MISMATCH.
   // Note: if c.satisfied is explicitly false and it is related to experience or capacity or categorical matching, it is MISMATCH.
   if (c.satisfied === false) {
@@ -516,6 +525,17 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
     - If a required field is genuinely blank / missing / "Unknown / Unset" in the company profile (e.g. BERC, Fire, DLS when unset in the profile), set "valuePresent" to false. Do NOT mark it as MISMATCH.
     - Only present-but-wrong cases (like an IT Manufacturer's Authorization on an LPG tender, or IT contracts on an Animal Feed tender) become MISMATCH. Set "valuePresent" = true but "satisfied" = false.
     - Describe the mismatch or missing field explicitly, naming both what they have and what is required.
+    - LICENCE / DOCUMENT VALIDITY — NEVER ASSUME: For any licence, certificate or document criterion
+      (Trade Licence, TIN, VAT/BIN, Electrical, Fire, BERC, DLS, enlistment / blue book, audit reports, etc.):
+        * Set "satisfied" = true ONLY when the profile positively confirms the item is present AND — where the
+          tender requires a specific validity period, "up to date" status, or a given FY — its validity is
+          confirmed to cover that period.
+        * If the item is present but its required validity / currency is "N/A", blank, or otherwise NOT confirmed
+          by the profile, set "satisfied" = null (present but unconfirmed). NEVER assume it is current and NEVER
+          write phrases like "assumed up-to-date". In the note, state plainly that validity could not be confirmed
+          from the profile and must be verified by the bidder.
+        * Set "satisfied" = false only when the item is present but clearly wrong, expired, or insufficient.
+        * For every non-numeric criterion, "satisfied" MUST be exactly true, false, or null — never omit it.
 
     ========================================================================
     RULE 8 — DO NOT COMPUTE SCORE OR BADGES (APP COMPUTES THEM)
@@ -661,7 +681,7 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
           "kind": "numeric" | "categorical" | "boolean",
           "weight": number, // 0 if completely excluded/non-applicable under category rules, 1 otherwise
           "valuePresent": boolean, // is there any value in the profile for this item? Set to false if missing/unset in the profile
-          "satisfied": boolean | null, // does the present value actually meet the requirement? If the value is present but for the WRONG product/category (such as IT authorization on an LPG tender), set satisfied=false - do NOT mark it as missing data!
+          "satisfied": boolean | null, // does the present value actually meet the requirement? If the value is present but for the WRONG product/category (such as IT authorization on an LPG tender), set satisfied=false - do NOT mark it as missing data! For a licence/document that is present but whose required validity/currency cannot be confirmed from the profile, set satisfied=null (present but unconfirmed) — never assume it is up-to-date.
           "requiredValue": number | null, // stated numeric requirement threshold (plain integer value, e.g. BDT, years, count), or null
           "haveValue": number | null, // bidder's numeric profile value, or null
           "unitsComparable": boolean | null, // false when units/goods don't line up, e.g. "units" vs "pc" or different product domains, otherwise true/null
