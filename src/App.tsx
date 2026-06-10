@@ -2196,66 +2196,17 @@ export default function App() {
                   {result && !loading && (
                       (() => {
                         const tenderInfo = (() => {
-                          const text = (formData?.fullText || scannedText || '');
-                          if (!text || text.trim().length < 40) return undefined; // no tender document -> hide meta box
-
-                          // Tender ID (typically 6 digits)
-                          let tenderId = 'Not specified';
-                          const idMatch = text.match(/Tender ID\s*[:：]\s*(\d+)/i) ||
-                                          text.match(/Tender ID\s+(\d+)/i) ||
-                                          text.match(/আইডি\s*[:：]\s*(\d+)/) ||
-                                          text.match(/ID\s*[:：]\s*(\d+)/i);
-                          if (idMatch) tenderId = idMatch[1];
-                          else {
-                            const sixDigits = text.substring(0, 2000).match(/\b\d{6}\b/);
-                            if (sixDigits) tenderId = sixDigits[0];
-                          }
-
-                          // Reference + Date
-                          let refNo = '';
-                          const refMatch = text.match(/(?:Invitation|Memo|Ref)\s*(?:No|)\s*[:.\s]+([^\n,;]+)/i) ||
-                                           text.match(/স্মারক\s*নম্বর\s*[:.\s]+([^\n,;]+)/) ||
-                                           text.match(/সূত্র\s*[:.\s]+([^\n,;]+)/);
-                          if (refMatch) refNo = refMatch[1].trim();
-                          let dateStr = '';
-                          const dateMatch = text.match(/(?:Date|তারিখ)\s*[:.\s]+([0-9\-\/A-Za-z ]+)/i);
-                          if (dateMatch) dateStr = dateMatch[1].trim();
-                          const refAndDate = refNo ? (dateStr ? `${refNo} (${dateStr})` : refNo) : 'Not specified';
-
-                          // Procuring Entity
-                          let procuringEntity = 'Not specified';
-                          const peMatch = text.match(/(?:Procuring|Executive|Superintending|Chief)\s+Engineer[^\n]+/i) ||
-                                          text.match(/(?:Procuring\s+Entity|PE)\s*[:.\s]+([^\n]+)/i) ||
-                                          text.match(/দপ্তর\/সংস্থা\s*[:.\s]+([^\n]+)/) ||
-                                          text.match(/নির্বাহী\s+প্রকৌশলী[^\n]+/);
-                          if (peMatch) {
-                            procuringEntity = peMatch[0].trim();
-                            if (procuringEntity.toLowerCase().includes('entity:')) {
-                              procuringEntity = procuringEntity.split(/entity:/i)[1].trim();
-                            }
-                          }
-
-                          // Brief
-                          const brief = formData?.title || result?.tenderSubject || 'Not specified';
-
-                          // Closing
-                          let closing = 'Not specified';
-                          const closingMatch = text.match(/(?:Closing|Opening)\s*(?:Date|Time|)\s*[:.\s]+([0-9\-\/A-Za-z :]+)/i) ||
-                                               text.match(/বন্ধের\s*তারিখ\s*[:.\s]+([^\n]+)/);
-                          if (closingMatch) closing = closingMatch[1].trim();
-
-                          // Tender Security
-                          let security = 'Not specified';
-                          const securityMatch = text.match(/(?:Security|জামানত)\s*[:.\s]+(?:BDT|Tk\.|৳)?\s*([0-9,]+)/i) ||
-                                                text.match(/(?:Tender Security|বিজনেস জামানত)[^\n]+/i);
-                          if (securityMatch) {
-                            security = securityMatch[0].trim();
-                            if (security.toLowerCase().includes('security:')) {
-                              security = security.split(/security:/i)[1].trim();
-                            }
-                          }
-
-                          return { tenderId, refAndDate, procuringEntity, brief, closing, security };
+                          // Built from AI-extracted structured fields (format-agnostic) — no regex parsing.
+                          const hasInfo = !!(formData?.tenderId || formData?.referenceNo || formData?.procuringEntity || formData?.closingDateTime || formData?.tenderSecurity);
+                          if (!hasInfo) return undefined; // no document metadata extracted -> hide the box
+                          return {
+                            tenderId: formData?.tenderId || 'Not specified',
+                            refAndDate: formData?.referenceNo || 'Not specified',
+                            procuringEntity: formData?.procuringEntity || 'Not specified',
+                            brief: formData?.title || result?.tenderSubject || 'Not specified',
+                            closing: formData?.closingDateTime || 'Not specified',
+                            security: formData?.tenderSecurity || 'Not specified',
+                          };
                         })();
 
                         return <AnalysisReport result={result} info={tenderInfo} lang={lang} onUpdateProfile={() => setView('profile')} />;
