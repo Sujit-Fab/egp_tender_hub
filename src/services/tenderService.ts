@@ -12,6 +12,12 @@ export interface TenderData {
   isOutsourcing?: boolean; // For Physical Services
   consultantType?: 'Firm' | 'Individual'; // For Consultancy
   paymentType?: 'Lump-Sum' | 'Time-Based'; // For Consultancy
+  // Document metadata for the report header (AI-extracted, format-agnostic)
+  tenderId?: string;
+  referenceNo?: string;
+  procuringEntity?: string;
+  closingDateTime?: string;
+  tenderSecurity?: string;
   fullText?: string;
   tokensUsed?: number;
 }
@@ -140,6 +146,12 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
       * paymentType: "Lump-Sum" or "Time-Based".
     - Outsourcing: For Physical Services, determine if it involves "Hiring Service Personnel through Outsourcing Policy" (isOutsourcing: true) or other physical services like maintenance, cleaning, etc. (isOutsourcing: false).
     - Development Partner Funded: Set to true if the notice mentions funding from World Bank, ADB, JICA, or other international agencies.
+    - Tender ID: The tender/proposal ID number (look for "Tender/Proposal ID", "Tender ID"). Empty string if not present.
+    - Reference No: The invitation/memo reference number (look for "Invitation Reference No.", "Tender Ref", "Memo No", "স্মারক নম্বর"). Empty string if not present.
+    - Procuring Entity: The procuring entity / office name (look for "Procuring Entity", "Executive Engineer ...", "নির্বাহী প্রকৌশলী ..."). Return ONLY the entity name, WITHOUT the "Procuring Entity:" prefix. Empty string if not present.
+    - Closing Date/Time: The tender closing (submission deadline) date and time exactly as stated (e.g. "14-Jun-2026 14:00"). Empty string if not present. Do NOT confuse it with the opening date.
+    - Tender Security: The tender security amount or stated text (e.g. "Tk. 2,50,000" or "As per e-Tender Notice"). Empty string if not present.
+    IMPORTANT for the five fields above: copy values EXACTLY from the document; if a field is not present, return an EMPTY STRING — never guess or invent.
     - Full Text: Reproduce the COMPLETE text of the document VERBATIM — every clause, number, date and threshold exactly as written. Do NOT summarize, paraphrase, shorten or omit anything (especially qualification/financial clause values such as experience years, turnover, similar-contract values, liquid assets, supply capacity). This raw text drives the clause-by-clause analysis, so completeness and exactness are critical.
 
     Return the response strictly in JSON format:
@@ -152,6 +164,11 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
       "paymentType": "Lump-Sum" | "Time-Based",
       "isOutsourcing": boolean,
       "isDPFunded": boolean,
+      "tenderId": "string",
+      "referenceNo": "string",
+      "procuringEntity": "string",
+      "closingDateTime": "string",
+      "tenderSecurity": "string",
       "fullText": "string"
     }
   `;
@@ -255,6 +272,11 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
       paymentType: result.paymentType,
       isOutsourcing: result.isOutsourcing || false,
       isDPFunded: result.isDPFunded || false,
+      tenderId: result.tenderId || "",
+      referenceNo: result.referenceNo || "",
+      procuringEntity: result.procuringEntity || "",
+      closingDateTime: result.closingDateTime || "",
+      tenderSecurity: result.tenderSecurity || "",
       fullText: verbatimText || result.fullText || "",
       tokensUsed: resData.tokensUsed || 0
     };
