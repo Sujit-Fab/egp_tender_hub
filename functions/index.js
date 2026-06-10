@@ -236,8 +236,23 @@ const getApp = () => {
 
       console.log("Gemini response received successfully");
 
+      // Also extract the COMPLETE verbatim text layer via pdf-parse on the SAME base64 buffer (no multipart).
+      // Gemini's JSON output truncates/paraphrases long PDFs and drops clause numbers; pdf-parse keeps them all.
+      let rawText = "";
+      if (mimeType === "application/pdf") {
+        try {
+          const pdfParse = require("pdf-parse/lib/pdf-parse");
+          const buffer = Buffer.from(fileData, "base64");
+          const pdfData = await pdfParse(buffer);
+          rawText = pdfData.text || "";
+        } catch (pdfErr) {
+          console.warn("pdf-parse failed in extract-file:", pdfErr.message);
+        }
+      }
+
       res.json({
         text: result.text,
+        rawText: rawText,
         tokensUsed: result.usageMetadata?.totalTokenCount || 0,
       });
     } catch (e) {
