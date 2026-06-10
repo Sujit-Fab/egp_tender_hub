@@ -1643,7 +1643,16 @@ export default function App() {
         title: extracted.title || prev.title,
         nature: extracted.nature || prev.nature,
         value: extracted.value || prev.value,
-        method: extracted.method || prev.method
+        method: extracted.method || prev.method,
+        // Carry the verbatim TDS text into the form so analyzeTender() actually sees the
+        // stated clause numbers (e.g. 125/115/65 Lakh) instead of deriving from estimated value.
+        fullText: extracted.fullText || prev.fullText,
+        // Carry the AI-extracted metadata so the tender info-box renders.
+        tenderId: extracted.tenderId || prev.tenderId,
+        referenceNo: extracted.referenceNo || prev.referenceNo,
+        procuringEntity: extracted.procuringEntity || prev.procuringEntity,
+        closingDateTime: extracted.closingDateTime || prev.closingDateTime,
+        tenderSecurity: extracted.tenderSecurity || prev.tenderSecurity
       }));
     } catch (err) {
       setError('Failed to scan notice. Please enter details manually.');
