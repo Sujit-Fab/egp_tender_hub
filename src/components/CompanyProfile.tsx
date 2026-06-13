@@ -14,7 +14,8 @@ import {
   Briefcase, 
   ShieldAlert, 
   Boxes, 
-  UserCheck 
+  UserCheck,
+  TrendingDown
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { CompanyProfile, KeyPersonnelRow, EquipmentRow, LicenseStatus } from '../services/tenderService';
@@ -46,6 +47,10 @@ export const CompanyProfileSettings: React.FC<Props> = ({ profile, onSave, lang 
       supplyCapacity: profile.supplyCapacity ?? '',
       manufacturerAuthorization: profile.manufacturerAuthorization ?? { hasAuth: '', items: '' },
       isJV: profile.isJV ?? false,
+      existingCommitmentsValue: profile.existingCommitmentsValue ?? 0,
+      committedLiquidAssets: profile.committedLiquidAssets ?? 0,
+      committedManpower: profile.committedManpower ?? '',
+      committedEquipment: profile.committedEquipment ?? '',
       foreignCurrency: profile.foreignCurrency ?? 'USD',
       foreignExchangeRate: profile.foreignExchangeRate ?? 118,
       foreignLiquidAssetsOriginal: profile.foreignLiquidAssetsOriginal ?? 0,
@@ -74,6 +79,7 @@ export const CompanyProfileSettings: React.FC<Props> = ({ profile, onSave, lang 
   const [saved, setSaved] = useState(false);
   const [openSections, setOpenSections] = useState({
     financials: true,
+    commitments: true,
     technical: true,
     licenses: true,
     goods: true
@@ -720,6 +726,142 @@ export const CompanyProfileSettings: React.FC<Props> = ({ profile, onSave, lang 
                     </div>
                   </div>
                 )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Accordion 1b: Existing & Ongoing Commitments — Sarkar saab improvement */}
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xs border border-amber-200 dark:border-amber-900/50 overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('commitments')}
+            className="w-full flex items-center justify-between p-6 bg-amber-50 dark:bg-amber-900/10 border-b border-amber-100 dark:border-amber-900/30 text-left cursor-pointer transition-colors hover:bg-amber-100/50 dark:hover:bg-amber-900/20"
+          >
+            <div className="flex items-center gap-3">
+              <TrendingDown className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  {lang === 'bn' ? 'চলমান কাজ ও প্রতিশ্রুতি' : 'Existing & Ongoing Commitments'}
+                </h3>
+                <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5 font-medium">
+                  {lang === 'bn'
+                    ? 'এই তথ্য থেকে নেট আভেইলেবল ক্যাপাসিটি হিসাব হবে — Sarkar saab-এর পরামর্শ'
+                    : 'Used to compute net available capacity — expert reviewer advice'}
+                </p>
+              </div>
+            </div>
+            {openSections.commitments ? (
+              <ChevronUp className="w-5 h-5 text-amber-500" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-amber-500" />
+            )}
+          </button>
+
+          <AnimatePresence initial={false}>
+            {openSections.commitments && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="p-8 space-y-6">
+
+                  {/* Info banner */}
+                  <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/40 rounded-xl p-4 flex gap-3 items-start">
+                    <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                    <p className="text-xs text-amber-800 dark:text-amber-300 font-medium leading-relaxed">
+                      {lang === 'bn'
+                        ? 'একটি ফার্মের কাগজে যা আছে তা নয়, বরং কত টুকু আসলে ফ্রি — সেটাই যোগ্যতার আসল মাপকাঠি। এখানে চলমান কাজের তথ্য দিলে AI নেট ক্যাপাসিটি হিসাব করবে।'
+                        : 'What matters is not what a firm owns on paper, but what is actually free for this contract. Entering your ongoing commitments here lets the AI calculate your net available capacity.'}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Existing Commitments Value — the B term */}
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        {lang === 'bn' ? 'চলমান কাজের মোট মূল্য (BDT Taka)' : 'Total Value of Works Currently in Hand (BDT Taka)'}
+                      </label>
+                      <p className="text-xs text-slate-400 dark:text-slate-500 mb-2">
+                        {lang === 'bn'
+                          ? 'Tender Capacity formula-র "B" term হিসেবে ব্যবহৃত হবে।'
+                          : 'Used as the "B" term (value of existing commitments) in the Tender Capacity formula.'}
+                      </p>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          min="0"
+                          step="1"
+                          placeholder={lang === 'bn' ? 'যেমন: ৫০০০০০০' : 'e.g., 5000000'}
+                          value={formData.existingCommitmentsValue || ''}
+                          onChange={e => setFormData({ ...formData, existingCommitmentsValue: parseFloat(e.target.value) || 0 })}
+                          className="w-full pl-4 pr-16 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-slate-800 dark:text-slate-200 font-semibold"
+                        />
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-bold">BDT</div>
+                      </div>
+                    </div>
+
+                    {/* Committed Liquid Assets */}
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        {lang === 'bn' ? 'চলমান কাজে ব্যবহৃত লিকুইড অ্যাসেট (BDT Taka)' : 'Portion of Liquid Assets Committed to Ongoing Work (BDT Taka)'}
+                      </label>
+                      <p className="text-xs text-slate-400 dark:text-slate-500 mb-2">
+                        {lang === 'bn'
+                          ? 'এই পরিমাণ Gross থেকে বাদ দিয়ে Net Available দেখানো হবে।'
+                          : 'Subtracted from your Gross Liquid Assets to show Net Available.'}
+                      </p>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          min="0"
+                          step="1"
+                          placeholder={lang === 'bn' ? 'যেমন: ১৫০০০০০' : 'e.g., 1500000'}
+                          value={formData.committedLiquidAssets || ''}
+                          onChange={e => setFormData({ ...formData, committedLiquidAssets: parseFloat(e.target.value) || 0 })}
+                          className="w-full pl-4 pr-16 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-slate-800 dark:text-slate-200 font-semibold"
+                        />
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-bold">BDT</div>
+                      </div>
+                      {(formData.committedLiquidAssets ?? 0) > 0 && (formData.liquidAssets ?? 0) > 0 && (
+                        <p className="text-xs text-amber-600 dark:text-amber-400 mt-1.5 font-semibold">
+                          {lang === 'bn' ? 'নেট আভেইলেবল: ' : 'Net Available: '}
+                          ৳{((formData.liquidAssets ?? 0) - (formData.committedLiquidAssets ?? 0)).toLocaleString()}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Committed Manpower */}
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        {lang === 'bn' ? 'চলমান কাজে নিযুক্ত জনবল (ঐচ্ছিক)' : 'Manpower Committed to Ongoing Work (Optional)'}
+                      </label>
+                      <textarea
+                        rows={2}
+                        placeholder={lang === 'bn' ? 'যেমন: ২ PM এবং ৪ Engineer Site-X এ কর্মরত' : 'e.g. 2 PMs and 4 Engineers deployed on active site...'}
+                        value={formData.committedManpower || ''}
+                        onChange={e => setFormData({ ...formData, committedManpower: e.target.value })}
+                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-slate-800 dark:text-slate-200 text-sm resize-none"
+                      />
+                    </div>
+
+                    {/* Committed Equipment */}
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        {lang === 'bn' ? 'চলমান কাজে ব্যবহৃত সরঞ্জাম (ঐচ্ছিক)' : 'Equipment Committed to Ongoing Work (Optional)'}
+                      </label>
+                      <textarea
+                        rows={2}
+                        placeholder={lang === 'bn' ? 'যেমন: ২ Mixer এবং ১ Crane Project-Y তে নিযুক্ত' : 'e.g. 2 Mixers and 1 Crane deployed on Project X...'}
+                        value={formData.committedEquipment || ''}
+                        onChange={e => setFormData({ ...formData, committedEquipment: e.target.value })}
+                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-slate-800 dark:text-slate-200 text-sm resize-none"
+                      />
+                    </div>
+                  </div>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
