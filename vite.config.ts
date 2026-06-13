@@ -18,6 +18,9 @@ export default defineConfig(({mode}) => {
         devOptions: {
           enabled: false
         },
+        workbox: {
+          maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // 4MB — allows bundles up to 4MB
+        },
         manifest: {
           short_name: "eGPTenderHub",
           name: "eGPTenderHub Analyst",
