@@ -62,6 +62,11 @@ export interface CompanyProfile {
     hasAuth: boolean | '';
     items?: string;
   };
+  // Sarkar saab improvement 1 — Net Available Capacity
+  existingCommitmentsValue?: number;       // BDT value of works currently in hand (the "B" term)
+  committedLiquidAssets?: number;          // BDT liquid assets already tied to ongoing work
+  committedManpower?: string;              // free-text: e.g. "2 PMs and 4 Engineers on Project X"
+  committedEquipment?: string;             // free-text: e.g. "2 Mixers deployed on Site Y"
   isJV?: boolean;
   foreignCurrency?: string;
   foreignExchangeRate?: number;
@@ -560,7 +565,41 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
     - When excluding or evaluating categories, state the rationale naturally using standard procurement language. E.g., write: "Key Personnel evaluation is not required for Goods tenders under standard e-PG3A guidelines" instead of referencing internal rules or algorithms.
 
     ========================================================================
-    RULE 11 — ONLY INCLUDE CLAUSES PRESENT IN THIS TENDER (NO INVENTED CARDS)
+    RULE 11 — NET AVAILABLE CAPACITY (Sarkar principle 1 — most important)
+    ========================================================================
+    - For Liquid Assets: ALWAYS use the NET AVAILABLE figure (gross minus committed) when comparing
+      against the tender requirement. Show both in the note: e.g. "Gross ৳X, ৳Y committed to ongoing
+      work, Net Available ৳Z vs Required ৳R." Never silently use the gross figure.
+    - For Tender Capacity: the "B" term in the formula (A×N×1.25−B) must be populated from the
+      bidder's "Existing Commitments Value" field. If the bidder entered a B value, use it. If they
+      left it at 0, note "B term not entered — assumed zero; bidder should confirm."
+    - For Personnel & Equipment: if the bidder entered committed manpower or equipment, flag in the
+      note how much is already deployed and comment on whether enough is free for the new contract.
+      Never assume all resources are available when the bidder has disclosed commitments.
+
+    ========================================================================
+    RULE 12 — ToR-DRIVEN TECHNICAL + PRE-BID REMINDER (Sarkar principle 2)
+    ========================================================================
+    - Evaluate technical requirements strictly from THIS tender's ToR/specifications/ITT clauses.
+      Do not apply a fixed generic checklist.
+    - Formula-derived thresholds (AACT, Liquid Assets, Tender Capacity) are ESTIMATES when not
+      explicitly stated. Label them as "indicative — confirm against the tender document."
+    - In the "summary" field, always add this sentence at the end: "Note: Confirm any unclear or
+      assumed requirement at the pre-bid meeting; the procuring entity's clarification overrides
+      any formula-derived figure."
+
+    ========================================================================
+    RULE 13 — GOODS TECHNICAL DIMENSION (Sarkar principle 3)
+    ========================================================================
+    - For Goods tenders, technical capacity is NOT irrelevant. In addition to supply capacity,
+      manufacturer authorization and product licences, also evaluate whether the bidder can:
+      (a) select/source goods to the correct specification, (b) import if required, and
+      (c) access testing/QA facilities when the tender requires testing or inspection.
+    - If the bidder has provided QA/testing capability information, evaluate it. If not provided,
+      mark as DATA_NEEDED with a note explaining which Goods-specific competencies are needed.
+
+    ========================================================================
+    RULE 14 — ONLY INCLUDE CLAUSES PRESENT IN THIS TENDER (NO INVENTED CARDS)
     ========================================================================
     - NEVER create a criterion card or include an item in the "criteria" list for a clause that does not actually appear in this analysed TDS/ITT document.
     - If a clause does not appear in the analysed tender's document (e.g., this tender has NO ITT Clause 13.1c supply/production capacity clause), you MUST NOT create a 13.1(c) card, and never mark a non-existent criterion as PASS.
@@ -633,10 +672,15 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
       * Equivalent Tender Capacity in BDT: ${companyProfile.foreignTenderCapacityBDT ?? 0} BDT
     ` : `
     - SINGLE CONTRACTOR PROFILE (BDT Taka):
-      * Liquid Assets: ${companyProfile.liquidAssets ?? 0} BDT
+      * Gross Liquid Assets: ${companyProfile.liquidAssets ?? 0} BDT
+      * Liquid Assets Committed to Ongoing Work: ${companyProfile.committedLiquidAssets ?? 0} BDT
+      * NET AVAILABLE Liquid Assets (use this for comparison): ${(companyProfile.liquidAssets ?? 0) - (companyProfile.committedLiquidAssets ?? 0)} BDT
       * Similar Work Experience: ${companyProfile.similarWorkExperience ?? 0} BDT
       * Average Annual Turnover (AACT): ${companyProfile.averageAnnualTurnover ?? 0} BDT
-      * Tender Capacity: ${companyProfile.tenderCapacity ?? 0} BDT
+      * Gross Tender Capacity entered by bidder: ${companyProfile.tenderCapacity ?? 0} BDT
+      * Existing Commitments Value ("B" term for Tender Capacity formula): ${companyProfile.existingCommitmentsValue ?? 0} BDT
+      * Manpower Already Committed to Ongoing Work: ${companyProfile.committedManpower || 'Not specified'}
+      * Equipment Already Committed to Ongoing Work: ${companyProfile.committedEquipment || 'Not specified'}
     `}
       * General Experience: ${companyProfile.generalExperienceYears !== undefined && companyProfile.generalExperienceYears !== '' ? companyProfile.generalExperienceYears : 'Unknown'} years
       * Number of Similar Contracts (last 5 years): ${companyProfile.similarContractsCount5Years !== undefined && companyProfile.similarContractsCount5Years !== '' ? companyProfile.similarContractsCount5Years : 'Unknown'} contracts
