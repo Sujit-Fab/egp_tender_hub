@@ -6,7 +6,160 @@ import ReactMarkdown from 'react-markdown';
 export const Blog = ({ lang }: { lang: 'en' | 'bn' }) => {
   const [activePostIdx, setActivePostIdx] = useState<number | null>(null);
 
-  const posts = [
+  const posts = [    
+    {
+      title: lang === 'bn' ? 'দরপত্র Non-Responsive কেন হয়? ১০টি সাধারণ কারণ ও সমাধান (২০২৫)' : 'Why Tenders Become Non-Responsive: 10 Common Reasons & How to Fix Them (2025)',
+      excerpt: lang === 'bn' ? 'বেশিরভাগ ঠিকাদার bid করে হেরে যান eligibility-র ভুলে, দামে নয়। এই গাইডে দরপত্র non-responsive হওয়ার ১০টি আসল কারণ এবং প্রতিটির সমাধান।' : 'Most contractors lose bids on eligibility mistakes, not price. This guide breaks down the 10 real reasons tenders are declared non-responsive and how to fix each one.',
+      date: 'Jun 17, 2026',
+      category: 'Guide',
+      contentEn: `
+## Why Tenders Become Non-Responsive in Bangladesh (And How to Avoid It)
+
+If you have ever submitted a bid on the **e-GP portal (eprocure.gov.bd)** only to find your tender marked "non-responsive," you already know the frustration. You spent days preparing documents, calculated your rates carefully, and still got knocked out before the price was even considered.
+
+Here is the hard truth most contractors learn too late: **the majority of tenders fail on eligibility and documentation, not on price.** A single missing certificate or a liquid asset figure that falls short can disqualify an otherwise strong bid.
+
+This guide breaks down the 10 most common reasons a tender is declared non-responsive under **PPR 2025**, and exactly how to fix each one before you bid.
+
+---
+
+### 1. Liquid Assets Below the Required Minimum
+This is the number one silent killer. The tender specifies a minimum liquid asset (working capital or credit line) — for example, Tk. 65 Lakh. Many bidders show their gross figure and assume they qualify.
+
+The mistake: the requirement is **net of other contractual commitments**. If you have Tk. 50 Lakh in liquid assets but Tk. 15 Lakh is already tied to ongoing work, your *available* liquid asset is only Tk. 35 Lakh — and you fail.
+
+**Fix:** Always calculate your *net available* liquid assets before bidding. Submit the certificate in the correct format (Form e-PW2A-8) in original, within the specified period.
+
+### 2. Missing or Expired Mandatory Documents
+Trade License, TIN Certificate, VAT/BIN registration, the income tax acknowledgement slip — if any of these is missing, expired, or not covering the required fiscal year, your bid is non-responsive regardless of how strong everything else is.
+
+**Fix:** Make a checklist of every document the TDS demands and verify each validity date before submission.
+
+### 3. Key Personnel Requirements Not Met
+The tender lists specific roles — Project Manager, Site Engineer (Civil), Site Engineer (Electrical), Manager, Foreman, and so on — each with minimum education and years of experience. A common failure is having a Project Manager but missing a required Electrical Site Engineer or Night Guard.
+
+**Fix:** Map each required role against your actual staff, including their CVs and experience years (in the e-PW2A-5 form). If a role is committed to another ongoing project, it does not count as available.
+
+### 4. Equipment Capacity Shortfall
+Works tenders require specific equipment — concrete mixers, vibrators, levelling machines, compaction machines, re-bar cutting and welding machines. Missing even one type, or lacking the ownership/hire certificate, makes the bid non-responsive.
+
+**Fix:** Match your equipment list (owned, hired, or leased) against the requirement, and prepare the supporting ownership or hire agreements.
+
+### 5. Similar Work Experience Value Too Low
+The tender asks for completed contracts of a similar nature, each above a minimum value, within the last few years — supported by a work completion certificate (not just a work order).
+
+**Fix:** Keep your completion certificates organised and ensure at least one matches the value and nature required.
+
+### 6. Tender Capacity Below Threshold
+Tender Capacity is calculated using a formula (A×N×1.25 − B), where B is the value of your existing commitments. Bidders often forget to subtract B, overstating their capacity.
+
+**Fix:** Calculate honestly. We cover this formula in detail in a separate guide.
+
+### 7. Tender Security Issues
+Wrong amount, wrong format, or expired validity of the e-Tender security can sink a bid instantly.
+
+**Fix:** Follow the exact amount and validity stated in the IFT.
+
+### 8. Bid Validity Period Too Short
+If your tender is valid for a shorter period than the TDS requires (e.g. 120 days), it is automatically non-responsive.
+
+**Fix:** Match the validity period exactly.
+
+### 9. Significantly Low-Priced Tender (SLT) — New in PPR 2025
+PPR 2025 introduced a formula-based SLT system. If your price is flagged as abnormally low against the market and official estimate, it can be declared non-responsive.
+
+**Fix:** Price realistically. An unusually low bid is no longer a guaranteed win — it is now a risk.
+
+### 10. Not Reading the Pre-Bid Meeting Clarifications
+Many requirements are clarified at the pre-bid meeting. Skipping it means you may misread an ambiguous requirement.
+
+**Fix:** Always attend or review pre-bid clarifications — the procuring entity's clarification overrides assumptions.
+
+---
+
+### The Smarter Way: Check Before You Bid
+
+Going through all 10 points manually for every tender takes hours of careful reading of a long Standard Tender Document (STD). And one missed detail can still cost you the bid.
+
+**This is exactly what eGPTenderHub does for you.** Upload the tender notice, and our AI checks every one of these criteria against your company profile — liquid assets (net of commitments), personnel, equipment, documents, and capacity — then tells you instantly whether you are eligible, and what is missing.
+
+**Stop guessing. Check your eligibility in minutes at [egptenderhub.com](https://egptenderhub.com) before you spend days on a bid you cannot win.**
+      \`,
+      contentBn: \`
+## বাংলাদেশে দরপত্র Non-Responsive কেন হয় (এবং কীভাবে এড়াবেন)
+
+আপনি যদি কখনো **e-GP পোর্টালে (eprocure.gov.bd)** bid জমা দিয়ে দেখে থাকেন যে আপনার দরপত্র "non-responsive" হয়ে গেছে, তাহলে সেই হতাশা আপনার চেনা। দিনের পর দিন কাগজপত্র তৈরি করলেন, যত্ন করে দর হিসাব করলেন — তবু দাম বিবেচনার আগেই বাদ পড়ে গেলেন।
+
+বেশিরভাগ ঠিকাদার দেরিতে যে কঠিন সত্যটা শেখেন তা হলো: **বেশিরভাগ দরপত্র হারে eligibility আর কাগজপত্রের ভুলে, দামে নয়।** একটা মাত্র অনুপস্থিত সনদ বা liquid asset-এর ঘাটতি একটা শক্তিশালী bid-কেও অযোগ্য করে দিতে পারে।
+
+এই গাইডে **PPR 2025**-এর অধীনে দরপত্র non-responsive হওয়ার ১০টি সবচেয়ে সাধারণ কারণ এবং প্রতিটির সমাধান তুলে ধরা হলো।
+
+---
+
+### ১. Liquid Assets নির্ধারিত পরিমাণের কম
+এটাই এক নম্বর নীরব ঘাতক। দরপত্রে একটা নির্দিষ্ট liquid asset চাওয়া হয় — যেমন ৬৫ লাখ টাকা। অনেক bidder তাদের gross পরিমাণ দেখিয়ে ধরে নেন তারা যোগ্য।
+
+ভুলটা হলো: শর্তটা হলো **চলমান কাজের প্রতিশ্রুতি বাদ দিয়ে (net of commitments)**। আপনার ৫০ লাখ টাকা liquid asset থাকলেও যদি ১৫ লাখ ইতিমধ্যে চলমান কাজে আটকে থাকে, তাহলে আপনার *available* liquid asset মাত্র ৩৫ লাখ — এবং আপনি বাদ।
+
+**সমাধান:** Bid করার আগে সবসময় *net available* liquid asset হিসাব করুন। সঠিক ফরম্যাটে (Form e-PW2A-8) মূল কপি নির্ধারিত সময়ের মধ্যে জমা দিন।
+
+### ২. বাধ্যতামূলক কাগজপত্র অনুপস্থিত বা মেয়াদোত্তীর্ণ
+ট্রেড লাইসেন্স, TIN সনদ, VAT/BIN নিবন্ধন, আয়কর রিটার্নের acknowledgement slip — এর কোনো একটি অনুপস্থিত, মেয়াদোত্তীর্ণ বা প্রয়োজনীয় অর্থবছর কভার না করলে, বাকি সব ঠিক থাকলেও bid non-responsive।
+
+**সমাধান:** TDS-এ চাওয়া প্রতিটি কাগজের একটা checklist বানান এবং জমা দেওয়ার আগে প্রতিটির মেয়াদ যাচাই করুন।
+
+### ৩. Key Personnel শর্ত পূরণ না হওয়া
+দরপত্রে নির্দিষ্ট পদ থাকে — Project Manager, Site Engineer (Civil), Site Engineer (Electrical), Manager, Foreman ইত্যাদি — প্রতিটির ন্যূনতম শিক্ষাগত যোগ্যতা ও অভিজ্ঞতার বছর সহ। সাধারণ ভুল হলো Project Manager থাকলেও প্রয়োজনীয় Electrical Site Engineer বা Night Guard না থাকা।
+
+**সমাধান:** প্রতিটি প্রয়োজনীয় পদ আপনার আসল জনবলের সাথে মিলিয়ে নিন, CV ও অভিজ্ঞতার বছর সহ (e-PW2A-5 ফরমে)। কোনো পদ অন্য চলমান কাজে নিযুক্ত থাকলে সেটা available হিসেবে গণ্য হবে না।
+
+### ৪. Equipment Capacity-র ঘাটতি
+Works দরপত্রে নির্দিষ্ট সরঞ্জাম লাগে — concrete mixer, vibrator, levelling machine, compaction machine, re-bar cutting ও welding machine। একটা ধরনও অনুপস্থিত থাকলে, বা ownership/hire সনদ না থাকলে bid non-responsive।
+
+**সমাধান:** আপনার সরঞ্জামের তালিকা (owned, hired বা leased) শর্তের সাথে মিলিয়ে নিন এবং সহায়ক ownership বা hire চুক্তি প্রস্তুত রাখুন।
+
+### ৫. Similar Work Experience-এর মূল্য কম
+দরপত্রে সাম্প্রতিক বছরগুলোতে সম্পন্ন একই ধরনের কাজ চাওয়া হয়, প্রতিটি একটা ন্যূনতম মূল্যের উপরে — work completion certificate দিয়ে সমর্থিত (শুধু work order নয়)।
+
+**সমাধান:** আপনার completion certificate গুলো গুছিয়ে রাখুন এবং নিশ্চিত করুন অন্তত একটা প্রয়োজনীয় মূল্য ও ধরনের সাথে মেলে।
+
+### ৬. Tender Capacity সীমার নিচে
+Tender Capacity একটা formula দিয়ে হিসাব হয় (A×N×1.25 − B), যেখানে B হলো আপনার চলমান প্রতিশ্রুতির মূল্য। Bidder-রা প্রায়ই B বাদ দিতে ভুলে যান, ফলে capacity বেশি দেখায়।
+
+**সমাধান:** সৎভাবে হিসাব করুন। এই formula নিয়ে আমরা আলাদা একটা গাইডে বিস্তারিত আলোচনা করেছি।
+
+### ৭. Tender Security সংক্রান্ত সমস্যা
+ভুল পরিমাণ, ভুল ফরম্যাট, বা e-Tender security-র মেয়াদ শেষ — যেকোনোটাই তাৎক্ষণিকভাবে bid বাতিল করতে পারে।
+
+**সমাধান:** IFT-তে উল্লেখিত সঠিক পরিমাণ ও মেয়াদ অনুসরণ করুন।
+
+### ৮. Bid Validity Period খুব কম
+আপনার দরপত্র যদি TDS-এর চাওয়া সময়ের (যেমন ১২০ দিন) চেয়ে কম মেয়াদের হয়, তাহলে স্বয়ংক্রিয়ভাবে non-responsive।
+
+**সমাধান:** Validity period হুবহু মিলিয়ে দিন।
+
+### ৯. Significantly Low-Priced Tender (SLT) — PPR 2025-এ নতুন
+PPR 2025 একটা formula-ভিত্তিক SLT সিস্টেম চালু করেছে। আপনার দাম যদি বাজার ও official estimate-এর তুলনায় অস্বাভাবিক কম হিসেবে চিহ্নিত হয়, তাহলে non-responsive হতে পারে।
+
+**সমাধান:** বাস্তবসম্মত দাম দিন। অস্বাভাবিক কম bid এখন আর নিশ্চিত জয় নয় — এটা এখন একটা ঝুঁকি।
+
+### ১০. Pre-Bid Meeting-এর Clarification না পড়া
+অনেক শর্ত pre-bid meeting-এ পরিষ্কার করা হয়। সেটা এড়িয়ে গেলে আপনি একটা অস্পষ্ট শর্ত ভুল বুঝতে পারেন।
+
+**সমাধান:** সবসময় pre-bid clarification পড়ুন বা অংশ নিন — procuring entity-র ব্যাখ্যা অনুমানের চেয়ে বড়।
+
+---
+
+### বুদ্ধিমানের পথ: Bid করার আগে যাচাই করুন
+
+প্রতিটা দরপত্রের জন্য এই ১০টা পয়েন্ট হাতে হাতে যাচাই করতে একটা দীর্ঘ Standard Tender Document (STD) সাবধানে পড়তে ঘণ্টার পর ঘণ্টা লাগে। আর একটা মিস হলেই bid হারাতে পারেন।
+
+**eGPTenderHub ঠিক এই কাজটাই আপনার জন্য করে।** দরপত্রের notice upload করুন, আমাদের AI এই প্রতিটি শর্ত আপনার company profile-এর সাথে যাচাই করে — liquid assets (net of commitments), personnel, equipment, কাগজপত্র, এবং capacity — তারপর তাৎক্ষণিকভাবে বলে দেয় আপনি যোগ্য কিনা, আর কী missing।
+
+**আর অনুমান নয়। [egptenderhub.com](https://egptenderhub.com)-এ মিনিটেই আপনার eligibility যাচাই করুন — এমন একটা bid-এ দিন নষ্ট করার আগে যেটা আপনি জিততে পারবেন না।**
+      \`,
+    },
+
     {
       title: lang === 'bn' ? 'ই-জিপি রেজিস্ট্রেশন ও প্রোফাইল আপডেট গাইড (২০২৫)' : 'Step-by-Step Guide to e-GP Registration & Profile Update in Bangladesh (2025)',
       excerpt: lang === 'bn' ? 'নতুন ঠিকাদারদের জন্য ই-জিপি পোর্টালে সাইন আপ এবং প্রয়োজনীয় কাগজপত্র আপডেট করার সহজ নির্দেশিকা।' : 'A simple guide on how new contractors can sign up for e-GP and map their mandatory documents successfully.',
