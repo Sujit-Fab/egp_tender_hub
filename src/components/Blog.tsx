@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown';
 export const Blog = ({ lang }: { lang: 'en' | 'bn' }) => {
   const [activePostIdx, setActivePostIdx] = useState<number | null>(null);
 
-  const posts = [    
+  const posts = [
     {
       title: lang === 'bn' ? 'দরপত্র Non-Responsive কেন হয়? ১০টি সাধারণ কারণ ও সমাধান (২০২৫)' : 'Why Tenders Become Non-Responsive: 10 Common Reasons & How to Fix Them (2025)',
       excerpt: lang === 'bn' ? 'বেশিরভাগ ঠিকাদার bid করে হেরে যান eligibility-র ভুলে, দামে নয়। এই গাইডে দরপত্র non-responsive হওয়ার ১০টি আসল কারণ এবং প্রতিটির সমাধান।' : 'Most contractors lose bids on eligibility mistakes, not price. This guide breaks down the 10 real reasons tenders are declared non-responsive and how to fix each one.',
@@ -83,9 +83,9 @@ Going through all 10 points manually for every tender takes hours of careful rea
 
 **This is exactly what eGPTenderHub does for you.** Upload the tender notice, and our AI checks every one of these criteria against your company profile — liquid assets (net of commitments), personnel, equipment, documents, and capacity — then tells you instantly whether you are eligible, and what is missing.
 
-**Stop guessing. Check your eligibility in minutes at [egptenderhub.com](https://egptenderhub.com) before you spend days on a bid you cannot win.**
-      \`,
-      contentBn: \`
+**Stop guessing. Check your eligibility in minutes at egptenderhub.com before you spend days on a bid you cannot win.**
+      `,
+      contentBn: `
 ## বাংলাদেশে দরপত্র Non-Responsive কেন হয় (এবং কীভাবে এড়াবেন)
 
 আপনি যদি কখনো **e-GP পোর্টালে (eprocure.gov.bd)** bid জমা দিয়ে দেখে থাকেন যে আপনার দরপত্র "non-responsive" হয়ে গেছে, তাহলে সেই হতাশা আপনার চেনা। দিনের পর দিন কাগজপত্র তৈরি করলেন, যত্ন করে দর হিসাব করলেন — তবু দাম বিবেচনার আগেই বাদ পড়ে গেলেন।
@@ -156,10 +156,9 @@ PPR 2025 একটা formula-ভিত্তিক SLT সিস্টেম �
 
 **eGPTenderHub ঠিক এই কাজটাই আপনার জন্য করে।** দরপত্রের notice upload করুন, আমাদের AI এই প্রতিটি শর্ত আপনার company profile-এর সাথে যাচাই করে — liquid assets (net of commitments), personnel, equipment, কাগজপত্র, এবং capacity — তারপর তাৎক্ষণিকভাবে বলে দেয় আপনি যোগ্য কিনা, আর কী missing।
 
-**আর অনুমান নয়। [egptenderhub.com](https://egptenderhub.com)-এ মিনিটেই আপনার eligibility যাচাই করুন — এমন একটা bid-এ দিন নষ্ট করার আগে যেটা আপনি জিততে পারবেন না।**
-      \`,
+**আর অনুমান নয়। egptenderhub.com-এ মিনিটেই আপনার eligibility যাচাই করুন — এমন একটা bid-এ দিন নষ্ট করার আগে যেটা আপনি জিততে পারবেন না।**
+      `,
     },
-
     {
       title: lang === 'bn' ? 'ই-জিপি রেজিস্ট্রেশন ও প্রোফাইল আপডেট গাইড (২০২৫)' : 'Step-by-Step Guide to e-GP Registration & Profile Update in Bangladesh (2025)',
       excerpt: lang === 'bn' ? 'নতুন ঠিকাদারদের জন্য ই-জিপি পোর্টালে সাইন আপ এবং প্রয়োজনীয় কাগজপত্র আপডেট করার সহজ নির্দেশিকা।' : 'A simple guide on how new contractors can sign up for e-GP and map their mandatory documents successfully.',
@@ -170,26 +169,26 @@ PPR 2025 একটা formula-ভিত্তিক SLT সিস্টেম �
 
 The National e-Government Procurement (e-GP) portal has completely digitized how public infrastructure and supply contracts are managed in Bangladesh. Whether you are a newly enlisted *Tekadar* (contractor) or an established firm looking to bid on massive PWD projects, having a verified and highly optimized e-GP profile is your first ticket to success.
 
-However, the **e-GP registration in Bangladesh** can feel overwhelming due to the strict document verification process. A single misaligned document can lock you out of bidding for weeks. 
+However, the **e-GP registration in Bangladesh** can feel overwhelming due to the strict document verification process. A single misaligned document can lock you out of bidding for weeks.
 
 In this guide, we break down the exact steps to register, update your profile, and start bidding in 2025 without the headaches.
 
 ---
 
 ### Step 1: Prepare Your Mandatory Legal Documents
-Before you even click "Register" on the e-GP portal, you must have high-quality, scanned PDFs of your company's core documents. The verification desk will reject your application if anything is blurry or expired. 
+Before you even click "Register" on the e-GP portal, you must have high-quality, scanned PDFs of your company's core documents. The verification desk will reject your application if anything is blurry or expired.
 
 Gather the following:
 1.  **Up-to-date Trade License:** Ensure it is renewed for the current fiscal year.
 2.  **TIN Certificate & Income Tax Clearance:** You must show proof of recent tax returns.
 3.  **VAT/BIN Registration Certificate.**
 4.  **Enlistment Certificates:** If you are enlisting under specific departments (PWD, RHD, LGED), have those licenses ready.
-5.  **Bank Solvency Certificate:** A recent statement proving your company’s financial health.
+5.  **Bank Solvency Certificate:** A recent statement proving your company's financial health.
 6.  **NID & Passport Size Photos:** For the Managing Director or authorized personnel.
 7.  **(Optional but Recommended):** Incorporation certificate (if a limited company) and registered Partnership Deed (if applicable).
 
 ### Step 2: Create Your e-GP User Account
-1.  Navigate to the official e-GP portal (\`eprocure.gov.bd\`).
+1.  Navigate to the official e-GP portal (eprocure.gov.bd).
 2.  Click on the **"New User Registration"** tab.
 3.  Fill out the preliminary form with your email address and a highly secure password.
 4.  You will receive an OTP and a verification link to your email. Click it to activate your basic login profile.
@@ -201,11 +200,11 @@ This is the most critical phase. An incomplete **e-GP profile update** is the #1
 
 1.  Log into your new e-GP dashboard.
 2.  Go to the **"Mapper"** or **"Document"** section.
-3.  Upload the PDFs you prepared in Step 1. 
+3.  Upload the PDFs you prepared in Step 1.
 4.  **Important:** You must accurately enter the Issue Date, Expiry Date, and Reference Number for *every single document*. If a trade license expires next month, you must remember to update it in the e-GP system before bidding on any new tender.
 
 ### Step 4: Pay the Registration Fee
-To finalize your profile, you need to pay the non-refundable registration fee. 
+To finalize your profile, you need to pay the non-refundable registration fee.
 
 1.  Generate a payment slip from the dashboard.
 2.  Take this slip to any enlisted scheduled bank handling e-GP payments.
@@ -217,8 +216,8 @@ Simply having a registered profile is not enough to win OTM or LTM tenders. You 
 
 Inside your dashboard, regularly update your:
 *   **Similar Work Experience:** Upload Completion Certificates mapped meticulously to the correct procurement categories.
-*   **Average Annual Turnover:** Upload your audited financial reports. 
-*   **Liquid Assets:** Track your active credit lines to ensure you meet the minimum financial criteria of the tenders you are eyeing. 
+*   **Average Annual Turnover:** Upload your audited financial reports.
+*   **Liquid Assets:** Track your active credit lines to ensure you meet the minimum financial criteria of the tenders you are eyeing.
 
 ---
 
@@ -234,7 +233,7 @@ Instead of reading a 500-page PDF manually, simply upload the tender notice to *
       contentBn: `
 ## ই-জিপি রেজিস্ট্রেশন ও প্রোফাইল আপডেট গাইড (২০২৫)
 
-ন্যাশনাল ই-গভর্নমেন্ট প্রকিউরমেন্ট (e-GP) পোর্টাল বাংলাদেশের সরকারি অবকাঠামো এবং সরবরাহ চুক্তির ব্যবস্থাপনাকে সম্পূর্ণ ডিজিটাল করে তুলেছে। আপনি নতুন তালিকাভুক্ত ঠিকাদার হোন বা বড় প্রোজেক্টে বিড করতে চাওয়া প্রতিষ্ঠিত প্রতিষ্ঠান, যাচাইকৃত এবং অপ্টিমাইজড ই-জিপি প্রোফাইল থাকা আপনার সফলতার প্রথম সিঁড়ি।
+ন্যাশনাল ই-গভর্নমেন্ট প্রকিউরমেন্ট (e-GP) পোর্টাল বাংলাদেশের সরকারি অবকাঠামো এবং সরবরাহ চুক্তির ব্যবস্থাপনাকে সম্পূর্ণ ডিজিটাল করে তুলেছে। আপনি নতুন তালিকাভুক্ত ঠিকাদার হোন বা বড় প্রোজেক্টে বিড করতে চাওয়া প্রতিষ্ঠিত প্রতিষ্ঠান, যাচাইকৃত এবং অপ্টিমাইজড ই-জিপি প্রোফাইল থাকা আপনার সফলতার প্রথম সিঁড়ি।
 
 তবে, নথিপত্র যাচাইয়ের কঠোর প্রক্রিয়ার কারণে **ই-জিপি রেজিস্ট্রেশন** অনেক সময় জটিল মনে হতে পারে। একটি ভুল নথির কারণে আপনি সপ্তাহখানেকের জন্য বিডিং থেকে বাদ পড়তে পারেন।
 
@@ -255,7 +254,7 @@ Instead of reading a 500-page PDF manually, simply upload the tender notice to *
 ৭. **(ঐচ্ছিক কিন্তু প্রস্তাবিত):** ইনকর্পোরেশন সার্টিফিকেট (লিমিটেড কোম্পানি হলে) এবং নিবন্ধিত পার্টনারশিপ ডিড (প্রযোজ্য ক্ষেত্রে)।
 
 ### ধাপ ২: আপনার ই-জিপি ইউজার অ্যাকাউন্ট তৈরি করুন
-১. অফিসিয়াল ই-জিপি পোর্টালে (\`eprocure.gov.bd\`) যান।
+১. অফিসিয়াল ই-জিপি পোর্টালে (eprocure.gov.bd) যান।
 ২. **"New User Registration"** ট্যাবে ক্লিক করুন।
 ৩. আপনার ইমেইল এবং একটি শক্তিশালী পাসওয়ার্ড দিয়ে প্রাথমিক ফর্মটি পূরণ করুন।
 ৪. আপনি একটি OTP এবং ভেরিফিকেশন লিঙ্ক সহ ইমেইল পাবেন। প্রাথমিক লগইন প্রোফাইল সক্রিয় করতে সেটিতে ক্লিক করুন।
@@ -293,8 +292,8 @@ Instead of reading a 500-page PDF manually, simply upload the tender notice to *
 
 **আর এখানেই eGPTenderHub আপনার কাজ সহজ করে দেয়।**
 
-৫০০-পৃষ্ঠার পিডিএফ ম্যানুয়ালি না পড়ে, সরাসরি **eGPTenderHub** তে টেন্ডার নোটিশ আপলোড করুন। আমাদের আর্টিফিশিয়াল ইন্টেলিজেন্স তাৎক্ষণিকভাবে নোটিশটি স্ক্যান করে আপনার প্রোফাইলের সাথে শর্তগুলো মিলিয়ে দেখবে এবং আপনি বিড করার যোগ্য কি না তা সাথে সাথে বলে দেবে—যা আপনার সময় বাঁচাবে এবং অযোগ্য হওয়ার ঝুঁকি এড়াতে সাহায্য করবে।
-      `
+৫০০-পৃষ্ঠার পিডিএফ ম্যানুয়ালি না পড়ে, সরাসরি **eGPTenderHub** তে টেন্ডার নোটিশ আপলোড করুন। আমাদের আর্টিফিশিয়াল ইন্টেলিজেন্স তাৎক্ষণিকভাবে নোটিশটি স্ক্যান করে আপনার প্রোফাইলের সাথে শর্তগুলো মিলিয়ে দেখবে এবং আপনি বিড করার যোগ্য কি না তা সাথে সাথে বলে দেবে—যা আপনার সময় বাঁচাবে এবং অযোগ্য হওয়ার ঝুঁকি এড়াতে সাহায্য করবে।
+      `,
     },
     {
       title: lang === 'bn' ? 'পিপিআর ২০২৫-এ নতুন কী আছে?' : 'What is new in the PPR 2025 guidelines?',
@@ -304,7 +303,7 @@ Instead of reading a 500-page PDF manually, simply upload the tender notice to *
       contentEn: `
 ## Navigating the PPR 2025 Updates
 
-The Bangladesh Public Procurement Rules (PPR) have undergone significant revisions for the 2025 fiscal year. These changes are designed to streamline the e-GP system, enhance transparency, and ensure fairer competition among contractors. 
+The Bangladesh Public Procurement Rules (PPR) have undergone significant revisions for the 2025 fiscal year. These changes are designed to streamline the e-GP system, enhance transparency, and ensure fairer competition among contractors.
 
 ### 1. Stricter Liquid Asset Requirements
 Previously, many contractors struggled with the verification of bank credit lines. Under the new rules, the mechanism for submitting **Credit Line Certificates** has been digitally integrated with the Bangladesh Bank database. This means:
@@ -313,7 +312,7 @@ Previously, many contractors struggled with the verification of bank credit line
 * A clear mandate to maintain healthy working capital throughout the project lifecycle.
 
 ### 2. Enhanced Tender Capacity Calculations
-The formula for Tender Capacity (TC) has been modified. The new equation places a heavier weight on recent, successfully completed projects. 
+The formula for Tender Capacity (TC) has been modified. The new equation places a heavier weight on recent, successfully completed projects.
 > *Pro-Tip: Always update your e-GP profile immediately after receiving a completion certificate to reflect your maximized tender capacity.*
 
 ### 3. AI and Automated Evaluations
@@ -338,8 +337,8 @@ The evaluation committees are now equipped with preliminary AI-driven screening 
 ### ৩. স্বয়ংক্রিয় মূল্যায়ন
 মূল্যায়ন কমিটিগুলো এখন কৃত্রিম বুদ্ধিমত্তা (AI) চালিত প্রাথমিক স্ক্যানিং টুল ব্যবহার করছে।
 
-**উপসংহার:** ২০২৫ সালে কাজ পেটে হলে আপনাকে নতুন ই-জিপি ইকোসিস্টেমের ডিজিটাল প্রযুক্তির সাথে পুরোপুরি মানিয়ে নিতে হবে।
-      `
+**উপসংহার:** ২০২৫ সালে কাজ পেতে হলে আপনাকে নতুন ই-জিপি ইকোসিস্টেমের ডিজিটাল প্রযুক্তির সাথে পুরোপুরি মানিয়ে নিতে হবে।
+      `,
     },
     {
       title: lang === 'bn' ? 'কিভাবে তরল সম্পদের হিসাব করবেন' : 'How to accurately calculate Liquid Assets for e-GP',
@@ -364,7 +363,7 @@ Many contractors fail the evaluation stage simply because their bank certificate
       contentBn: `
 ## তরল সম্পদের গুরুত্ব
 
-বড় অবকাঠামো প্রকল্পে দরপত্রের জন্য, আপনার আর্থিক সক্ষমতা প্রমাণ করা অত্যন্ত গুরুত্বপূর্ণ। ই-জিপি সিস্টেমে লিকুইড অ্যাসেট (LA) এর জন্য একটি খুব নির্দিষ্ট হিসাব প্রয়োজন। 
+বড় অবকাঠামো প্রকল্পে দরপত্রের জন্য, আপনার আর্থিক সক্ষমতা প্রমাণ করা অত্যন্ত গুরুত্বপূর্ণ। ই-জিপি সিস্টেমে লিকুইড অ্যাসেট (LA) এর জন্য একটি খুব নির্দিষ্ট হিসাব প্রয়োজন।
 
 ### তরল সম্পদ হিসাবে কী গণ্য হয়?
 ১. ব্যাংকে থাকা নগদ অর্থ (চলতি/সঞ্চয়ী হিসাব)
@@ -372,7 +371,7 @@ Many contractors fail the evaluation stage simply because their bank certificate
 ৩. তফসিলি ব্যাংক থেকে নিশ্চিত ক্রেডিট লাইন সার্টিফিকেট
 
 **সুবর্ণ নিয়ম:** সর্বদা আপনার ব্যাংককে টেন্ডার ডকুমেন্টে দেওয়া সঠিক ফরমেটে ক্রেডিট লাইন সার্টিফিকেট ইস্যু করার জন্য অনুরোধ করুন।
-      `
+      `,
     },
     {
       title: lang === 'bn' ? 'সর্বোচ্চ দরদাতা হওয়ার গোপন কৌশল' : 'Winning Strategies for LTM and OTM Tenders',
@@ -393,34 +392,34 @@ By running the tender notice through eGPTenderHub's AI Analysis engine, you can 
 - Exact equipment ownership needs.
 - Accurate liquid asset benchmarks.
 
-This saves hours of manual reading and prevents critical oversights. 
+This saves hours of manual reading and prevents critical oversights.
       `,
       contentBn: `
 ## OTM এবং LTM দরপত্র জেতার কৌশল
 
-উন্মুক্ত দরপত্র পদ্ধতি (OTM) এবং সীমিত দরপত্র পদ্ধতি (LTM) এর প্রতিযোগিতামূলক ক্ষেত্র ভিন্ন। 
+উন্মুক্ত দরপত্র পদ্ধতি (OTM) এবং সীমিত দরপত্র পদ্ধতি (LTM) এর প্রতিযোগিতামূলক ক্ষেত্র ভিন্ন।
 
 ### ১. দরপত্র পূর্ব বিশ্লেষণ
 শুধুমাত্র দাম নির্ধারণে ঝাঁপিয়ে পড়বেন না। প্রথমে চুক্তির সাধারণ শর্তাবলি (GCC) এবং চুক্তির বিশেষ শর্তাবলি (PCC) গভীরভাবে বিশ্লেষণ করুন।
 
 ### ২. এআই ব্যবহার করা
 eGPTenderHub এর এআই বিশ্লেষণ ইঞ্জিন ব্যবহার করে, আপনি তাৎক্ষণিকভাবে মূল তথ্যগুলো বের করতে পারেন, যা আপনাকে অন্যান্য প্রতিযোগীদের থেকে এগিয়ে রাখবে।
-      `
-    }
+      `,
+    },
   ];
 
   if (activePostIdx !== null) {
     const activePost = posts[activePostIdx];
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -20 }}
         className="max-w-3xl mx-auto py-12 px-4 space-y-8"
       >
-        <button 
+        <button
           onClick={() => setActivePostIdx(null)}
-          className="flex items-center gap-2 text-sm font-bold text-slate-500hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors group px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg w-auto hover:bg-slate-200 dark:hover:bg-slate-700"
+          className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors group px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg w-auto hover:bg-slate-200 dark:hover:bg-slate-700"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           {lang === 'bn' ? 'ফিরে যান' : 'Back to Articles'}
@@ -441,7 +440,7 @@ eGPTenderHub এর এআই বিশ্লেষণ ইঞ্জিন ব্
           <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
             {activePost.title}
           </h1>
-          
+
           <div className="w-full h-px bg-slate-200 dark:bg-slate-800 my-8"></div>
 
           <div className="prose prose-slate dark:prose-invert max-w-none text-slate-700 dark:text-slate-300">
@@ -467,10 +466,10 @@ eGPTenderHub এর এআই বিশ্লেষণ ইঞ্জিন ব্
   }
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto space-y-12 py-12 px-4 shadow-[0_0_0_1px_transparent]" // Prevent margin collapse
+      className="max-w-4xl mx-auto space-y-12 py-12 px-4 shadow-[0_0_0_1px_transparent]"
     >
       <div className="text-center space-y-4">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-sm font-semibold mb-4 border border-blue-100 dark:border-blue-800">
@@ -481,16 +480,16 @@ eGPTenderHub এর এআই বিশ্লেষণ ইঞ্জিন ব্
           {lang === 'bn' ? 'উন্নয়ন ও দরপত্র বিষয়ক ব্লগ' : 'eGPTenderHub Insights'}
         </h2>
         <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-          {lang === 'bn' 
-            ? 'পিপিআর আপডেট, ই-জিপি টিপস এবং ঠিকাদারি ব্যবসার প্রসারের জন্য প্রবন্ধ।' 
+          {lang === 'bn'
+            ? 'পিপিআর আপডেট, ই-জিপি টিপস এবং ঠিকাদারি ব্যবসার প্রসারের জন্য প্রবন্ধ।'
             : 'Stay updated with the latest in Bangladesh procurement rules, e-GP strategies, and AI innovations.'}
         </p>
       </div>
 
       <div className="space-y-6">
         {posts.map((post, idx) => (
-          <div 
-            key={idx} 
+          <div
+            key={idx}
             onClick={() => setActivePostIdx(idx)}
             className="group flex flex-col md:flex-row gap-6 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all cursor-pointer"
           >
@@ -515,7 +514,7 @@ eGPTenderHub এর এআই বিশ্লেষণ ইঞ্জিন ব্
           </div>
         ))}
       </div>
-      
+
       <div className="text-center pt-8">
          <button className="px-6 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white rounded-xl font-bold transition-colors shadow-sm">
             {lang === 'bn' ? 'আরও দেখুন' : 'Load More Posts'}
