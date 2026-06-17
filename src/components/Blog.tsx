@@ -160,6 +160,182 @@ PPR 2025 একটা formula-ভিত্তিক SLT সিস্টেম �
       `,
     },
     {
+      title: lang === 'bn' ? 'Tender Capacity Formula (A×N×1.25−B) কীভাবে হিসাব করবেন — উদাহরণসহ' : 'How to Calculate Tender Capacity (A×N×1.25−B) — With Worked Examples',
+      excerpt: lang === 'bn' ? 'Tender Capacity-র সূত্রটা অনেকেই ভুল বোঝেন এবং B বাদ দিতে ভুলে যান। এই গাইডে সহজ উদাহরণ দিয়ে ধাপে ধাপে হিসাব দেখানো হলো।' : 'Most bidders misread the Tender Capacity formula and forget to subtract B. This guide walks through the calculation step by step with simple examples.',
+      date: 'Jun 24, 2026',
+      category: 'Financial',
+      contentEn: `
+## Understanding Tender Capacity: The Formula That Quietly Disqualifies Bidders
+
+Tender Capacity is one of the most misunderstood financial criteria in Bangladesh's e-GP system. Many contractors meet every other requirement — turnover, liquid assets, experience — yet still get marked non-responsive because they miscalculated their Tender Capacity.
+
+The reason is simple: most bidders look at the impressive first half of the formula and forget the part that subtracts their existing workload. This guide breaks the formula down in plain language, with worked examples, so you never make that mistake again.
+
+---
+
+### The Formula
+
+Under the Standard Tender Document, Assessed Tender Capacity is calculated as:
+
+**Assessed Tender Capacity = (A × N × 1.25) − B**
+
+Let us define each term clearly:
+
+- **A** = The maximum value of construction works performed in any one year during the last five years.
+- **N** = The completion time of the proposed work, in years.
+- **1.25** = A fixed multiplier set by the rules.
+- **B** = The value of existing commitments and works to be completed during the next N years.
+
+The most important term here is **B** — and it is the one bidders forget.
+
+> Note: If N is less than 12 months, N is counted as 1 (one).
+
+---
+
+### Why B Matters So Much
+
+Think of it this way. The first part (A × N × 1.25) measures how much work you are *theoretically* capable of taking on. But you cannot use 100% of that capacity if you are already busy with other projects.
+
+**B is your existing workload.** Subtracting it gives your *real, available* capacity for this new tender. This is the same principle as net available liquid assets — what matters is not your total capacity on paper, but how much is actually free.
+
+A bidder who forgets to subtract B will overstate their capacity, and during evaluation the committee will recalculate it correctly — often pushing the bidder below the required threshold.
+
+---
+
+### Worked Example 1: A Contractor With No Other Work
+
+Suppose:
+- A = Tk. 2,00,00,000 (your best single-year construction value in the last 5 years)
+- N = 2 years (the proposed work will take 2 years)
+- B = Tk. 0 (you have no ongoing commitments)
+
+Calculation:
+- A × N × 1.25 = 2,00,00,000 × 2 × 1.25 = Tk. 5,00,00,000
+- Minus B (0) = **Tk. 5,00,00,000**
+
+If the tender requires a minimum Tender Capacity of Tk. 1,15,00,000, this bidder qualifies comfortably.
+
+---
+
+### Worked Example 2: The Same Contractor With Ongoing Work
+
+Now suppose the same contractor already has Tk. 3,50,00,000 worth of work in hand to be completed over the next 2 years.
+
+- A × N × 1.25 = Tk. 5,00,00,000 (same as before)
+- Minus B (3,50,00,000) = **Tk. 1,50,00,000**
+
+The bidder still qualifies against a Tk. 1,15,00,000 requirement — but only just. Notice how the available capacity dropped from Tk. 5 crore to Tk. 1.5 crore once existing work was counted. If their ongoing commitments were a little higher, they would fail.
+
+This is exactly why honest, accurate entry of B is critical.
+
+---
+
+### Common Mistakes to Avoid
+
+The most frequent errors bidders make with Tender Capacity:
+
+- **Forgetting B entirely** and submitting only A × N × 1.25.
+- **Using the wrong A** — using an average instead of the *maximum* single-year value, or vice versa.
+- **Miscounting N** — using months instead of years, or forgetting the "less than 12 months counts as 1" rule.
+- **Outdated commitments** — not updating B as old projects finish and new ones start.
+
+---
+
+### Let the Tool Do the Math
+
+Calculating this by hand for every tender, while also tracking your changing commitments, is tedious and error-prone. A small mistake in B can cost you the bid.
+
+**eGPTenderHub calculates your Tender Capacity automatically.** Enter your figures once in your company profile — including your existing commitments — and the AI applies the formula correctly for every tender, showing your true available capacity against the requirement.
+
+**Stop guessing your numbers. Check your real Tender Capacity in seconds at egptenderhub.com.**
+      `,
+      contentBn: `
+## Tender Capacity বোঝা: যে সূত্রটি নীরবে bidder-দের বাদ দেয়
+
+Tender Capacity বাংলাদেশের e-GP সিস্টেমে সবচেয়ে ভুল-বোঝা আর্থিক মানদণ্ডগুলোর একটি। অনেক ঠিকাদার বাকি সব শর্ত পূরণ করেন — turnover, liquid assets, অভিজ্ঞতা — তবু Tender Capacity ভুল হিসাব করার কারণে non-responsive হয়ে যান।
+
+কারণটা সহজ: বেশিরভাগ bidder সূত্রের প্রথম, আকর্ষণীয় অংশটা দেখেন আর যে অংশটা তাদের চলমান কাজ বাদ দেয় সেটা ভুলে যান। এই গাইডে সূত্রটা সহজ ভাষায়, উদাহরণসহ ভেঙে দেখানো হলো, যাতে আপনি আর কখনো এই ভুল না করেন।
+
+---
+
+### সূত্রটি
+
+Standard Tender Document অনুযায়ী, Assessed Tender Capacity হিসাব হয় এভাবে:
+
+**Assessed Tender Capacity = (A × N × 1.25) − B**
+
+প্রতিটি term পরিষ্কারভাবে বুঝে নিই:
+
+- **A** = গত পাঁচ বছরের যেকোনো এক বছরে সম্পন্ন construction কাজের সর্বোচ্চ মূল্য।
+- **N** = প্রস্তাবিত কাজের সম্পন্ন করার সময়, বছরে।
+- **1.25** = বিধি দ্বারা নির্ধারিত একটি স্থির গুণক।
+- **B** = চলমান প্রতিশ্রুতি এবং আগামী N বছরে সম্পন্ন হতে যাওয়া কাজের মূল্য।
+
+এখানে সবচেয়ে গুরুত্বপূর্ণ term হলো **B** — এবং এটাই bidder-রা ভুলে যান।
+
+> দ্রষ্টব্য: N যদি ১২ মাসের কম হয়, তাহলে N কে ১ (এক) হিসেবে গণ্য করা হয়।
+
+---
+
+### B কেন এত গুরুত্বপূর্ণ
+
+এভাবে ভাবুন। প্রথম অংশটা (A × N × 1.25) মাপে আপনি *তাত্ত্বিকভাবে* কতটা কাজ নিতে সক্ষম। কিন্তু আপনি সেই সক্ষমতার ১০০% ব্যবহার করতে পারবেন না যদি ইতিমধ্যে অন্য কাজে ব্যস্ত থাকেন।
+
+**B হলো আপনার চলমান কাজের ভার।** এটা বাদ দিলে এই নতুন দরপত্রের জন্য আপনার *আসল, available* সক্ষমতা পাওয়া যায়। এটা net available liquid asset-এর মতোই নীতি — কাগজে আপনার মোট সক্ষমতা নয়, বরং কতটা আসলে খালি আছে সেটাই গুরুত্বপূর্ণ।
+
+যে bidder B বাদ দিতে ভুলে যান, তিনি তার সক্ষমতা বেশি দেখান, এবং মূল্যায়নের সময় কমিটি সেটা সঠিকভাবে আবার হিসাব করে — যা প্রায়ই bidder-কে প্রয়োজনীয় সীমার নিচে নামিয়ে দেয়।
+
+---
+
+### উদাহরণ ১: যে ঠিকাদারের অন্য কোনো কাজ নেই
+
+ধরুন:
+- A = ২,০০,০০,০০০ টাকা (গত ৫ বছরে আপনার সেরা এক-বছরের construction মূল্য)
+- N = ২ বছর (প্রস্তাবিত কাজে ২ বছর লাগবে)
+- B = ০ টাকা (আপনার কোনো চলমান প্রতিশ্রুতি নেই)
+
+হিসাব:
+- A × N × 1.25 = ২,০০,০০,০০০ × ২ × ১.২৫ = ৫,০০,০০,০০০ টাকা
+- বাদ B (০) = **৫,০০,০০,০০০ টাকা**
+
+দরপত্রে যদি ন্যূনতম Tender Capacity ১,১৫,০০,০০০ টাকা চাওয়া হয়, এই bidder সহজেই যোগ্য।
+
+---
+
+### উদাহরণ ২: একই ঠিকাদার, কিন্তু চলমান কাজসহ
+
+এবার ধরুন একই ঠিকাদারের ইতিমধ্যে ৩,৫০,০০,০০০ টাকার কাজ হাতে আছে, যা আগামী ২ বছরে শেষ হবে।
+
+- A × N × 1.25 = ৫,০০,০০,০০০ টাকা (আগের মতোই)
+- বাদ B (৩,৫০,০০,০০০) = **১,৫০,০০,০০০ টাকা**
+
+bidder এখনও ১,১৫,০০,০০০ টাকার শর্তের বিপরীতে যোগ্য — কিন্তু খুব অল্পের জন্য। লক্ষ্য করুন, চলমান কাজ গণনায় আসার পর available সক্ষমতা ৫ কোটি থেকে ১.৫ কোটিতে নেমে এলো। তাদের চলমান প্রতিশ্রুতি একটু বেশি হলেই তারা বাদ পড়তেন।
+
+ঠিক এই কারণেই B সৎভাবে ও নির্ভুলভাবে দেওয়া অত্যন্ত জরুরি।
+
+---
+
+### যে ভুলগুলো এড়াবেন
+
+Tender Capacity নিয়ে bidder-রা যে ভুলগুলো সবচেয়ে বেশি করেন:
+
+- **B সম্পূর্ণ ভুলে যাওয়া** এবং শুধু A × N × 1.25 জমা দেওয়া।
+- **ভুল A ব্যবহার** — সর্বোচ্চ এক-বছরের মূল্যের বদলে গড় ব্যবহার করা, বা উল্টোটা।
+- **N ভুল গণনা** — বছরের বদলে মাস ব্যবহার করা, বা "১২ মাসের কম হলে ১ গণ্য" নিয়মটা ভুলে যাওয়া।
+- **পুরনো commitments** — পুরনো কাজ শেষ হলে আর নতুন শুরু হলে B আপডেট না করা।
+
+---
+
+### হিসাবটা Tool-কে করতে দিন
+
+প্রতিটা দরপত্রের জন্য হাতে হাতে এই হিসাব করা, সেই সাথে পরিবর্তনশীল commitments-ও ট্র্যাক করা — ক্লান্তিকর এবং ভুল হওয়ার ঝুঁকিপূর্ণ। B-তে একটা ছোট ভুল আপনার bid হারাতে পারে।
+
+**eGPTenderHub আপনার Tender Capacity স্বয়ংক্রিয়ভাবে হিসাব করে।** আপনার company profile-এ একবার তথ্য দিন — চলমান commitments সহ — এবং AI প্রতিটা দরপত্রের জন্য সূত্রটা সঠিকভাবে প্রয়োগ করে, শর্তের বিপরীতে আপনার আসল available সক্ষমতা দেখায়।
+
+**আর সংখ্যা নিয়ে অনুমান নয়। egptenderhub.com-এ সেকেন্ডে আপনার আসল Tender Capacity যাচাই করুন।**
+      `,
+    },
+    {
       title: lang === 'bn' ? 'ই-জিপি রেজিস্ট্রেশন ও প্রোফাইল আপডেট গাইড (২০২৫)' : 'Step-by-Step Guide to e-GP Registration & Profile Update in Bangladesh (2025)',
       excerpt: lang === 'bn' ? 'নতুন ঠিকাদারদের জন্য ই-জিপি পোর্টালে সাইন আপ এবং প্রয়োজনীয় কাগজপত্র আপডেট করার সহজ নির্দেশিকা।' : 'A simple guide on how new contractors can sign up for e-GP and map their mandatory documents successfully.',
       date: 'Oct 20, 2025',
