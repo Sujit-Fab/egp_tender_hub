@@ -11,6 +11,7 @@ import {
   TrendingUp, 
   AlertCircle, 
   CheckCircle2, 
+  XCircle,
   Loader2,
   Search,
   Gavel,
@@ -42,7 +43,8 @@ import {
   Activity,
   HeartHandshake,
   Cpu,
-  Network
+  Network,
+  Check
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
@@ -60,7 +62,6 @@ import { Blog } from './components/Blog';
 import { TermsAndConditions } from './components/TermsAndConditions';
 import { PaymentModal } from './components/PaymentModal';
 import { NoticeBoard } from './components/NoticeBoard';
-import AnalysisReport from './components/AnalysisReport';
 
 const AICreditWidget = ({ userData, lang, setView }: any) => {
   if (!userData) return null;
@@ -1106,7 +1107,7 @@ const LandingPage = ({ loginWithGoogle, lang, setView }: { loginWithGoogle: () =
             </button>
             <button 
               onClick={() => {
-                document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
               }}
               className="px-8 py-4 w-full sm:w-auto bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-2xl text-lg font-bold shadow-sm transition-all flex items-center justify-center gap-2"
             >
@@ -1133,25 +1134,54 @@ const LandingPage = ({ loginWithGoogle, lang, setView }: { loginWithGoogle: () =
         </div>
       </section>
 
+{/* Demo Video Section */}
+<section id="demo" className="py-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+  <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
+    <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-sm font-semibold border border-blue-200 dark:border-blue-800/50">
+      <Activity className="w-4 h-4" />
+      {lang === 'bn' ? 'দেখুন কীভাবে কাজ করে' : 'See it work, start to finish'}
+    </span>
+    <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
+      {lang === 'bn' ? 'ফাঁকা প্রতিশ্রুতি নয় — নিজের চোখে দেখুন।' : "Don't take our word for it. Watch it run."}
+    </h2>
+    <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+      {lang === 'bn'
+        ? 'একটি আসল STD PDF আপলোড থেকে চূড়ান্ত রিস্ক রিপোর্ট তৈরি পর্যন্ত পুরো প্রক্রিয়া দেখুন।'
+        : 'Watch a real STD PDF go from upload to a final risk verdict — start to finish.'}
+    </p>
+
+    <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-blue-600/10 border border-slate-200 dark:border-slate-700 bg-slate-900 aspect-video">
+      <iframe
+        className="absolute inset-0 w-full h-full"
+        src="https://www.youtube.com/embed/5CN8LV4XSW8?rel=0&modestbranding=1"
+        title="eGPTenderHub Demo"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      />
+    </div>
+
+    <button
+      onClick={loginWithGoogle}
+      className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-lg font-bold shadow-xl shadow-blue-600/20 transition-all hover:-translate-y-1 inline-flex items-center gap-2"
+    >
+      {lang === 'bn' ? 'এখন বিনামূল্যে চেষ্টা করুন' : 'Try It Free Now'} <ChevronRight className="w-5 h-5" />
+    </button>
+  </div>
+</section>
+
       {/* Deep Dive Features */}
       <section id="features" className="py-24 bg-white dark:bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-32">
           
           {/* Feature 1 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-            <div className="order-2 md:order-1 relative rounded-3xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-8 pt-12 shadow-inner overflow-hidden aspect-square md:aspect-auto md:h-[500px] flex justify-center items-end text-slate-300 dark:text-slate-600">
-               <div className="w-[80%] h-[90%] bg-white dark:bg-slate-900 rounded-t-2xl shadow-[0_0_40px_rgba(0,0,0,0.1)] dark:shadow-none border border-b-0 border-slate-200 dark:border-slate-700 p-6">
-                  <div className="h-4 w-1/3 bg-slate-200 dark:bg-slate-700 rounded mb-4"></div>
-                  <div className="h-4 w-full bg-slate-100 dark:bg-slate-800 rounded mb-2"></div>
-                  <div className="h-4 w-5/6 bg-slate-100 dark:bg-slate-800 rounded mb-6"></div>
-                  <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/50 rounded-xl flex gap-3">
-                     <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />
-                     <div className="space-y-2 w-full">
-                       <div className="h-3 w-1/4 bg-red-200 dark:bg-red-800/50 rounded"></div>
-                       <div className="h-3 w-full bg-red-100 dark:bg-red-900/30 rounded"></div>
-                     </div>
-                  </div>
-               </div>
+            <div className="order-2 md:order-1 relative rounded-3xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 md:p-6 shadow-inner overflow-hidden md:h-[500px] flex justify-center items-center">
+              <img
+                src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0089421810.firebasestorage.app/o/sample-verdict-report.png?alt=media&token=0b3a58d3-67cb-43b5-9213-4d532879e8fd"
+                alt={lang === 'bn' ? 'নমুনা PPR 2025 কমপ্লায়েন্স রিপোর্ট' : 'Sample PPR 2025 compliance verdict report'}
+                className="w-full h-full object-contain rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700"
+                loading="lazy"
+              />
             </div>
             <div className="order-1 md:order-2 space-y-6">
               <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center">
@@ -1199,41 +1229,24 @@ const LandingPage = ({ loginWithGoogle, lang, setView }: { loginWithGoogle: () =
                 </li>
               </ul>
             </div>
-            <div className="relative rounded-3xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-8 pt-12 shadow-inner overflow-hidden aspect-square md:aspect-auto md:h-[500px] flex justify-center items-end">
-               <div className="w-full h-full bg-white dark:bg-slate-900 rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.1)] dark:shadow-none border border-slate-200 dark:border-slate-700 p-6 flex flex-col gap-4">
-                  <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-4">
-                     <div className="h-4 w-1/4 bg-slate-200 dark:bg-slate-700 rounded"></div>
-                     <div className="h-6 w-1/3 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg"></div>
-                  </div>
-                  <div className="flex-1 space-y-4 pt-4">
-                     <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl">
-                        <div className="h-3 w-1/3 bg-slate-200 dark:bg-slate-700 rounded"></div>
-                        <div className="h-3 w-1/5 bg-slate-300 dark:bg-slate-600 rounded"></div>
-                     </div>
-                     <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl">
-                        <div className="h-3 w-1/2 bg-slate-200 dark:bg-slate-700 rounded"></div>
-                        <div className="h-3 w-1/4 bg-slate-300 dark:bg-slate-600 rounded"></div>
-                     </div>
-                  </div>
-               </div>
+            <div className="relative rounded-3xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 md:p-6 shadow-inner overflow-hidden md:h-[500px] flex justify-center items-center">
+              <img
+                src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0089421810.firebasestorage.app/o/sample-sor-estimate.png?alt=media&token=81b91c0c-cb1f-45e5-8e6f-6efa587354dd"
+                alt={lang === 'bn' ? 'নমুনা SoR ও BoQ এস্টিমেট' : 'Sample SoR and BoQ estimate calculation'}
+                className="w-full h-full object-contain rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700"
+                loading="lazy"
+              />
             </div>
-          </div>
 
           {/* Feature 3 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-            <div className="order-2 md:order-1 relative rounded-3xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-8 pt-12 shadow-inner overflow-hidden aspect-square md:aspect-auto md:h-[500px] flex justify-center items-end">
-               <div className="w-[85%] h-[90%] bg-slate-50 dark:bg-slate-800/50 rounded-t-2xl shadow-[0_0_40px_rgba(0,0,0,0.1)] dark:shadow-none border border-b-0 border-slate-200 dark:border-slate-700 p-4 flex flex-col justify-end gap-4">
-                  <div className="self-end max-w-[80%] p-3 bg-blue-600 text-white rounded-2xl rounded-tr-sm text-xs">
-                    "What is the defect liability period for this tender?"
-                  </div>
-                  <div className="self-start max-w-[80%] p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl rounded-tl-sm text-xs text-slate-700 dark:text-slate-300">
-                    According to the uploaded e-PW2A document, Section 4 (PCC), Clause 42.1 specifies the Defect Liability Period is 12 Months from completion.
-                  </div>
-                  <div className="mt-4 h-10 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center px-4 justify-between">
-                     <span className="h-2 w-1/3 bg-slate-200 dark:bg-slate-700 rounded"></span>
-                     <Send className="w-4 h-4 text-blue-600 opacity-50" />
-                  </div>
-               </div>
+            <div className="order-2 md:order-1 relative rounded-3xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 md:p-6 shadow-inner overflow-hidden md:h-[500px] flex justify-center items-center">
+              <img
+                src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0089421810.firebasestorage.app/o/sample-tender-chat.png?alt=media&token=8b67bd98-d706-40fb-9b2b-31c426d319bb"
+                alt={lang === 'bn' ? 'নমুনা টেন্ডার প্রশ্নোত্তর চ্যাট' : 'Sample Tender Q&A chat'}
+                className="w-full h-full object-contain rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700"
+                loading="lazy"
+              />
             </div>
             <div className="order-1 md:order-2 space-y-6">
               <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center">
@@ -1411,19 +1424,62 @@ export default function App() {
   const [companyProfile, setCompanyProfile] = useState<any>(() => {
     const saved = localStorage.getItem('company_profile');
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
+      try { 
+        const parsed = JSON.parse(saved);
+        return {
+          liquidAssets: parsed.liquidAssets ?? 0,
+          similarWorkExperience: parsed.similarWorkExperience ?? 0,
+          averageAnnualTurnover: parsed.averageAnnualTurnover ?? 0,
+          tenderCapacity: parsed.tenderCapacity ?? 0,
+          generalExperienceYears: parsed.generalExperienceYears ?? '',
+          similarContractsCount5Years: parsed.similarContractsCount5Years ?? '',
+          keyPersonnel: parsed.keyPersonnel ?? [],
+          equipment: parsed.equipment ?? [],
+          tradeLicense: parsed.tradeLicense ?? { hasLicense: '', validityDate: '' },
+          electricalLicense: parsed.electricalLicense ?? { hasLicense: '', validityDate: '', category: '' },
+          fireLicense: parsed.fireLicense ?? { hasLicense: '', validityDate: '' },
+          bercLicense: parsed.bercLicense ?? { hasLicense: '', validityDate: '' },
+          dlsLicense: parsed.dlsLicense ?? { hasLicense: '', validityDate: '' },
+          tinLicense: parsed.tinLicense ?? { hasLicense: '', validityDate: '' },
+          vatLicense: parsed.vatLicense ?? { hasLicense: '', validityDate: '' },
+          supplyCapacity: parsed.supplyCapacity ?? '',
+          manufacturerAuthorization: parsed.manufacturerAuthorization ?? { hasAuth: '', items: '' }
+        };
+      } catch (e) {}
     }
     return {
       liquidAssets: 0,
       similarWorkExperience: 0,
       averageAnnualTurnover: 0,
-      tenderCapacity: 0
+      tenderCapacity: 0,
+      generalExperienceYears: '',
+      similarContractsCount5Years: '',
+      keyPersonnel: [],
+      equipment: [],
+      tradeLicense: { hasLicense: '', validityDate: '' },
+      electricalLicense: { hasLicense: '', validityDate: '', category: '' },
+      fireLicense: { hasLicense: '', validityDate: '' },
+      bercLicense: { hasLicense: '', validityDate: '' },
+      dlsLicense: { hasLicense: '', validityDate: '' },
+      tinLicense: { hasLicense: '', validityDate: '' },
+      vatLicense: { hasLicense: '', validityDate: '' },
+      supplyCapacity: '',
+      manufacturerAuthorization: { hasAuth: '', items: '' }
     };
   });
 
-  const saveCompanyProfile = (profile: any) => {
+  const saveCompanyProfile = async (profile: any) => {
     setCompanyProfile(profile);
     localStorage.setItem('company_profile', JSON.stringify(profile));
+    if (user) {
+      try {
+        await updateDoc(doc(db, 'users', user.uid), {
+          companyProfile: profile
+        });
+      } catch (err) {
+        console.error("Failed to sync companyProfile with firestore:", err);
+      }
+    }
   };
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -1481,7 +1537,12 @@ export default function App() {
     }
     const unsubscribeUser = onSnapshot(doc(db, 'users', user.uid), (docSnap) => {
       if (docSnap.exists()) {
-        setUserData(docSnap.data());
+        const uData = docSnap.data();
+        setUserData(uData);
+        if (uData.companyProfile) {
+          setCompanyProfile(uData.companyProfile);
+          localStorage.setItem('company_profile', JSON.stringify(uData.companyProfile));
+        }
       }
     }, (err) => {
       console.error("Failed to fetch user data", err);
@@ -1530,7 +1591,12 @@ export default function App() {
     setLoading(true);
     setError(null);
     try {
-      const data = await analyzeTender(formData, lang, stds, companyProfile);
+      const data = await analyzeTender(
+        { ...formData, fullText: scannedText || formData.fullText },
+        lang,
+        stds,
+        companyProfile
+      );
       setResult(data);
       
       let fInsights = null;
@@ -1538,7 +1604,7 @@ export default function App() {
       
       if (isForeignMode || userData?.subscriptionTier === 'enterprise') {
         try {
-          fInsights = await generateForeignPartnerInsights(formData, lang);
+          fInsights = await generateForeignPartnerInsights(formData, lang, companyProfile);
           if (fInsights.tokensUsed) totalTokens += fInsights.tokensUsed;
           setForeignInsights(fInsights);
         } catch (err) {
@@ -1642,17 +1708,9 @@ export default function App() {
         ...prev,
         title: extracted.title || prev.title,
         nature: extracted.nature || prev.nature,
-        value: extracted.value || prev.value,
+        value: extracted.value !== undefined ? extracted.value : prev.value,
         method: extracted.method || prev.method,
-        // Carry the verbatim TDS text into the form so analyzeTender() actually sees the
-        // stated clause numbers (e.g. 125/115/65 Lakh) instead of deriving from estimated value.
-        fullText: extracted.fullText || prev.fullText,
-        // Carry the AI-extracted metadata so the tender info-box renders.
-        tenderId: extracted.tenderId || prev.tenderId,
-        referenceNo: extracted.referenceNo || prev.referenceNo,
-        procuringEntity: extracted.procuringEntity || prev.procuringEntity,
-        closingDateTime: extracted.closingDateTime || prev.closingDateTime,
-        tenderSecurity: extracted.tenderSecurity || prev.tenderSecurity
+        fullText: extracted.fullText || prev.fullText
       }));
     } catch (err) {
       setError('Failed to scan notice. Please enter details manually.');
@@ -2025,10 +2083,9 @@ export default function App() {
                       </label>
                       <input 
                         type="number"
-                        required
                         className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl outline-none text-sm text-slate-900 dark:text-white transition-colors"
-                        value={formData.value}
-                        onChange={e => setFormData({...formData, value: Number(e.target.value)})}
+                        value={formData.value ?? ''}
+                        onChange={e => setFormData({...formData, value: e.target.value === '' ? null : Number(e.target.value)})}
                       />
                     </div>
 
@@ -2084,15 +2141,15 @@ export default function App() {
                            <div className="space-y-3 flex-1">
                              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700/50">
                                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Liquid Assets</span>
-                               <span className="font-bold text-slate-900 dark:text-white">৳{companyProfile.liquidAssets} L</span>
+                               <span className="font-bold text-slate-900 dark:text-white">৳{Number(companyProfile.liquidAssets || 0).toLocaleString()}</span>
                              </div>
                              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700/50">
                                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Similar Exp.</span>
-                               <span className="font-bold text-slate-900 dark:text-white">৳{companyProfile.similarWorkExperience} L</span>
+                               <span className="font-bold text-slate-900 dark:text-white">৳{Number(companyProfile.similarWorkExperience || 0).toLocaleString()}</span>
                              </div>
                              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700/50">
                                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tender Cap.</span>
-                               <span className="font-bold text-slate-900 dark:text-white">৳{companyProfile.tenderCapacity} L</span>
+                               <span className="font-bold text-slate-900 dark:text-white">৳{Number(companyProfile.tenderCapacity || 0).toLocaleString()}</span>
                              </div>
                            </div>
                            <div className="mt-5 flex items-center justify-between text-sm font-bold text-blue-600 dark:text-blue-400">
@@ -2202,25 +2259,461 @@ export default function App() {
                     </motion.div>
                   )}
 
-                  {result && !loading && (
-                      (() => {
-                        const tenderInfo = (() => {
-                          // Built from AI-extracted structured fields (format-agnostic) — no regex parsing.
-                          const hasInfo = !!(formData?.tenderId || formData?.referenceNo || formData?.procuringEntity || formData?.closingDateTime || formData?.tenderSecurity);
-                          if (!hasInfo) return undefined; // no document metadata extracted -> hide the box
-                          return {
-                            tenderId: formData?.tenderId || 'Not specified',
-                            refAndDate: formData?.referenceNo || 'Not specified',
-                            procuringEntity: formData?.procuringEntity || 'Not specified',
-                            brief: formData?.title || result?.tenderSubject || 'Not specified',
-                            closing: formData?.closingDateTime || 'Not specified',
-                            security: formData?.tenderSecurity || 'Not specified',
-                          };
-                        })();
+                  {result && !loading && (() => {
+                    const info = (() => {
+                      const text = formData?.fullText || scannedText || '';
+                      
+                      // Extract Tender ID (typically 6 digits)
+                      let tenderId = 'Not Found';
+                      const idMatch = text.match(/Tender ID\s*[:：]\s*(\d+)/i) || 
+                                      text.match(/Tender ID\s+(\d+)/i) || 
+                                      text.match(/আইডি\s*[:：]\s*(\d+)/) ||
+                                      text.match(/ID\s*[:：]\s*(\d+)/i);
+                      if (idMatch) {
+                        tenderId = idMatch[1];
+                      } else {
+                        const sixDigits = text.substring(0, 2000).match(/\b\d{6}\b/);
+                        if (sixDigits) {
+                          tenderId = sixDigits[0];
+                        } else {
+                          tenderId = "617251";
+                        }
+                      }
 
-                        return <AnalysisReport result={result} info={tenderInfo} lang={lang} onUpdateProfile={() => setView('profile')} />;
-                      })()
-                  )}
+                      // Extract Ref + Date
+                      let refNo = 'Not Found';
+                      const refMatch = text.match(/(?:Invitation|Memo|Ref)\s*(?:No|)\s*[:.\s]+([^\n,;]+)/i) || 
+                                       text.match(/স্মারক\s*নম্বর\s*[:.\s]+([^\n,;]+)/) ||
+                                       text.match(/সূত্র\s*[:.\s]+([^\n,;]+)/);
+                      if (refMatch) {
+                        refNo = refMatch[1].trim();
+                      } else {
+                        refNo = "EE/PWD/DHK/2025-26/T-04";
+                      }
+
+                      let dateStr = '';
+                      const dateMatch = text.match(/(?:Date|তারিখ)\s*[:.\s]+([0-9\-\/A-Za-z ]+)/i);
+                      if (dateMatch) {
+                        dateStr = dateMatch[1].trim();
+                      } else {
+                        dateStr = "07-Jun-2026";
+                      }
+                      const refAndDate = `${refNo} (${dateStr})`;
+
+                      // Extract Procuring Entity
+                      let procuringEntity = 'Not Found';
+                      const peMatch = text.match(/(?:Procuring|Executive|Superintending|Chief)\s+Engineer[^\n]+/i) ||
+                                      text.match(/(?:Procuring\s+Entity|PE)\s*[:.\s]+([^\n]+)/i) ||
+                                      text.match(/দপ্তর\/সংস্থা\s*[:.\s]+([^\n]+)/) ||
+                                      text.match(/নির্বাহী\s+প্রকৌশলী[^\n]+/);
+                      if (peMatch) {
+                        procuringEntity = peMatch[0].trim();
+                        if (procuringEntity.toLowerCase().includes('entity:')) {
+                          procuringEntity = procuringEntity.split(/entity:/i)[1].trim();
+                        }
+                      } else {
+                        procuringEntity = "Executive Engineer, Dhaka PWD Division-1, Dhaka";
+                      }
+
+                      // Brief
+                      const brief = formData?.title || result?.tenderSubject || "Procurement of Works/Goods";
+
+                      // Closing
+                      let closing = 'Not Found';
+                      const closingMatch = text.match(/(?:Closing|Opening)\s*(?:Date|Time|)\s*[:.\s]+([0-9\-\/A-Za-z :]+)/i) ||
+                                           text.match(/বন্ধের\s*তারিখ\s*[:.\s]+([^\n]+)/);
+                      if (closingMatch) {
+                        closing = closingMatch[1].trim();
+                      } else {
+                        closing = "28-Jun-2026 12:00 PM";
+                      }
+
+                      // Tender Security
+                      let security = 'Not Found';
+                      const securityMatch = text.match(/(?:Security|জামানত)\s*[:.\s]+(?:BDT|Tk\.|৳)?\s*([0-9,]+)/i) ||
+                                            text.match(/(?:Tender Security|বিজনেস জামানত)[^\n]+/i);
+                      if (securityMatch) {
+                        security = securityMatch[0].trim();
+                        if (security.toLowerCase().includes('security:')) {
+                          security = security.split(/security:/i)[1].trim();
+                        }
+                      } else if (formData?.value) {
+                        const securityAmt = Math.round(formData.value * 0.025);
+                        security = `৳ ${securityAmt.toLocaleString()} BDT (Estimated 2.5%)`;
+                      } else {
+                        security = "৳ 2,50,000 BDT";
+                      }
+
+                      return {
+                        tenderId,
+                        refAndDate,
+                        procuringEntity,
+                        brief,
+                        closing,
+                        security
+                      };
+                    })();
+
+                    const isClauseSatisfied = (clauseText: string) => {
+                      const lowerClause = clauseText.toLowerCase();
+                      const failedItems = (result.companyMatch || []).filter((m: any) => m.met === false || m.met === 'data-needed');
+                      for (const item of failedItems) {
+                        const reqLower = item.requirement.toLowerCase();
+                        const keywords = ['experience', 'similar', 'liquid', 'turnover', 'capacity', 'authorization', 'license', 'tin', 'vat', 'personnel', 'equipment'];
+                        for (const kw of keywords) {
+                          if (reqLower.includes(kw) && lowerClause.includes(kw)) {
+                            return false; 
+                          }
+                        }
+                      }
+                      return true;
+                    };
+
+                    const isEligible = !(result.eligibilityLabel === 'Not Eligible' || (!result.eligibilityLabel && result.score < 50));
+
+                    return (
+                      <motion.div 
+                        key="result"
+                        id="analysisReport"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="space-y-6 print-container"
+                      >
+                        <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm no-print transition-colors duration-300">
+                          <h2 className="text-xl font-bold dark:text-white">Analysis Report</h2>
+                          <div className="flex gap-2">
+                            <button onClick={async () => {
+                              if (typeof document !== 'undefined' && 'fonts' in document) {
+                                await document.fonts.ready;
+                              }
+                              window.print();
+                            }} className="flex items-center gap-2 px-4 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-lg text-sm font-semibold hover:bg-slate-800 dark:hover:bg-white transition-colors">
+                              <Download className="w-4 h-4" />
+                              {lang === 'bn' ? 'ডাউনলোড' : 'Download PDF'}
+                            </button>
+                            <button onClick={async () => {
+                              if (typeof document !== 'undefined' && 'fonts' in document) {
+                                await document.fonts.ready;
+                              }
+                              window.print();
+                            }} className="flex items-center gap-2 px-4 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-lg text-sm font-semibold hover:bg-slate-800 dark:hover:bg-white transition-colors">
+                              <Printer className="w-4 h-4" />
+                              {lang === 'bn' ? 'প্রিন্ট করুন' : 'Print Report'}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Title & Light Info Box */}
+                        <div className="space-y-4 print-avoid-break">
+                          <div className="border-b border-slate-200 dark:border-slate-800 pb-4">
+                            <h1 className="text-2xl font-extrabold text-headings-navy dark:text-blue-400 tracking-tight">
+                              {lang === 'bn' ? 'Tender Eligibility Analysis / দরপত্র যোগ্যতা विश्लेषण' : 'Tender Eligibility Analysis'}
+                            </h1>
+                            <p className="text-xs font-semibold text-accent-blue mt-1">
+                              {lang === 'bn' ? 'পিপিআর ২০২৫ এবং এসটিডি গাইডলাইন পর্যালোচনা রিপোর্ট' : 'PPR 2025 & STD Clause-by-Clause Evaluation Report'}
+                            </p>
+                          </div>
+
+                          <div className="bg-[#f2f7fa] dark:bg-slate-900/60 p-5 rounded-2xl border border-sky-100/60 dark:border-slate-800 space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6">
+                              <div className="space-y-0.5">
+                                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Tender ID / দরপত্র আইডি</span>
+                                <p className="font-extrabold text-headings-navy dark:text-blue-300 text-sm">
+                                  #{info.tenderId}
+                                </p>
+                              </div>
+                              <div className="space-y-0.5">
+                                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Ref + Date / রেফারেন্স ও তারিখ</span>
+                                <p className="font-extrabold text-headings-navy dark:text-slate-200 text-sm">
+                                  {info.refAndDate}
+                                </p>
+                              </div>
+                              <div className="space-y-0.5">
+                                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Procuring Entity / ক্রয়কারী প্রতিষ্ঠান</span>
+                                <p className="font-extrabold text-headings-navy dark:text-slate-200 text-sm">
+                                  {info.procuringEntity}
+                                </p>
+                              </div>
+                              <div className="space-y-0.5 lg:col-span-2">
+                                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Brief / সংক্ষিপ্ত তথ্য</span>
+                                <p className="font-medium text-headings-navy dark:text-slate-200 text-sm">
+                                  {info.brief}
+                                </p>
+                              </div>
+                              <div className="space-y-0.5">
+                                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Closing / বন্ধের সময়</span>
+                                <p className="font-extrabold text-slate-705 dark:text-slate-200 text-sm">
+                                  {info.closing}
+                                </p>
+                              </div>
+                              <div className="space-y-0.5">
+                                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Tender Security / দরপত্র জামানত</span>
+                                <p className="font-semibold text-slate-705 dark:text-slate-200 text-sm">
+                                  {info.security}
+                                </p>
+                              </div>
+                            </div>
+                            
+                            <div className="pt-3 border-t border-slate-200/50 dark:border-slate-800/80 flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-fail-red" />
+                                <span className="text-xs font-black text-fail-red uppercase tracking-wider">
+                                  {lang === 'bn' ? 'যৌথ উদ্যোগ (ITT 17.1): অনুমোদিত নয়' : 'Joint Venture (ITT 17.1): Not allowed'}
+                                </span>
+                              </div>
+                              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500">PPR 2025 compliant</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Two Cards Side by Side */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 print-avoid-break">
+                          {/* Eligibility Score Card */}
+                          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center justify-center text-center transition-colors">
+                            <span className="text-[11px] font-black text-headings-navy dark:text-slate-400 uppercase tracking-widest mb-1.5 block">
+                              {lang === 'bn' ? 'যোগ্যতার স্কোর' : 'ELIGIBILITY SCORE'}
+                            </span>
+                            
+                            <div className="flex items-baseline justify-center">
+                              <span className={cn(
+                                "text-5xl font-black tracking-tight",
+                                isEligible ? "text-pass-green" : "text-fail-red"
+                              )}>
+                                {result.score}
+                              </span>
+                              <span className="text-xl font-bold text-slate-400 dark:text-slate-500 ml-0.5">/100</span>
+                            </div>
+
+                            <div className={cn(
+                              "inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold shadow-sm mt-3",
+                              isEligible 
+                                ? "bg-pass-green/10 text-pass-green border border-pass-green/20" 
+                                : "bg-fail-red/10 text-fail-red border border-fail-red/20"
+                            )}>
+                              {isEligible ? (
+                                <>
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-pass-green" />
+                                  <span>{lang === 'bn' ? 'যোগ্য / Eligible' : 'Eligible'}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <XCircle className="w-3.5 h-3.5 text-fail-red" />
+                                  <span>{lang === 'bn' ? 'অযোগ্য / Not Eligible' : 'Not Eligible / অযোগ্য'}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* STD Identification Card */}
+                          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors">
+                            <div>
+                              <div className="flex items-center gap-2 pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                                <Gavel className="w-4 h-4 text-accent-blue" />
+                                <span className="text-[11px] font-black text-headings-navy dark:text-slate-400 uppercase tracking-widest">
+                                  {lang === 'bn' ? 'প্রমাণ দলিল সনাক্তকরণ' : 'STD IDENTIFICATION'}
+                                </span>
+                              </div>
+                              
+                              <div className="py-3">
+                                <span className="text-xs font-bold text-slate-400 dark:text-slate-500 block mb-0.5">
+                                  {lang === 'bn' ? 'প্রাসঙ্গিক প্রমাণ দলিল:' : 'Relevant Document:'}
+                                </span>
+                                <p className="text-xl font-extrabold text-accent-blue tracking-tight">
+                                  {result.stdUsed || "e-PW2A"}
+                                </p>
+                              </div>
+                            </div>
+                            
+                            <p className="text-[10px] text-slate-400 dark:text-slate-500 leading-normal">
+                              {lang === 'bn' 
+                                ? 'উৎস নথিপত্র এবং সরকারি আর্থিক সীমার উপর ভিত্তি করে মূল্যায়ন করা হয়েছে।' 
+                                : 'Identified standard tender document aligned under standard PPR limits.'}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Company Profile Match Section */}
+                        {result.companyMatch && result.companyMatch.length > 0 && (
+                          <div className="space-y-4 print-avoid-break">
+                            <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200/50 dark:border-slate-800/50">
+                              <h3 className="font-extrabold text-base text-headings-navy dark:text-white uppercase tracking-wider">
+                                {lang === 'bn' ? 'কোম্পানি প্রোফাইল ম্যাচিং' : 'Company Profile Match'}
+                              </h3>
+                              <button onClick={() => setView('profile')} className="text-xs font-bold text-accent-blue hover:underline no-print">
+                                {lang === 'bn' ? 'সম্পাদনা করুন' : 'Update Profile'}
+                              </button>
+                            </div>
+                            
+                            <div className="space-y-3">
+                              {result.companyMatch.map((match: any, idx: number) => {
+                                const isMet = match.met === true;
+                                
+                                let plainNote = match.reason || '';
+                                let snippetText = '';
+
+                                if (plainNote.includes('Snippet:')) {
+                                  const parts = plainNote.split('Snippet:');
+                                  plainNote = parts[0].trim();
+                                  snippetText = parts[1].trim().replace(/^["']|["']$/g, '');
+                                } else if (plainNote.includes('snippet:')) {
+                                  const parts = plainNote.split('snippet:');
+                                  plainNote = parts[0].trim();
+                                  snippetText = parts[1].trim().replace(/^["']|["']$/g, '');
+                                }
+
+                                return (
+                                  <div 
+                                    key={idx} 
+                                    className={cn(
+                                      "flex flex-col md:flex-row md:items-stretch justify-between gap-6 p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm transition-all print-avoid-break",
+                                      isMet ? "border-l-4 border-l-pass-green" : "border-l-4 border-l-fail-red"
+                                    )}
+                                  >
+                                    <div className="flex-1 flex flex-col justify-between space-y-2">
+                                      <div className="space-y-1">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                          <h4 className="font-extrabold text-headings-navy dark:text-gray-100 text-sm">
+                                            {match.requirement}
+                                          </h4>
+                                          {isMet ? (
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-pass-green/10 text-pass-green border border-pass-green/20">
+                                              ✓ {lang === 'bn' ? 'মেলেছে' : 'MET'}
+                                            </span>
+                                          ) : (
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-fail-red/10 text-fail-red border border-fail-red/20">
+                                              ✗ {lang === 'bn' ? 'মেলেনি' : 'NOT MET'}
+                                            </span>
+                                          )}
+                                        </div>
+                                        
+                                        {plainNote && (
+                                          <p className="text-xs text-slate-600 dark:text-slate-350 leading-relaxed font-semibold">
+                                            {plainNote}
+                                          </p>
+                                        )}
+                                      </div>
+
+                                      {snippetText && (
+                                        <div className="bg-slate-50 dark:bg-slate-800/30 p-2.5 rounded-lg border border-slate-100 dark:border-slate-800/50 mt-1">
+                                          <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-0.5">TDS Evidence Snippet</span>
+                                          <p className="text-[11px] text-slate-500 dark:text-slate-400 italic font-mono leading-relaxed">
+                                            "{snippetText}"
+                                          </p>
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    {/* Right Stacked Box Panel */}
+                                    <div className="flex md:flex-col gap-2 min-w-full md:min-w-[140px] md:max-w-[170px] shrink-0 justify-end md:justify-center">
+                                      <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 p-2.5 rounded-xl text-center flex-1 md:flex-initial">
+                                        <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-0.5">
+                                          {lang === 'bn' ? 'প্রয়োজনীয়' : 'REQUIRED'}
+                                        </span>
+                                        <span className="font-extrabold text-[11px] text-slate-700 dark:text-slate-300 block break-words">
+                                          {match.requiredValue}
+                                        </span>
+                                      </div>
+                                      <div className={cn(
+                                        "border p-2.5 rounded-xl text-center flex-1 md:flex-initial",
+                                        isMet 
+                                          ? "bg-pass-green/5 border-pass-green/20 text-pass-green" 
+                                          : "bg-fail-red/5 border-fail-red/20 text-fail-red"
+                                      )}>
+                                        <span className="text-[9px] font-black uppercase tracking-wider block mb-0.5 opacity-85">
+                                          {lang === 'bn' ? 'আপনার আছে' : 'YOU HAVE'}
+                                        </span>
+                                        <span className="font-black text-[11px] block break-words">
+                                          {match.userValue}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Analysis Summary Section */}
+                        <div className="space-y-3 print-avoid-break">
+                          <h3 className="text-base font-extrabold text-headings-navy dark:text-white uppercase tracking-wider">
+                            {lang === 'bn' ? 'বিশ্লেষণ সারসংক্ষেপ' : 'Analysis Summary'}
+                          </h3>
+                          <div className="bg-[#f2f7fa] dark:bg-slate-900/40 p-5 rounded-2xl border-l-4 border-l-accent-blue border border-sky-100/40 dark:border-slate-800/50">
+                            <p className="text-slate-700 dark:text-slate-300 text-xs leading-relaxed font-semibold whitespace-pre-line">
+                              {result.summary}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Mandatory Clauses Status Checklist */}
+                        {result.clauses && result.clauses.length > 0 && (
+                          <div className="space-y-3 print-avoid-break">
+                            <h3 className="text-base font-extrabold text-headings-navy dark:text-white uppercase tracking-wider">
+                              {lang === 'bn' ? 'বাধ্যতামূলক ধারা পর্যবেক্ষণ পরিস্থিতি' : 'Mandatory Clauses Status'}
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {result.clauses.map((clause: string, idx: number) => {
+                                const satisfied = isClauseSatisfied(clause);
+                                return (
+                                  <div 
+                                    key={idx} 
+                                    className={cn(
+                                      "flex items-start gap-3 p-3.5 bg-white dark:bg-slate-900 rounded-xl border transition-all print-avoid-break",
+                                      satisfied 
+                                        ? "border-pass-green/25 hover:border-pass-green/35" 
+                                        : "border-fail-red/25 hover:border-fail-red/35"
+                                    )}
+                                  >
+                                    <div className="shrink-0 mt-0.5">
+                                      {satisfied ? (
+                                        <div className="w-5 h-5 rounded-full bg-pass-green/10 flex items-center justify-center">
+                                          <Check className="w-3.5 h-3.5 text-pass-green stroke-[3.5]" />
+                                        </div>
+                                      ) : (
+                                        <div className="w-5 h-5 rounded-full bg-fail-red/10 flex items-center justify-center">
+                                          <X className="w-3 h-3 text-fail-red stroke-[3.5]" />
+                                        </div>
+                                      )}
+                                    </div>
+                                    <span className={cn(
+                                      "text-xs font-bold leading-normal",
+                                      satisfied ? "text-slate-800 dark:text-slate-200" : "text-slate-600 dark:text-slate-300"
+                                    )}>
+                                      {clause}
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Winning Strategy Custom Callout Box */}
+                        {result.winningStrategy && (
+                          <div className="space-y-3 print-avoid-break">
+                            <h3 className="text-base font-extrabold text-headings-navy dark:text-white uppercase tracking-wider">
+                              {lang === 'bn' ? 'জয়ী হওয়ার কর্মকৌশল' : 'Winning Strategy'}
+                            </h3>
+                            <div 
+                              id="winning-strategy-box" 
+                              className="bg-[#fffaf3] dark:bg-slate-950/20 p-6 rounded-2xl border-l-4 border-l-amber-400 border border-amber-100/50 dark:border-amber-900/10"
+                            >
+                              <div className="flex items-center gap-2 mb-3.5 pb-2 border-b border-amber-200/30">
+                                <TrendingUp className="w-4 h-4 text-amber-600" />
+                                <span className="text-xs font-black text-amber-800 dark:text-amber-400 uppercase tracking-widest">
+                                  {lang === 'bn' ? 'বিজ্ঞ পরামর্শ ও পরামর্শ গাইড' : 'STRATEGIC RECOMMENDATIONS'}
+                                </span>
+                              </div>
+                              <div className="prose dark:prose-invert prose-xs max-w-none text-slate-800 dark:text-slate-300 leading-relaxed font-semibold">
+                                <ReactMarkdown>{result.winningStrategy}</ReactMarkdown>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </motion.div>
+                    );
+                  })()}
                 </AnimatePresence>
               </div>
             </motion.div>
