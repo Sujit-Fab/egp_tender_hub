@@ -43,4 +43,4 @@ jobs:
       - name: Deploy Functions and Hosting to Firebase
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        run: firebase deploy --only functions,hosting --project gen-lang-client-0089421810
+        run: firebase deploy --only functions,hosting --project gen-lang-client-0089421810 --force --non-interactive
