@@ -1237,6 +1237,7 @@ const LandingPage = ({ loginWithGoogle, lang, setView }: { loginWithGoogle: () =
                 loading="lazy"
               />
             </div>
+          </div>
 
           {/* Feature 3 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
@@ -1248,6 +1249,9 @@ const LandingPage = ({ loginWithGoogle, lang, setView }: { loginWithGoogle: () =
                 loading="lazy"
               />
             </div>
+          </div>
+
+          {/* Feature 3 */}
             <div className="order-1 md:order-2 space-y-6">
               <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center">
                 <MessageSquare className="w-6 h-6" />
