@@ -1412,6 +1412,14 @@ export default function App() {
     localStorage.setItem('dark_mode', String(isDarkMode));
   }, [isDarkMode]);
 
+  // Track each in-app screen change as a virtual pageview (so GA4 shows /landing, /dashboard, /pricing, etc.)
+  useEffect(() => {
+    trackEvent('page_view', {
+      page_title: `egp_${view}`,
+      page_path: `/${view}`,
+    });
+  }, [view]);
+
   const [foreignInsights, setForeignInsights] = useState<ForeignPartnerInsights | null>(null);
   const [loading, setLoading] = useState(false);
   const [scanning, setScanning] = useState(false);
@@ -1880,7 +1888,7 @@ export default function App() {
                 {lang === 'bn' ? 'বিদেশী অংশীদার' : 'Foreign Partner'}
               </span>
               <button
-                onClick={() => setIsForeignMode(!isForeignMode)}
+                onClick={() => { const next = !isForeignMode; trackEvent('foreign_partner_toggle', { enabled: next }); setIsForeignMode(next); }}
                 className={cn(
                   "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 dark:focus:ring-offset-slate-900",
                   isForeignMode ? "bg-blue-900 dark:bg-blue-600" : "bg-slate-300 dark:bg-slate-600"
