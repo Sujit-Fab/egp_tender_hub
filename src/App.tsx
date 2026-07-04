@@ -1380,6 +1380,13 @@ const LandingPage = ({ loginWithGoogle, lang, setView }: { loginWithGoogle: () =
   );
 };
 
+// GA4 event helper — fires to the gtag already loaded in index.html (G-6MT7G3LGZY)
+const trackEvent = (name: string, params: Record<string, any> = {}) => {
+  if (typeof window !== 'undefined' && typeof (window as any).gtag === 'function') {
+    (window as any).gtag('event', name, params);
+  }
+};
+
 export default function App() {
   const [lang, setLang] = useState<'en' | 'bn'>('en');
   const [view, setView] = useState<'landing' | 'dashboard' | 'library' | 'guide' | 'manage' | 'qna' | 'sop' | 'history' | 'pricing' | 'sor' | 'profile' | 'manual' | 'support' | 'blog' | 'terms' | 'noticeboard'>('landing');
@@ -1519,6 +1526,7 @@ export default function App() {
               scansThisMonth: 0,
               createdAt: serverTimestamp()
             });
+            trackEvent('sign_up', { method: 'google_workspace' });
           }
         } catch (err) {
           console.error("Error creating user document:", err);
@@ -1599,6 +1607,7 @@ export default function App() {
         companyProfile
       );
       setResult(data);
+      trackEvent('scan_complete', { verdict: data.eligibilityLabel || (data.score >= 50 ? 'eligible' : 'not_eligible'), score: data.score });
       
       let fInsights = null;
       let totalTokens = data.tokensUsed || 0;
@@ -1922,7 +1931,7 @@ export default function App() {
               </div>
             ) : (
               <button 
-                onClick={loginWithGoogle}
+                onClick={() => { trackEvent('cta_click', { location: 'header' }); loginWithGoogle(); }}
                 className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white rounded-lg text-sm font-semibold transition-colors flex items-center gap-2"
               >
                 <UserIcon className="w-4 h-4 hidden sm:block" /> Login
@@ -2005,7 +2014,7 @@ export default function App() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <AnimatePresence mode="wait">
           {view === 'landing' ? (
-            <LandingPage loginWithGoogle={loginWithGoogle} lang={lang} setView={setView} />
+            <LandingPage loginWithGoogle={() => { trackEvent('cta_click', { location: 'landing' }); loginWithGoogle(); }} lang={lang} setView={setView} />
           ) : view === 'sop' ? (
             <TenderSOP result={result} lang={lang} />
           ) : view === 'dashboard' ? (
