@@ -533,6 +533,15 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
       * "Sample Submission (ITT Clause 20.1j)" if a physical sample submission is required by the tender's TDS/ITT text before closing.
       * "DLS Category-1 License" if a DLS Category-1 license/registration is specified as mandatory for poultry, animal feed, or livestock ingredients.
       Keep them as separate, individual criteria cards in "criteria" and map them as "DATA_NEEDED" if not verified/unset in the profile.
+    - NEVER merge two or more distinct required documents/certificates into a single criterion card,
+      even when they share a clause reference or a common issuing authority. Each named document in
+      the tender's document list gets exactly one criterion card, evaluated independently, with its own
+      "satisfied" value. In particular, under ITT 23.1(f)/23.1(j) taxation and compliance documents:
+      the "TIN Certificate" and the "Income Tax Return Acknowledgement Slip" are TWO separate mandatory
+      documents — always create two separate criterion cards for them, never one combined card. A
+      card's "satisfied" must never be set to true because a sibling requirement folded into the same
+      card happens to be met; an unconfirmed or missing document must surface as its own DATA_NEEDED
+      or FAIL card, never be absorbed silently into a passing neighbor.
 
     ========================================================================
     RULE 6 — CATEGORY-AWARE & DOMAIN/CATEGORY MATCH EVALUATION
