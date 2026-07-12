@@ -639,8 +639,12 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
       * "CRITICAL" (knock-out): explicitly-mandated minimums the bidder must already hold to be eligible
         at all — e.g. a valid Trade Licence, TIN, VAT/BIN, tender security, any statutory licence the
         tender states as mandatory for this subject (Electrical/Fire/BERC/DLS as applicable), a required
-        sample submission, and any minimum personnel/equipment list or financial threshold that the
-        tender's own text states as a pass/fail minimum.
+        sample submission, and a financial threshold the tender states as a hard pass/fail floor that
+        cannot realistically be bridged by a credit line before contract signing.
+      * Personnel and equipment shortfalls are ALWAYS "IMPORTANT" (compensable via hire/lease), even if
+        the tender's own boilerplate text states non-fulfillment leads to "non-responsiveness" — that
+        boilerplate reflects the PE's formal evaluation process, not whether the gap is realistically
+        closeable before contract signing. Never classify a personnel or equipment shortfall as CRITICAL.
       * "IMPORTANT" (compensable): capacity gaps the bidder can realistically arrange before contract
         signing — a liquid-asset shortfall (bridgeable with a bank credit line/loan), a personnel
         shortfall (can be hired), or an equipment shortfall (can be leased/hired). These do NOT
