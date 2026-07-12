@@ -2387,7 +2387,9 @@ export default function App() {
                       return true;
                     };
 
-                    const isEligible = !(result.eligibilityLabel === 'Not Eligible' || (!result.eligibilityLabel && result.score < 50));
+                    const isEligible = result.eligibilityLabel
+                      ? !result.eligibilityLabel.includes('Not Eligible')
+                      : result.score >= 50;
 
                     return (
                       <motion.div 
@@ -2516,7 +2518,11 @@ export default function App() {
                               ) : (
                                 <>
                                   <XCircle className="w-3.5 h-3.5 text-fail-red" />
-                                  <span>{lang === 'bn' ? 'অযোগ্য / Not Eligible' : 'Not Eligible / অযোগ্য'}</span>
+                                  <span>
+                                    {result.eligibilityLabel === 'Not Eligible (knock-out)'
+                                      ? (lang === 'bn' ? 'যোগ্য নয় (বাধ্যতামূলক শর্ত পূরণ হয়নি) / Not Eligible (Knock-out)' : 'Not Eligible (Knock-out)')
+                                      : (lang === 'bn' ? 'অযোগ্য / Not Eligible' : 'Not Eligible / অযোগ্য')}
+                                  </span>
                                 </>
                               )}
                             </div>
@@ -2561,7 +2567,23 @@ export default function App() {
                                 {lang === 'bn' ? 'সম্পাদনা করুন' : 'Update Profile'}
                               </button>
                             </div>
-                            
+
+                            {/* Bilingual Disclaimer: strategic self-evaluation aid, not the PE's official scoring scheme */}
+                            <div className="bg-sky-50 dark:bg-sky-950/25 p-4 rounded-2xl border border-sky-100 dark:border-sky-900/50 flex items-start gap-3 print-avoid-break">
+                              <span className="text-lg shrink-0 mt-0.5">🛡️</span>
+                              <div className="space-y-1.5">
+                                <h4 className="text-xs font-black text-sky-900 dark:text-sky-300 uppercase tracking-wider">
+                                  Bidder-Facing Decision Guidance / বিডার-মুখী সিদ্ধান্ত নির্দেশিকা
+                                </h4>
+                                <p className="text-xs text-sky-750 dark:text-sky-400 leading-relaxed font-semibold">
+                                  This 3-tier severity model (Critical / Important / Minor) is a strategic self-evaluation aid to help you assess bidding risk and plan gap-closing actions. It is NOT the procuring entity's official scoring or evaluation scheme.
+                                </p>
+                                <p className="text-xs text-sky-750 dark:text-sky-400 leading-relaxed font-semibold">
+                                  এই ৩-স্তরের গুরুত্ব মডেল (গুরুত্বপূর্ণ / প্রয়োজনীয় / সাধারণ) আপনার দরপত্র ঝুঁকি মূল্যায়ন ও ঘাটতি পূরণের পরিকল্পনার জন্য একটি কৌশলগত স্ব-মূল্যায়ন সহায়ক। এটি ক্রয়কারী প্রতিষ্ঠানের আনুষ্ঠানিক মূল্যায়ন বা নম্বর প্রদান পদ্ধতি নয়।
+                                </p>
+                              </div>
+                            </div>
+
                             <div className="space-y-3">
                               {result.companyMatch.map((match: any, idx: number) => {
                                 const isMet = match.met === true;
@@ -2602,8 +2624,26 @@ export default function App() {
                                               ✗ {lang === 'bn' ? 'মেলেনি' : 'NOT MET'}
                                             </span>
                                           )}
+
+                                          {/* Severity Tier Badge */}
+                                          {match.severity && (
+                                            <span className={cn(
+                                              "inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider border",
+                                              match.severity === 'CRITICAL'
+                                                ? "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50"
+                                                : match.severity === 'IMPORTANT'
+                                                  ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/50"
+                                                  : "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700"
+                                            )}>
+                                              {match.severity === 'CRITICAL'
+                                                ? (lang === 'bn' ? 'গুরুত্বপূর্ণ / Critical (Knock-out)' : 'Critical (Knock-out)')
+                                                : match.severity === 'IMPORTANT'
+                                                  ? (lang === 'bn' ? 'প্রয়োজনীয় / Important (Compensable)' : 'Important (Compensable)')
+                                                  : (lang === 'bn' ? 'সাধারণ / Minor (Quality)' : 'Minor (Quality)')}
+                                            </span>
+                                          )}
                                         </div>
-                                        
+
                                         {plainNote && (
                                           <p className="text-xs text-slate-600 dark:text-slate-350 leading-relaxed font-semibold">
                                             {plainNote}
@@ -2616,6 +2656,17 @@ export default function App() {
                                           <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-0.5">TDS Evidence Snippet</span>
                                           <p className="text-[11px] text-slate-500 dark:text-slate-400 italic font-mono leading-relaxed">
                                             "{snippetText}"
+                                          </p>
+                                        </div>
+                                      )}
+
+                                      {!isMet && match.howToClose && (
+                                        <div className="bg-amber-500/5 dark:bg-amber-500/10 p-3 rounded-xl border border-amber-500/20 mt-2">
+                                          <span className="text-[10px] font-black text-amber-800 dark:text-amber-400 uppercase tracking-widest block mb-1">
+                                            💡 {lang === 'bn' ? 'এই ঘাটতি পূরণের উপায় / How to close this gap' : 'How to close this gap'}
+                                          </span>
+                                          <p className="text-xs text-amber-950 dark:text-amber-350 font-bold leading-relaxed">
+                                            {match.howToClose}
                                           </p>
                                         </div>
                                       )}
