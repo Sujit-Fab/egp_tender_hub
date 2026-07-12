@@ -542,6 +542,14 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
       card's "satisfied" must never be set to true because a sibling requirement folded into the same
       card happens to be met; an unconfirmed or missing document must surface as its own DATA_NEEDED
       or FAIL card, never be absorbed silently into a passing neighbor.
+    - The anti-merge rule above applies to DISTINCT required documents/certificates only. It does NOT
+      apply to a single requirement that has more than one condition joined by "AND" within the SAME
+      clause — e.g. ITT 13.1(b) similar-contract experience is typically phrased as "at least N contract(s),
+      EACH with a value of at least Tk. X" — the contract count and the per-contract value are two
+      conditions of ONE requirement, not two separate documents. Keep such a requirement as ONE
+      composite criterion card, and mark it NOT MET as a whole if ANY of its joined conditions fails
+      (e.g. the bidder has enough contracts by count but no single contract meets the minimum value —
+      the card is still NOT MET, never split into a passing "count" card and a failing "value" card).
 
     ========================================================================
     RULE 6 — CATEGORY-AWARE & DOMAIN/CATEGORY MATCH EVALUATION
@@ -711,6 +719,17 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
       * In Joint Venture (JV) Mode, do NOT flag the foreign company for missing these Bangladesh-specific licenses.
       * Attribute them to the local partner and only flag a gap if the local partner also lacks them or is expired.
       * For "Trade License", "TIN License", and "VAT License", if the local partner has them, evaluate them as met (set "valuePresent" = true, "satisfied" = true).
+
+    - JOINT VENTURE (JV) PARTICIPATION IS OPTIONAL, NOT MANDATORY:
+      * A tender clause stating "Joint Ventures are allowed" grants bidders the OPTION to bid as a JV —
+        it never requires them to. Bidding alone when JV is merely "allowed" is fully compliant and must
+        never be treated as a shortfall.
+      * If the bidder's profile is NOT in JV mode (single contractor), set "weight" = 0 and "valuePresent"
+        appropriately so the criterion resolves to EXCLUDED / not applicable — never "NOT MET" / FAIL —
+        for the "Joint Venture Allowed/Permitted" criterion itself. Do not give it a red/failing status or
+        let it read as a gap the bidder needs to close.
+      * Only evaluate JV-specific sub-requirements (lead/foreign partner shares, JV agreement document,
+        etc.) as pass/fail criteria when the bidder's profile indicates "Joint Venture (JV) Active: YES".
 
     ## INPUTS:
     - Tender Title: ${data.title}
