@@ -104,6 +104,8 @@ export interface Criterion {
   userValueStr?: string;
   requiredValueStr?: string;
   note?: string;
+  severity?: 'CRITICAL' | 'IMPORTANT' | 'MINOR';
+  howToClose?: string;
 }
 
 export interface TrackRecordMatch {
@@ -112,12 +114,14 @@ export interface TrackRecordMatch {
   userValue: string;
   requiredValue: string;
   reason: string;
+  severity?: 'CRITICAL' | 'IMPORTANT' | 'MINOR';
+  howToClose?: string;
 }
 
 export interface AnalysisResult {
   stdUsed: string;
   score: number;
-  eligibilityLabel?: 'High Probability' | 'Action Needed' | 'Not Eligible' | string;
+  eligibilityLabel?: 'High Probability' | 'Action Needed' | 'Not Eligible (knock-out)' | string;
   clauses: string[];
   winningStrategy: string;
   summary: string;
@@ -339,9 +343,15 @@ export function classifyCriterion(c: Criterion): CriterionStatus {
 
 export interface EligibilityResult {
   score: number;
-  eligibilityLabel: 'High Probability' | 'Action Needed' | 'Not Eligible';
+  eligibilityLabel: 'High Probability' | 'Action Needed' | 'Not Eligible (knock-out)';
   isEligible: boolean;
   criteria: Array<Criterion & { status: CriterionStatus }>;
+}
+
+// A criterion's tier, falling back to the legacy "mandatory" flag for any criterion
+// the model didn't (or couldn't) assign a severity to.
+function tierOf(c: Criterion): 'CRITICAL' | 'IMPORTANT' | 'MINOR' {
+  return c.severity || (c.mandatory ? 'CRITICAL' : 'IMPORTANT');
 }
 
 export function computeEligibility(criteria: Criterion[]): EligibilityResult {
@@ -351,33 +361,46 @@ export function computeEligibility(criteria: Criterion[]): EligibilityResult {
   }));
 
   const scorable = resolved.filter(c => c.status !== 'EXCLUDED' && c.status !== 'NOT_APPLICABLE');
-  const mandatory = scorable.filter(c => c.mandatory);
 
-  const hardFails = mandatory.filter(c => c.status === 'FAIL' || c.status === 'MISMATCH');
-  const dataNeeded = mandatory.filter(c => c.status === 'DATA_NEEDED');
+  const criticalItems = scorable.filter(c => tierOf(c) === 'CRITICAL');
+  const importantItems = scorable.filter(c => tierOf(c) === 'IMPORTANT');
 
-  // Base score calculation based on weights
-  const totalW = scorable.reduce((sum, c) => sum + (c.weight ?? 1), 0);
+  const criticalFails = criticalItems.filter(c => c.status === 'FAIL' || c.status === 'MISMATCH');
+  const criticalDataNeeded = criticalItems.filter(c => c.status === 'DATA_NEEDED');
+  const importantFails = importantItems.filter(c => c.status === 'FAIL' || c.status === 'MISMATCH');
+  const importantDataNeeded = importantItems.filter(c => c.status === 'DATA_NEEDED');
+
+  // Weighted score: IMPORTANT (compensable capacity gaps) counts for more than MINOR
+  // (nice-to-have quality items), so a bidder's technical score reflects real bidding risk.
+  const tierWeight = (c: Criterion) => {
+    const base = c.weight ?? 1;
+    return tierOf(c) === 'MINOR' ? base : base * 2;
+  };
+
+  const totalW = scorable.reduce((sum, c) => sum + tierWeight(c), 0);
   const passW = scorable
     .filter(c => c.status === 'PASS')
-    .reduce((sum, c) => sum + (c.weight ?? 1), 0);
-  
+    .reduce((sum, c) => sum + tierWeight(c), 0);
+
   let score = totalW > 0 ? Math.round((passW / totalW) * 100) : 0;
 
-  let label: 'High Probability' | 'Action Needed' | 'Not Eligible' = 'High Probability';
+  let label: 'High Probability' | 'Action Needed' | 'Not Eligible (knock-out)' = 'High Probability';
 
-  if (hardFails.length > 0) {
+  // Any CRITICAL (knock-out) failure overrides everything else and caps the score low.
+  if (criticalFails.length > 0) {
     score = Math.min(score, SCORE_CAP_HARD_FAIL);
-    label = 'Not Eligible';
-  } else if (dataNeeded.length > 0) {
+    label = 'Not Eligible (knock-out)';
+  } else if (criticalDataNeeded.length > 0) {
     score = Math.min(score, SCORE_CAP_DATA_NEEDED);
+    label = 'Action Needed';
+  } else if (importantFails.length > 0 || importantDataNeeded.length > 0) {
     label = 'Action Needed';
   }
 
   return {
     score,
     eligibilityLabel: label,
-    isEligible: hardFails.length === 0 && dataNeeded.length === 0,
+    isEligible: criticalFails.length === 0 && criticalDataNeeded.length === 0,
     criteria: resolved
   };
 }
@@ -605,6 +628,39 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
     - If a clause does not appear in the analysed tender's document (e.g., this tender has NO ITT Clause 13.1c supply/production capacity clause), you MUST NOT create a 13.1(c) card, and never mark a non-existent criterion as PASS.
     - Only evaluate criteria explicitly mentioned in the tender text (e.g. general experience ITT 13.1a, similar experience ITT 13.1b, liquid assets ITT 14.1b, Trade License, TIN, VAT, Sample Submission ITT 20.1j, and DLS Category-1 License if mentioned).
 
+    ========================================================================
+    RULE 15 — SEVERITY TIERING & GAP-CLOSING ADVISORY (Mr. Sarkar's 3-tier model)
+    ========================================================================
+    - Classify EVERY criterion in the "criteria" list into exactly one severity tier. Decide the tier from
+      what THIS tender's own TDS/ITT text requires for its own procurement category (Works, Goods, Physical
+      Services, or Consultancy Services) — use the category/clause map below and the tender text itself,
+      never a fixed generic list; the same criterion name can be CRITICAL in one tender and IMPORTANT in
+      another depending on how that tender's own TDS/ITT actually states it.
+      * "CRITICAL" (knock-out): explicitly-mandated minimums the bidder must already hold to be eligible
+        at all — e.g. a valid Trade Licence, TIN, VAT/BIN, tender security, any statutory licence the
+        tender states as mandatory for this subject (Electrical/Fire/BERC/DLS as applicable), a required
+        sample submission, and any minimum personnel/equipment list or financial threshold that the
+        tender's own text states as a pass/fail minimum.
+      * "IMPORTANT" (compensable): capacity gaps the bidder can realistically arrange before contract
+        signing — a liquid-asset shortfall (bridgeable with a bank credit line/loan), a personnel
+        shortfall (can be hired), or an equipment shortfall (can be leased/hired). These do NOT
+        disqualify the bidder; they lower the technical score.
+      * "MINOR": lower-weight, nice-to-have quality items that are not pass/fail.
+    - The application treats ANY unmet "CRITICAL" criterion as an automatic knock-out (score capped low,
+      verdict "Not Eligible (knock-out)") regardless of every other criterion — so reserve "CRITICAL" for
+      genuine knock-out minimums only, never for a compensable capacity gap.
+    - For every "IMPORTANT" criterion the bidder does NOT currently meet, write a professional,
+      action-oriented "howToClose" recommendation with its caveat:
+      * Liquid-asset shortfall -> recommend arranging a bank credit line / loan to cover the shortfall,
+        and note that there is a practical limit to how much a firm can realistically borrow.
+      * Personnel shortfall -> recommend hiring the missing qualified staff before contract signing, note
+        that hired staff cost more and carry a quality risk, and state plainly if this category/work
+        needs the bidder's OWN permanent staff rather than hired staff.
+      * Equipment shortfall -> recommend leasing/hiring the missing equipment, and note that hired
+        equipment costs more than owned equipment.
+      * Any other compensable gap -> give similarly brief, caveated, professional advice.
+      Leave "howToClose" empty for criteria that are already met, and for CRITICAL or MINOR criteria.
+
     ## CATEGORY DEFINITION & CLAUSE MAP:
     First, detect the procurement category from: Works, Goods, Physical Services, or Consultancy Services. Apply the correct core map for clause evaluation:
     - WORKS (STD: e-PW2A/e-PW2B/e-PW3 OTM/LTM, e-PW1 RFQ):
@@ -731,7 +787,9 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
           "unitsComparable": boolean | null, // false when units/goods don't line up, e.g. "units" vs "pc" or different product domains, otherwise true/null
           "userValueStr": "string representation of bidder value, e.g. 'Authorized for IT and Networking' or '25 Lac BDT'",
           "requiredValueStr": "string representation of required value, e.g. 'Authorization for LPG Gas Cylinders' or '1 Crore BDT'",
-          "note": "A reason note detailing the check naturally, without referencing internal prompt rule numbers."
+          "note": "A reason note detailing the check naturally, without referencing internal prompt rule numbers.",
+          "severity": "CRITICAL" | "IMPORTANT" | "MINOR",
+          "howToClose": "Gap-closing advisory for an unmet IMPORTANT criterion, with its caveat. Empty string if met, or if CRITICAL/MINOR."
         }
       ]
     }
@@ -787,10 +845,22 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
         met: metVal,
         userValue: c.userValueStr || (c.haveValue !== undefined && c.haveValue !== null ? c.haveValue.toLocaleString() : (lang === 'bn' ? 'তথ্য অনুপস্থিত' : 'Data Missing')),
         requiredValue: c.requiredValueStr || (c.requiredValue !== undefined && c.requiredValue !== null ? c.requiredValue.toLocaleString() : (lang === 'bn' ? 'প্রয়োজন' : 'Required')),
-        reason: c.note || ""
+        reason: c.note || "",
+        severity: c.severity || (c.mandatory ? 'CRITICAL' : 'IMPORTANT'),
+        howToClose: c.howToClose || ""
       };
     });
-    
+
+    // Sort order: CRITICAL-fails, CRITICAL-passes, IMPORTANT-fixable (with advisory), IMPORTANT-passes, MINOR.
+    const sortRank = (item: TrackRecordMatch) => {
+      const isUnmet = item.met === false || item.met === 'data-needed';
+      const severity = item.severity || 'IMPORTANT';
+      if (severity === 'CRITICAL') return isUnmet ? 0 : 1;
+      if (severity === 'IMPORTANT') return isUnmet ? 2 : 3;
+      return 4; // MINOR
+    };
+    companyMatch.sort((a, b) => sortRank(a) - sortRank(b));
+
     return {
       stdUsed: result.stdUsed || std,
       score: verdict.score,
