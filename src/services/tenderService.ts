@@ -556,8 +556,16 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
     ========================================================================
     - GOODS: do NOT evaluate Key Personnel or Equipment as pass/fail; mark them with weight 0 / status EXCLUDED or as non-applicable.
     - WORKS and PHYSICAL SERVICES: DO evaluate personnel and equipment.
-    - Identify the correct STD (e.g., e-PG3A for Goods OTM/Framework) and report it as "stdUsed".
-    
+    - Identify the correct STD (e.g., e-PG3A for Goods OTM/Framework) and report it as "stdUsed". A
+      pre-computed guess (derived only from estimated value and procurement method) is supplied to you
+      as a fallback default for "stdUsed" — but the tender's OWN text is the authority whenever it
+      disagrees. Search the "Tender Notice Text" for any explicit citation of its own standard document
+      or form series (e.g. a form number referenced in the document list such as "e-PW2A-5", "e-PW2A-8",
+      "e-PW2B-...", "e-PW3-...", "e-PW1-...", or a direct statement like "as per e-PW2A"). If the tender
+      text cites a specific STD/form series ANYWHERE, that citation OVERRIDES the value-derived fallback
+      default — report the STD the document itself actually uses, not the value-threshold guess, and do
+      not let mismatched value-derived STDs leak into individual clause references.
+
     - DOMAIN/CATEGORY MATCH RULE FOR EXPERIENCE & CAPACITY:
       * For specific/similar experience under ITT 13.1(b): the bidder's past contracts MUST be in the SAME goods category/domain that the tender names (e.g., "Animal Feed" or "Poultry Feed").
       * If the bidder's experience is NOT in the tendered goods category (e.g., they are an IT company with IT contracts / IT products while the tender is for "Animal Feed" or "Poultry Feed"), you MUST evaluate this as a DOMAIN MISMATCH. Set "satisfied" = false and "unitsComparable" = false (hard fail, leading to MISMATCH). Do NOT mark it PASS just because the contract value or count is high.
@@ -795,7 +803,7 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
       "tenderSubject": "exact Brief / Name / subject extracted as string",
       "estimatedValue": number | null,
       "isFrameworkAgreement": boolean,
-      "stdUsed": "${std}",
+      "stdUsed": "${std}", // this is only a value-derived FALLBACK DEFAULT; override it with the STD/form series the tender's own text actually cites, if any (see the STD-identification rule above)
       "clauses": ["Clause ITT X.Y: Description...", ...], // Category-specific clauses mapped correctly.
       "winningStrategy": "Strategic pricing recommendation, SLT warning (if Works, warn if bidder goes below the 10% SLT threshold calculated of BDT), or licensing needs.",
       "summary": "Detailed eligibility analysis summary reflecting PPR 2025 and STD consistent with tenderSubject.",
