@@ -156,18 +156,11 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
     - Outsourcing: For Physical Services, determine if it involves "Hiring Service Personnel through Outsourcing Policy" (isOutsourcing: true) or other physical services like maintenance, cleaning, etc. (isOutsourcing: false).
     - Development Partner Funded: Set to true if the notice mentions funding from World Bank, ADB, JICA, or other international agencies.
     - Tender ID: The tender/proposal ID number (look for "Tender/Proposal ID", "Tender ID"). Empty string if not present.
-    - Reference No: The invitation/memo reference number (look for "Invitation Reference No.", "Tender Ref", "Memo No", "স্মারক নম্বর"). Copy the ENTIRE reference string exactly, including any trailing parenthetical suffix (e.g. "37.07.0000.014.20.101.24.2660(3)" must be copied in full — do NOT truncate it, and do NOT borrow digits from a nearby, separate "Date:" field). Empty string if not present.
+    - Reference No: The invitation/memo reference number (look for "Invitation Reference No.", "Tender Ref", "Memo No", "স্মারক নম্বর"). Empty string if not present.
     - Procuring Entity: The procuring entity / office name (look for "Procuring Entity", "Executive Engineer ...", "নির্বাহী প্রকৌশলী ..."). Return ONLY the entity name, WITHOUT the "Procuring Entity:" prefix. Empty string if not present.
-    - Closing Date/Time: The tender closing (submission deadline) date and time exactly as stated (e.g. "14-Jun-2026 14:00"). The header often lists several adjacent date/time fields back-to-back on one line, e.g.
-        "Date: 01.01.2026  Closing Date and Time: 25-Jun-2026 15:00  Opening Date and Time: 25-Jun-2026 15:00"
-      Treat "Date", "and", "Time" here as part of the FIELD LABEL, never as part of the value — extract
-      only the actual date-time string that follows the "Closing Date and Time:" label's colon. Do NOT
-      confuse it with the plain "Date:" field (that's the notice/invitation date, a different field) or
-      with "Opening Date and Time:" (a different field). If your extracted value is a bare word like
-      "and", "Date", or "Time" rather than an actual date/time, that is wrong — re-read the label and
-      re-extract the real value after its colon.
-    - Tender Security: The tender security amount or stated text (e.g. "Tk. 2,50,000" or "As per e-Tender Notice"). This must be a monetary amount or an explicit "as stated" phrase — never a bare clause/article number (e.g. do not return something like "32" or "Security 32" just because a clause such as "ITT Clause 32" is nearby; that is a clause reference, not the security amount). Empty string if not present.
-    IMPORTANT for the five fields above: copy values EXACTLY from the document; if a field is not present, return an EMPTY STRING — never guess or invent. Never let one field's label text or a neighboring field's digits leak into another field's value.
+    - Closing Date/Time: The tender closing (submission deadline) date and time exactly as stated (e.g. "14-Jun-2026 14:00"). Empty string if not present. Do NOT confuse it with the opening date.
+    - Tender Security: The tender security amount or stated text (e.g. "Tk. 2,50,000" or "As per e-Tender Notice"). Empty string if not present.
+    IMPORTANT for the five fields above: copy values EXACTLY from the document; if a field is not present, return an EMPTY STRING — never guess or invent.
     - Full Text: Reproduce the COMPLETE text of the document VERBATIM — every clause, number, date and threshold exactly as written. Do NOT summarize, paraphrase, shorten or omit anything (especially qualification/financial clause values such as experience years, turnover, similar-contract values, liquid assets, supply capacity). This raw text drives the clause-by-clause analysis, so completeness and exactness are critical.
 
     Return the response strictly in JSON format:
