@@ -156,11 +156,18 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
     - Outsourcing: For Physical Services, determine if it involves "Hiring Service Personnel through Outsourcing Policy" (isOutsourcing: true) or other physical services like maintenance, cleaning, etc. (isOutsourcing: false).
     - Development Partner Funded: Set to true if the notice mentions funding from World Bank, ADB, JICA, or other international agencies.
     - Tender ID: The tender/proposal ID number (look for "Tender/Proposal ID", "Tender ID"). Empty string if not present.
-    - Reference No: The invitation/memo reference number (look for "Invitation Reference No.", "Tender Ref", "Memo No", "স্মারক নম্বর"). Empty string if not present.
+    - Reference No: The invitation/memo reference number (look for "Invitation Reference No.", "Tender Ref", "Memo No", "স্মারক নম্বর"). Copy the ENTIRE reference string exactly, including any trailing parenthetical suffix (e.g. "37.07.0000.014.20.101.24.2660(3)" must be copied in full — do NOT truncate it, and do NOT borrow digits from a nearby, separate "Date:" field). Empty string if not present.
     - Procuring Entity: The procuring entity / office name (look for "Procuring Entity", "Executive Engineer ...", "নির্বাহী প্রকৌশলী ..."). Return ONLY the entity name, WITHOUT the "Procuring Entity:" prefix. Empty string if not present.
-    - Closing Date/Time: The tender closing (submission deadline) date and time exactly as stated (e.g. "14-Jun-2026 14:00"). Empty string if not present. Do NOT confuse it with the opening date.
-    - Tender Security: The tender security amount or stated text (e.g. "Tk. 2,50,000" or "As per e-Tender Notice"). Empty string if not present.
-    IMPORTANT for the five fields above: copy values EXACTLY from the document; if a field is not present, return an EMPTY STRING — never guess or invent.
+    - Closing Date/Time: The tender closing (submission deadline) date and time exactly as stated (e.g. "14-Jun-2026 14:00"). The header often lists several adjacent date/time fields back-to-back on one line, e.g.
+        "Date: 01.01.2026  Closing Date and Time: 25-Jun-2026 15:00  Opening Date and Time: 25-Jun-2026 15:00"
+      Treat "Date", "and", "Time" here as part of the FIELD LABEL, never as part of the value — extract
+      only the actual date-time string that follows the "Closing Date and Time:" label's colon. Do NOT
+      confuse it with the plain "Date:" field (that's the notice/invitation date, a different field) or
+      with "Opening Date and Time:" (a different field). If your extracted value is a bare word like
+      "and", "Date", or "Time" rather than an actual date/time, that is wrong — re-read the label and
+      re-extract the real value after its colon.
+    - Tender Security: The tender security amount or stated text (e.g. "Tk. 2,50,000" or "As per e-Tender Notice"). This must be a monetary amount or an explicit "as stated" phrase — never a bare clause/article number (e.g. do not return something like "32" or "Security 32" just because a clause such as "ITT Clause 32" is nearby; that is a clause reference, not the security amount). Empty string if not present.
+    IMPORTANT for the five fields above: copy values EXACTLY from the document; if a field is not present, return an EMPTY STRING — never guess or invent. Never let one field's label text or a neighboring field's digits leak into another field's value.
     - Full Text: Reproduce the COMPLETE text of the document VERBATIM — every clause, number, date and threshold exactly as written. Do NOT summarize, paraphrase, shorten or omit anything (especially qualification/financial clause values such as experience years, turnover, similar-contract values, liquid assets, supply capacity). This raw text drives the clause-by-clause analysis, so completeness and exactness are critical.
 
     Return the response strictly in JSON format:
@@ -670,6 +677,16 @@ export async function analyzeTender(data: TenderData, lang: 'en' | 'bn' = 'en', 
         the tender's own boilerplate text states non-fulfillment leads to "non-responsiveness" — that
         boilerplate reflects the PE's formal evaluation process, not whether the gap is realistically
         closeable before contract signing. Never classify a personnel or equipment shortfall as CRITICAL.
+      * GRANULARITY: Personnel and equipment must NEVER be reported as one single combined "Personnel
+        Capacity" / "Equipment Capacity" block. Create ONE separate criterion card PER required position
+        (e.g. "Key Personnel: Project Manager", "Key Personnel: Site Engineer (Civil)", "Key Personnel:
+        Site Engineer (Electrical)", "Key Personnel: Manager (B Com)", etc.) and PER required equipment
+        type (e.g. "Equipment: Vibrator Machine", "Equipment: Pump Motor", "Equipment: Compaction
+        Machine", etc.), each with its own "satisfied" value and its own role/type-specific "howToClose"
+        advisory (e.g. name which electrification/civil/financial work the missing role or machine is
+        needed for). This lets the bidder decide, position by position and machine by machine, which
+        gaps to hire/lease and which require the bidder's own permanent staff/owned equipment — do not
+        collapse this decision into one generic block advisory.
       * "IMPORTANT" (compensable): capacity gaps the bidder can realistically arrange before contract
         signing — a liquid-asset shortfall (bridgeable with a bank credit line/loan), a personnel
         shortfall (can be hired), or an equipment shortfall (can be leased/hired). These do NOT
