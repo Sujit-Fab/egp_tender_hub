@@ -627,83 +627,373 @@ Instead of reading a 500-page PDF manually, simply upload the tender notice to *
     },
     {
       slug: 'ppr-2025-guidelines',
-      title: lang === 'bn' ? 'পিপিআর ২০২৫-এ নতুন কী আছে?' : 'What is new in the PPR 2025 guidelines?',
-      excerpt: lang === 'bn' ? 'বাংলাদেশ সরকারি ক্রয় বিধিমালার সর্বশেষ সংশোধনী এবং ঠিকাদারদের জন্য এর প্রভাব নিয়ে বিস্তারিত আলোচনা।' : 'A detailed breakdown of the latest amendments to the Bangladesh Public Procurement Rules and what it means for contractors.',
-      date: 'Oct 15, 2025',
+            title: lang === 'bn' ? 'PPR 2025-এ নতুন কী কী এসেছে — ঠিকাদারদের জন্য সম্পূর্ণ গাইড' : 'What is New in PPR 2025 — A Complete Guide for Contractors',
+      excerpt: lang === 'bn' ? '২৮ সেপ্টেম্বর ২০২৫-এ জারি হওয়া PPR 2025 বাংলাদেশের সরকারি ক্রয়ে বড় পরিবর্তন এনেছে — ±১০% সীমা বিলুপ্ত, SLT সিস্টেম, beneficial owner প্রকাশ। ঠিকাদারদের জন্য এর অর্থ কী।' : 'PPR 2025, issued 28 September 2025, brought major changes to Bangladesh public procurement — the ±10% cap is gone, SLT arrived, beneficial ownership must be disclosed. Here is what it means for contractors.',
+      date: 'Jul 16, 2026',
       category: 'Compliance',
       contentEn: `
-## Navigating the PPR 2025 Updates
+## What Changed in PPR 2025 — And What It Means for Your Bids
 
-The Bangladesh Public Procurement Rules (PPR) have undergone significant revisions for the 2025 fiscal year. These changes are designed to streamline the e-GP system, enhance transparency, and ensure fairer competition among contractors.
+On **28 September 2025**, the Public Procurement Rules 2025 (PPR 2025) were issued, replacing the long-standing PPR 2008. There is a structural change worth noting straight away: PPR 2025 was published by the **Bangladesh Public Procurement Authority (BPPA)**, whereas PPR 2008 came from the Central Procurement Technical Unit (CPTU).
 
-### 1. Stricter Liquid Asset Requirements
-Previously, many contractors struggled with the verification of bank credit lines. Under the new rules, the mechanism for submitting **Credit Line Certificates** has been digitally integrated with the Bangladesh Bank database. This means:
-* No more manual verification delays.
-* Instant disqualification for forged documents.
-* A clear mandate to maintain healthy working capital throughout the project lifecycle.
+This is not a cosmetic update. Several changes directly affect how you bid, how you price, and what you must disclose. This guide walks through the ones that matter most to contractors.
 
-### 2. Enhanced Tender Capacity Calculations
-The formula for Tender Capacity (TC) has been modified. The new equation places a heavier weight on recent, successfully completed projects.
-> *Pro-Tip: Always update your e-GP profile immediately after receiving a completion certificate to reflect your maximized tender capacity.*
+---
 
-### 3. AI and Automated Evaluations
-The evaluation committees are now equipped with preliminary AI-driven screening tools. These tools cross-reference your past technical specifications and completion history automatically.
+### 1. e-GP Portal Use Is Now Mandatory
 
-**Conclusion:** Staying compliant in 2025 means fully embracing the digitized, interconnected nature of the new e-GP ecosystem. Ensure your financial documents are impeccable and your project completion records are instantly digitized.
+Under **Rule 150(1)**, all procuring entities are obliged to use the e-GP portal for any procurement supported on the e-GP system.
+
+**What this means for you:** offline workarounds are closing. If your e-GP profile is incomplete or your documents are not mapped and current in the system, you are not simply at a disadvantage — you may be locked out entirely.
+
+---
+
+### 2. The ±10% Price Cap Is Gone (National Works)
+
+This is the change with the biggest day-to-day impact. The plus/minus 10% limit for national works procurement — long controversial — has been repealed.
+
+**What this means for you:** the floor and ceiling that shaped bidding strategy for years no longer exist. There is no automatic protection from being undercut, and no automatic band keeping you "safe." Pricing discipline now has to come entirely from your own costing.
+
+But the cap was not removed and replaced with nothing. It was replaced with SLT.
+
+---
+
+### 3. Significantly Low-priced Tender (SLT) Evaluation
+
+PPR 2025 introduced a **formula-based system for identifying significantly low-priced tenders.** The assessment weighs the prices of technically acceptable tenderers (the average carrying roughly 50% weight), the official estimate, and recent price indices.
+
+The purpose is to determine SLT **objectively, eliminating subjective judgement** — and tenders identified as SLT are declared non-responsive. In e-GP, the calculation runs automatically during evaluation.
+
+**What this means for you:** bidding lowest is no longer the same as winning. An unrealistically low price is now a documented route to rejection, not a shortcut to a contract.
+
+> Note: SLT identification does not apply to every procurement method or category. Check the specific tender document, and raise it at the pre-bid meeting if the treatment of low prices is unclear.
+
+---
+
+### 4. Beneficial Owner Disclosure
+
+It is now required to **disclose the actual beneficial owner** of any contract award.
+
+The stated purpose is to improve transparency and prevent the use of proxy bidders or one person operating through many different licences.
+
+**What this means for you:** if you bid legitimately under your own licence, this is simply a disclosure step. If your arrangements are less straightforward, this rule is aimed squarely at them.
+
+---
+
+### 5. Four Procurement Categories Now
+
+Physical services (also called non-consulting services) are now established as a **distinct procurement category**, with expanded provisions for framework agreements and negotiations.
+
+So procurement is now divided into four categories:
+1. Works
+2. Goods
+3. Professional (consulting) services
+4. Non-consulting / physical services
+
+**What this means for you:** the category determines which Standard Tender Document applies and which qualification criteria you are judged against. Know which category your tender falls into before you assess your eligibility.
+
+---
+
+### 6. Sustainable Public Procurement (SPP)
+
+The concept of sustainable procurement has been incorporated into **Rule 6** of PPR 2025.
+
+**What this means for you:** this is early-stage, but it signals the direction of travel. Over time, expect sustainability considerations to appear in specifications and evaluation criteria.
+
+---
+
+### The Constant Underneath All of This
+
+Rules change. What does not change is that **most tenders are still lost at the eligibility stage, not the price stage.**
+
+Liquid assets net of ongoing commitments, key personnel with the right qualifications and years, equipment with valid ownership or hire documents, certificates that have not expired — these decide whether your bid is even considered. PPR 2025 did not make any of that easier.
+
+**eGPTenderHub reads the tender and checks every criterion against your company profile** — telling you plainly whether you qualify and exactly what is missing, before you spend days preparing a bid that cannot survive evaluation.
+
+**Check your eligibility in minutes at egptenderhub.com.**
+
+---
+
+*This guide summarises key changes for contractors. For the authoritative text, consult PPR 2025 as published by BPPA, and confirm any specific requirement against the tender document and at the pre-bid meeting.*
       `,
       contentBn: `
-## পিপিআর ২০২৫ আপডেটের নির্দেশিকা
+## PPR 2025-এ কী বদলালো — এবং আপনার দরপত্রের জন্য এর অর্থ
 
-বাংলাদেশ সরকারি ক্রয় বিধিমালা (PPR) ২০২৫ অর্থবছরের জন্য উল্লেখযোগ্যভাবে সংশোধন করা হয়েছে। এই পরিবর্তনগুলোর মূল উদ্দেশ্য হল ই-জিপি সিস্টেমকে আরও সহজতর করা, স্বচ্ছতা বৃদ্ধি করা এবং ঠিকাদারদের মধ্যে প্রতিযোগিতার সমতা নিশ্চিত করা।
+**২৮ সেপ্টেম্বর ২০২৫** তারিখে পাবলিক প্রকিউরমেন্ট বিধিমালা ২০২৫ (PPR 2025) জারি করা হয়, যা দীর্ঘদিনের PPR 2008-এর স্থলাভিষিক্ত হয়। একটা কাঠামোগত পরিবর্তন শুরুতেই বলে রাখা দরকার: PPR 2025 প্রকাশ করেছে **বাংলাদেশ পাবলিক প্রকিউরমেন্ট অথরিটি (BPPA)**, যেখানে PPR 2008 এসেছিল সেন্ট্রাল প্রকিউরমেন্ট টেকনিক্যাল ইউনিট (CPTU) থেকে।
 
-### ১. তরল সম্পদের কঠোর নিয়মাবলি
-আগে ব্যাংক ক্রেডিট লাইন যাচাই করতে অনেক সময় লাগত। নতুন নিয়মে, **ক্রেডিট লাইন সার্টিফিকেট** জমা দেওয়ার প্রক্রিয়াটি বাংলাদেশ ব্যাংকের ডেটাবেসের সাথে ডিজিটালি যুক্ত করা হয়েছে। এর মানে:
-* ম্যানুয়াল যাচাইকরণে আর কোনো বিলম্ব নেই।
-* জাল নথিপত্রের জন্য তাৎক্ষণিক অযোগ্যতা।
-* প্রকল্প চলাকালীন পর্যাপ্ত চলতি মূলধন বজায় রাখার কঠোর নির্দেশ।
+এটা নিছক প্রসাধনী সংশোধন নয়। বেশ কিছু পরিবর্তন সরাসরি প্রভাব ফেলে আপনি কীভাবে দর দেবেন, কীভাবে দাম নির্ধারণ করবেন, আর কী প্রকাশ করতে বাধ্য থাকবেন। এই গাইডে ঠিকাদারদের জন্য সবচেয়ে গুরুত্বপূর্ণ পরিবর্তনগুলো আলোচনা করা হলো।
 
-### ২. টেন্ডার ক্যাপাসিটি হিসাবের পরিবর্তন
-টেন্ডার ক্যাপাসিটি (TC) এর সূত্র পরিবর্তন করা হয়েছে। নতুন সমীকরণে সম্প্রতি সফলভাবে শেষ হওয়া প্রকল্পগুলোকে বেশি গুরুত্ব দেওয়া হচ্ছে।
+---
 
-### ৩. স্বয়ংক্রিয় মূল্যায়ন
-মূল্যায়ন কমিটিগুলো এখন কৃত্রিম বুদ্ধিমত্তা (AI) চালিত প্রাথমিক স্ক্যানিং টুল ব্যবহার করছে।
+### ১. e-GP পোর্টাল ব্যবহার এখন বাধ্যতামূলক
 
-**উপসংহার:** ২০২৫ সালে কাজ পেতে হলে আপনাকে নতুন ই-জিপি ইকোসিস্টেমের ডিজিটাল প্রযুক্তির সাথে পুরোপুরি মানিয়ে নিতে হবে।
+**বিধি ১৫০(১)** অনুযায়ী, e-GP সিস্টেমে সমর্থিত যেকোনো ক্রয়ের জন্য সকল ক্রয়কারী প্রতিষ্ঠান e-GP পোর্টাল ব্যবহার করতে বাধ্য।
+
+**আপনার জন্য এর অর্থ:** অফলাইন বিকল্প বন্ধ হয়ে আসছে। আপনার e-GP প্রোফাইল অসম্পূর্ণ থাকলে বা কাগজপত্র সিস্টেমে map করা ও হালনাগাদ না থাকলে আপনি শুধু পিছিয়ে থাকবেন না — সম্পূর্ণ বাদ পড়তে পারেন।
+
+---
+
+### ২. ±১০% মূল্য সীমা বিলুপ্ত (জাতীয় works)
+
+দৈনন্দিন কাজে সবচেয়ে বড় প্রভাব ফেলা পরিবর্তন এটাই। জাতীয় works procurement-এর জন্য দীর্ঘদিনের বিতর্কিত প্লাস/মাইনাস ১০% সীমা তুলে দেওয়া হয়েছে।
+
+**আপনার জন্য এর অর্থ:** বছরের পর বছর যে মেঝে ও ছাদ দরপত্র কৌশল গড়ে দিয়েছিল, তা আর নেই। অন্যের কম দরে কেটে যাওয়া থেকে স্বয়ংক্রিয় সুরক্ষা নেই, আবার আপনাকে "নিরাপদ" রাখার স্বয়ংক্রিয় সীমাও নেই। দর নির্ধারণের শৃঙ্খলা এখন সম্পূর্ণভাবে আপনার নিজের হিসাব থেকে আসতে হবে।
+
+তবে সীমাটা তুলে নিয়ে শূন্যতা রাখা হয়নি। এর জায়গায় এসেছে SLT।
+
+---
+
+### ৩. অত্যধিক নিম্নমূল্যের দরপত্র (SLT) মূল্যায়ন
+
+PPR 2025 **অত্যধিক নিম্নমূল্যের দরপত্র চিহ্নিত করার জন্য একটা formula-ভিত্তিক ব্যবস্থা** চালু করেছে। এই মূল্যায়নে বিবেচিত হয় কারিগরিভাবে গ্রহণযোগ্য দরদাতাদের প্রস্তাবিত মূল্য (যার গড় প্রায় ৫০% weight বহন করে), দাপ্তরিক প্রাক্কলিত মূল্য, এবং সাম্প্রতিক মূল্যসূচক।
+
+উদ্দেশ্য হলো SLT **বস্তুনিষ্ঠভাবে নির্ধারণ করা, ব্যক্তিগত বিচার সম্পূর্ণ বাদ দিয়ে** — এবং SLT হিসেবে চিহ্নিত দরপত্র non-responsive ঘোষণা করা হয়। e-GP-তে মূল্যায়নের সময় এই হিসাব স্বয়ংক্রিয়ভাবে চলে।
+
+**আপনার জন্য এর অর্থ:** সবচেয়ে কম দর দেওয়া আর জেতা এখন এক কথা নয়। অবাস্তব কম দাম এখন চুক্তির শর্টকাট নয়, বরং বাতিল হওয়ার নথিভুক্ত পথ।
+
+> দ্রষ্টব্য: SLT চিহ্নিতকরণ সব ক্রয় পদ্ধতি বা শ্রেণিতে প্রযোজ্য নয়। নির্দিষ্ট দরপত্র নথি দেখুন, এবং কম দাম কীভাবে বিবেচিত হবে তা অস্পষ্ট থাকলে pre-bid meeting-এ তুলুন।
+
+---
+
+### ৪. Beneficial Owner প্রকাশ
+
+যেকোনো চুক্তি প্রদানের ক্ষেত্রে এখন **প্রকৃত beneficial owner প্রকাশ করা** বাধ্যতামূলক।
+
+ঘোষিত উদ্দেশ্য হলো স্বচ্ছতা বৃদ্ধি এবং proxy bidder ব্যবহার বা একজন ব্যক্তির বহু ভিন্ন লাইসেন্স ব্যবহার প্রতিরোধ করা।
+
+**আপনার জন্য এর অর্থ:** আপনি যদি নিজের লাইসেন্সে বৈধভাবে দর দেন, এটা শুধু একটা প্রকাশের ধাপ। ব্যবস্থা যদি কম সরল হয়, এই নিয়ম সরাসরি সেদিকেই লক্ষ্য করা।
+
+---
+
+### ৫. এখন চারটি ক্রয় শ্রেণি
+
+Physical services (যাকে non-consulting services-ও বলা হয়) এখন একটি **স্বতন্ত্র ক্রয় শ্রেণি** হিসেবে প্রতিষ্ঠিত, framework agreement ও negotiation-এর বর্ধিত বিধান সহ।
+
+তাই ক্রয় এখন চারটি শ্রেণিতে বিভক্ত:
+১. Works (পূর্ত)
+২. Goods (পণ্য)
+৩. Professional (consulting) services
+৪. Non-consulting / physical services
+
+**আপনার জন্য এর অর্থ:** শ্রেণি নির্ধারণ করে কোন Standard Tender Document প্রযোজ্য হবে এবং কোন যোগ্যতার মানদণ্ডে আপনাকে বিচার করা হবে। নিজের যোগ্যতা যাচাইয়ের আগে জানুন আপনার দরপত্র কোন শ্রেণিতে পড়ে।
+
+---
+
+### ৬. টেকসই সরকারি ক্রয় (SPP)
+
+টেকসই ক্রয়ের ধারণা PPR 2025-এর **বিধি ৬**-এ অন্তর্ভুক্ত করা হয়েছে।
+
+**আপনার জন্য এর অর্থ:** এটা এখনও প্রাথমিক পর্যায়ে, তবে এটা যাত্রার দিক নির্দেশ করে। সময়ের সাথে specification ও মূল্যায়নের মানদণ্ডে টেকসইতার বিবেচনা আসবে বলে ধরে নিন।
+
+---
+
+### এই সবকিছুর নিচে যে ধ্রুবক
+
+নিয়ম বদলায়। যা বদলায় না তা হলো — **বেশিরভাগ দরপত্র এখনও eligibility ধাপেই হারে, দামের ধাপে নয়।**
+
+চলমান প্রতিশ্রুতি বাদ দিয়ে liquid assets, সঠিক যোগ্যতা ও বছরের অভিজ্ঞতাসহ key personnel, বৈধ ownership বা hire নথিসহ equipment, মেয়াদ না-ফুরানো সনদ — এগুলোই ঠিক করে আপনার দরপত্র আদৌ বিবেচিত হবে কিনা। PPR 2025 এর কোনোটাই সহজ করেনি।
+
+**eGPTenderHub দরপত্র পড়ে প্রতিটি শর্ত আপনার company profile-এর সাথে যাচাই করে** — পরিষ্কারভাবে বলে দেয় আপনি যোগ্য কিনা আর ঠিক কী missing, এমন একটা bid তৈরিতে দিন নষ্ট করার আগেই যা মূল্যায়নে টিকবে না।
+
+**egptenderhub.com-এ মিনিটেই আপনার eligibility যাচাই করুন।**
+
+---
+
+*এই গাইড ঠিকাদারদের জন্য মূল পরিবর্তনগুলোর সারসংক্ষেপ। প্রামাণিক পাঠের জন্য BPPA প্রকাশিত PPR 2025 দেখুন, এবং যেকোনো নির্দিষ্ট শর্ত দরপত্র নথি ও pre-bid meeting-এ যাচাই করে নিন।*
       `,
+
     },
     {
       slug: 'liquid-assets-calculation',
-      title: lang === 'bn' ? 'কিভাবে তরল সম্পদের হিসাব করবেন' : 'How to accurately calculate Liquid Assets for e-GP',
-      excerpt: lang === 'bn' ? 'ই-জিপি দরপত্রে অংশগ্রহণের জন্য ব্যাংক ক্রেডিট লাইন এবং তরল সম্পদের সঠিক হিসাব করার পদ্ধতি।' : 'Understanding Credit Lines and working capital requirements for major infrastructure tenders in the e-GP system.',
-      date: 'Oct 02, 2025',
+            title: lang === 'bn' ? 'e-GP-তে Liquid Assets কীভাবে সঠিকভাবে হিসাব করবেন — Net Available-ই আসল' : 'How to Calculate Liquid Assets for e-GP Correctly — Net Available Is What Counts',
+      excerpt: lang === 'bn' ? 'দরপত্রে liquid asset চাওয়া হয় "net of other contractual commitments" — অর্থাৎ gross নয়। এই একটা শব্দবন্ধ না বোঝার কারণেই বহু ঠিকাদার বাদ পড়েন। সঠিক হিসাব ও সঠিক ফরম।' : 'Tenders require liquid assets "net of other contractual commitments" — not your gross figure. Misreading that one phrase disqualifies more bidders than almost anything else. Here is the correct calculation and the correct form.',
+      date: 'Jul 16, 2026',
       category: 'Financial',
       contentEn: `
-## The Importance of Liquid Assets
+## Liquid Assets in e-GP: Why Your Gross Figure Is Not the Number That Matters
 
-When bidding for major infrastructure projects, proving you have the financial stamina is just as important as your technical capacity. The e-GP system demands a very specific calculation for Liquid Assets (LA).
+Liquid assets disqualify more bidders in Bangladesh than almost any other financial criterion — and usually not because the contractor is short of money. It is because they read the requirement wrong.
 
-### What Counts as a Liquid Asset?
-1. Cash at bank (Current/Savings Accounts)
-2. Fixed Deposits (FDR) free from lien
-3. Confirmed Credit Line Certificates from scheduled banks
+The tender asks for a minimum amount of liquid assets, credit line, or working capital. Say Tk. 65 Lakh. A contractor with Tk. 50 Lakh in the bank looks at that and thinks: close, but no. Another with Tk. 80 Lakh thinks: comfortable. Both may be wrong.
 
-### The Pitfalls to Avoid
-Many contractors fail the evaluation stage simply because their bank certificates are improperly formatted or issued after the tender publication date.
+The reason sits in five words that most bidders skim past.
 
-**Golden Rule:** Always request your bank to issue the Credit Line Certificate *strictly* in the exact format provided in the tender document (usually Form PW3-7). Any deviation in wording can lead to immediate rejection by the Tender Evaluation Committee (TEC).
+---
+
+### The Phrase That Decides It: "Net of Other Contractual Commitments"
+
+Read the requirement in the Tender Data Sheet carefully. It typically reads:
+
+> "availability of minimum financial resources in any form or combination of forms of liquid assets or credit line(s) or working capital, **net of other contractual commitments**"
+
+That phrase is not decoration. It is the whole test.
+
+**Gross liquid assets** = what you have.
+**Net available liquid assets** = what you have, minus what is already committed to work in hand.
+
+Only the second number is evaluated.
+
+---
+
+### A Worked Example
+
+Suppose the tender requires **Tk. 65,00,000** in liquid assets.
+
+**Contractor A** has Tk. 80,00,000 in the bank. Comfortable, surely? But Tk. 30,00,000 is tied to three ongoing projects. Net available: **Tk. 50,00,000.** Fails.
+
+**Contractor B** has Tk. 70,00,000 with no ongoing commitments. Net available: **Tk. 70,00,000.** Passes.
+
+Contractor A has more money than Contractor B and still loses. That is the rule working exactly as intended — the evaluation is asking whether you can finance *this* contract, not whether you are wealthy in general.
+
+---
+
+### What Counts as a Liquid Asset
+
+Generally, liquid assets are resources you can actually deploy on the contract:
+
+1. **Cash at bank** — current or savings accounts.
+2. **Fixed Deposits (FDR)** — but only those **free from lien**. An FDR pledged as security elsewhere is not liquid to you.
+3. **Confirmed credit line certificates** from scheduled banks.
+
+The common trap is the second one. Contractors count FDRs that are already pledged against other obligations. Those are not available, and an evaluation committee that checks will find it.
+
+---
+
+### Get the Form Right — e-PW2A-8
+
+This is where careful contractors still lose bids on a technicality.
+
+Tenders routinely specify that liquid asset documents must be submitted **in the Form e-PW2A-8, in original**, and often within a defined window — typically between the invitation of tender and the submission deadline.
+
+Tender Data Sheets frequently carry a warning to this effect: *submit in the specified form, in original, otherwise the tender will be considered non-responsive.*
+
+Three things follow from this:
+
+**Use the exact form the tender names.** Do not send your bank's standard solvency letter and hope. Ask your bank to issue it in the format the tender document specifies.
+
+**Watch the date window.** A certificate issued before the tender was invited may be rejected as outside the required period.
+
+**Submit the original where the tender demands original.** A scan or copy where the original is required is a straightforward path to non-responsiveness.
+
+---
+
+### Common Mistakes to Avoid
+
+- **Reporting gross instead of net.** The single biggest error.
+- **Counting lien-marked FDRs** as available.
+- **Using the wrong form** — a general bank solvency certificate instead of the specified e-PW2A-8.
+- **A stale certificate** issued outside the permitted window.
+- **Forgetting to update.** Your commitments change as projects start and finish. The figure that was true last month may not be true today.
+
+---
+
+### Stop Doing This Arithmetic by Hand
+
+Working out your net available liquid assets for every tender — while your ongoing commitments shift — is tedious, and a single error costs you the bid.
+
+**eGPTenderHub does it for you.** Enter your gross liquid assets and your existing commitments once in your company profile. For every tender you analyse, the AI subtracts what is committed and compares your **net available** figure against the requirement — showing you plainly whether you pass, and by how much.
+
+It does the same for tender capacity, personnel, equipment, and mandatory documents.
+
+**Know your real position before you bid. Check it in minutes at egptenderhub.com.**
+
+---
+
+*Confirm the exact form, amount and submission window against your specific tender document. If anything is unclear, raise it at the pre-bid meeting — the procuring entity's clarification is authoritative.*
       `,
       contentBn: `
-## তরল সম্পদের গুরুত্ব
+## e-GP-তে Liquid Assets: কেন আপনার Gross সংখ্যাটা আসল সংখ্যা নয়
 
-বড় অবকাঠামো প্রকল্পে দরপত্রের জন্য, আপনার আর্থিক সক্ষমতা প্রমাণ করা অত্যন্ত গুরুত্বপূর্ণ। ই-জিপি সিস্টেমে লিকুইড অ্যাসেট (LA) এর জন্য একটি খুব নির্দিষ্ট হিসাব প্রয়োজন।
+বাংলাদেশে অন্য যেকোনো আর্থিক মানদণ্ডের চেয়ে liquid asset বেশি bidder-কে অযোগ্য করে — এবং সাধারণত ঠিকাদারের টাকার অভাবে নয়। কারণটা হলো তারা শর্তটা ভুল পড়েন।
 
-### তরল সম্পদ হিসাবে কী গণ্য হয়?
-১. ব্যাংকে থাকা নগদ অর্থ (চলতি/সঞ্চয়ী হিসাব)
-২. লিয়েনমুক্ত ফিক্সড ডিপোজিট (FDR)
-৩. তফসিলি ব্যাংক থেকে নিশ্চিত ক্রেডিট লাইন সার্টিফিকেট
+দরপত্রে একটা ন্যূনতম liquid asset, credit line বা working capital চাওয়া হয়। ধরুন ৬৫ লাখ টাকা। ব্যাংকে ৫০ লাখ থাকা একজন ঠিকাদার দেখে ভাবেন: কাছাকাছি, কিন্তু হবে না। ৮০ লাখ থাকা আরেকজন ভাবেন: স্বচ্ছন্দ। দুজনেই ভুল হতে পারেন।
 
-**সুবর্ণ নিয়ম:** সর্বদা আপনার ব্যাংককে টেন্ডার ডকুমেন্টে দেওয়া সঠিক ফরমেটে ক্রেডিট লাইন সার্টিফিকেট ইস্যু করার জন্য অনুরোধ করুন।
+কারণটা লুকিয়ে আছে কয়েকটা শব্দে, যা বেশিরভাগ bidder চোখ বুলিয়ে পার হয়ে যান।
+
+---
+
+### যে শব্দবন্ধ সিদ্ধান্ত নেয়: "Net of Other Contractual Commitments"
+
+Tender Data Sheet-এ শর্তটা মন দিয়ে পড়ুন। সাধারণত লেখা থাকে:
+
+> "availability of minimum financial resources in any form or combination of forms of liquid assets or credit line(s) or working capital, **net of other contractual commitments**"
+
+এই শব্দবন্ধ অলঙ্কার নয়। এটাই পুরো পরীক্ষা।
+
+**Gross liquid assets** = আপনার যা আছে।
+**Net available liquid assets** = আপনার যা আছে, বিয়োগ যা ইতিমধ্যে হাতের কাজে প্রতিশ্রুত।
+
+শুধু দ্বিতীয় সংখ্যাটাই মূল্যায়িত হয়।
+
+---
+
+### একটা উদাহরণ
+
+ধরুন দরপত্রে **৬৫,০০,০০০ টাকা** liquid asset চাওয়া হয়েছে।
+
+**ঠিকাদার ক**-এর ব্যাংকে ৮০,০০,০০০ টাকা। নিশ্চয়ই স্বচ্ছন্দ? কিন্তু ৩০,০০,০০০ টাকা তিনটা চলমান প্রকল্পে আটকে আছে। Net available: **৫০,০০,০০০ টাকা।** বাদ।
+
+**ঠিকাদার খ**-এর আছে ৭০,০০,০০০ টাকা, কোনো চলমান প্রতিশ্রুতি নেই। Net available: **৭০,০০,০০০ টাকা।** উত্তীর্ণ।
+
+ঠিকাদার ক-এর কাছে খ-এর চেয়ে বেশি টাকা, তবু তিনি হারলেন। নিয়মটা ঠিক যেভাবে কাজ করার কথা সেভাবেই কাজ করছে — মূল্যায়ন জানতে চাইছে আপনি *এই* চুক্তিটার অর্থায়ন করতে পারবেন কিনা, আপনি সাধারণভাবে ধনী কিনা তা নয়।
+
+---
+
+### Liquid Asset হিসেবে কী গণ্য হয়
+
+সাধারণত liquid asset হলো সেই সম্পদ যা আপনি আসলেই চুক্তিতে নিয়োগ করতে পারবেন:
+
+১. **ব্যাংকে নগদ** — চলতি বা সঞ্চয়ী হিসাব।
+২. **ফিক্সড ডিপোজিট (FDR)** — তবে শুধুমাত্র **লিয়েনমুক্ত** গুলো। অন্য কোথাও জামানত হিসেবে বন্ধক রাখা FDR আপনার জন্য liquid নয়।
+৩. তফসিলি ব্যাংক থেকে **নিশ্চিত credit line certificate**।
+
+সাধারণ ফাঁদটা হলো দ্বিতীয়টা। ঠিকাদাররা এমন FDR গণনা করেন যা ইতিমধ্যে অন্য দায়বদ্ধতায় বন্ধক। সেগুলো available নয়, আর যাচাই করলে মূল্যায়ন কমিটি তা ধরে ফেলবে।
+
+---
+
+### সঠিক ফরম দিন — e-PW2A-8
+
+এখানেই সতর্ক ঠিকাদাররাও কারিগরি কারণে দরপত্র হারান।
+
+দরপত্রে নিয়মিতভাবে উল্লেখ থাকে যে liquid asset নথি জমা দিতে হবে **Form e-PW2A-8-এ, মূল কপিতে**, এবং প্রায়ই একটা নির্দিষ্ট সময়সীমার মধ্যে — সাধারণত দরপত্র আহ্বান থেকে জমা দেওয়ার সময়ের মধ্যে।
+
+Tender Data Sheet-এ প্রায়ই এ বিষয়ে সতর্কবাণী থাকে: *নির্দিষ্ট ফরমে, মূল কপিতে জমা দিন, অন্যথায় দরপত্র non-responsive বিবেচিত হবে।*
+
+এ থেকে তিনটি জিনিস অনুসরণ করে:
+
+**দরপত্র যে ফরম উল্লেখ করেছে ঠিক সেটাই ব্যবহার করুন।** আপনার ব্যাংকের সাধারণ solvency চিঠি পাঠিয়ে আশা করবেন না। দরপত্র নথিতে উল্লেখিত ফরম্যাটে ইস্যু করতে ব্যাংককে বলুন।
+
+**তারিখের সীমা লক্ষ্য রাখুন।** দরপত্র আহ্বানের আগে ইস্যু করা সনদ প্রয়োজনীয় সময়ের বাইরে হিসেবে বাতিল হতে পারে।
+
+**যেখানে মূল কপি চাওয়া হয়েছে সেখানে মূল কপিই দিন।** মূল কপির জায়গায় scan বা photocopy দেওয়া non-responsive হওয়ার সহজ পথ।
+
+---
+
+### যে ভুলগুলো এড়াবেন
+
+- **Net-এর বদলে gross দেখানো।** সবচেয়ে বড় একক ভুল।
+- **লিয়েন-চিহ্নিত FDR** available হিসেবে গণনা করা।
+- **ভুল ফরম ব্যবহার** — নির্দিষ্ট e-PW2A-8-এর বদলে সাধারণ ব্যাংক solvency সনদ।
+- **পুরনো সনদ** যা অনুমোদিত সময়সীমার বাইরে ইস্যু করা।
+- **হালনাগাদ করতে ভুলে যাওয়া।** প্রকল্প শুরু ও শেষ হওয়ার সাথে আপনার commitments বদলায়। গত মাসে যে সংখ্যা সত্যি ছিল, আজ তা না-ও হতে পারে।
+
+---
+
+### এই হিসাব আর হাতে করবেন না
+
+প্রতিটা দরপত্রের জন্য net available liquid asset বের করা — সেই সাথে চলমান commitments বদলাতে থাকে — ক্লান্তিকর, আর একটা ভুলেই দরপত্র হারাবেন।
+
+**eGPTenderHub এটা আপনার জন্য করে।** Company profile-এ একবার আপনার gross liquid assets আর চলমান commitments দিন। আপনি যে দরপত্রই বিশ্লেষণ করুন, AI প্রতিশ্রুত অংশ বাদ দিয়ে আপনার **net available** সংখ্যা শর্তের সাথে তুলনা করে — পরিষ্কারভাবে দেখায় আপনি উত্তীর্ণ কিনা, আর কতটা ব্যবধানে।
+
+Tender capacity, personnel, equipment আর বাধ্যতামূলক কাগজপত্রের ক্ষেত্রেও একই কাজ করে।
+
+**দর দেওয়ার আগে আপনার আসল অবস্থান জানুন। egptenderhub.com-এ মিনিটেই যাচাই করুন।**
+
+---
+
+*সঠিক ফরম, পরিমাণ ও জমা দেওয়ার সময়সীমা আপনার নির্দিষ্ট দরপত্র নথির সাথে মিলিয়ে নিন। কিছু অস্পষ্ট থাকলে pre-bid meeting-এ তুলুন — ক্রয়কারী প্রতিষ্ঠানের ব্যাখ্যাই চূড়ান্ত।*
       `,
+
     },
     {
       slug: 'ltm-otm-winning-strategies',
