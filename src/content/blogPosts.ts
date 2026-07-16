@@ -1,5 +1,164 @@
 export const getBlogPosts = (lang: 'en' | 'bn') => [
-    {
+          {
+             slug: 'slt-significantly-low-priced-tender-ppr-2025',
+      title: lang === 'bn' ? 'PPR 2025-এ SLT (অত্যধিক নিম্নমূল্যের দরপত্র) — কেন সবচেয়ে কম দর দিলেও এখন বাতিল হতে পারে' : 'SLT (Significantly Low-Priced Tender) in PPR 2025 — Why Your Lowest Bid Can Now Be Rejected',
+      excerpt: lang === 'bn' ? 'PPR 2025-এ ±১০% সীমা তুলে দিয়ে formula-ভিত্তিক SLT সিস্টেম চালু হয়েছে। সবচেয়ে কম দর দেওয়া এখন আর নিশ্চিত জয় নয় — এটা এখন ঝুঁকি। কী বদলালো এবং কীভাবে নিরাপদে দর দেবেন।' : 'PPR 2025 removed the ±10% cap and introduced a formula-based SLT system. Bidding lowest is no longer a guaranteed win — it is now a risk. Here is what changed and how to price safely.',
+      date: 'Jul 16, 2026',
+      category: 'Compliance',
+      contentEn: `
+## SLT in PPR 2025: The Rule That Changed How You Should Price a Tender
+
+For years, the strategy in Bangladeshi public tendering was simple: stay within the ±10% band and bid as low as you safely could. That strategy is now obsolete.
+
+PPR 2025, issued on 28 September 2025, made two connected changes that most contractors have not fully absorbed:
+
+1. It **removed the ±10% price cap** for national works procurement.
+2. It **introduced a formula-based SLT (Significantly Low-priced Tender) evaluation system.**
+
+Together, these mean the floor under your pricing is gone — and a new, automatic mechanism now decides whether your low bid is credible or reckless. If it is judged an SLT, your tender is declared non-responsive.
+
+This guide explains what SLT is, how it is assessed, when it applies, and how to price without walking into it.
+
+---
+
+### What SLT Actually Is
+
+SLT stands for **Significantly Low-priced Tender** — a bid so far below what the work realistically costs that the procuring entity doubts you can deliver it.
+
+The old system handled this crudely with the ±10% cap: anything outside the band was simply out. PPR 2025 replaced that blunt instrument with an objective, formula-driven assessment. The stated purpose is to remove subjective judgement from the process — the calculation decides, not an opinion in the room.
+
+The important consequence for you: **being the lowest bidder is no longer the same as winning.** You can be lowest, be technically responsive, and still be knocked out because the formula flags your price as not credible.
+
+---
+
+### How the Assessment Works
+
+Under PPR 2025, the SLT evaluation weighs three inputs:
+
+- **The prices of technically acceptable tenderers** — with the average of acceptable bids carrying roughly **50% weight**.
+- **The official estimate** prepared by the procuring entity.
+- **Recent price indices** reflecting current market rates.
+
+In the e-GP system, this is calculated **automatically during evaluation**. You do not submit anything extra for it; the system runs it on the bids received.
+
+Two things follow from this design. First, your price is not judged in isolation — it is judged against what your competitors bid. A price that looks aggressive in a field of tight bids may look fine in a field of loose ones. Second, because the average of acceptable bids carries half the weight, **you cannot know in advance exactly where the line falls.** It depends on who else bids and what they offer.
+
+> Important: The exact formula and its parameters are set out in the Rules and the relevant Schedule. Treat any figure you calculate yourself as indicative. Confirm the applicable method against the tender document and raise it at the pre-bid meeting if anything is unclear — the procuring entity's clarification is authoritative.
+
+---
+
+### SLT Does Not Apply to Every Tender
+
+This is a detail many bidders miss. The SLT identification and evaluation process is **not applicable to all types of procurement.** It applies to specific procurement methods and categories, and the applicable rules will be reflected in the tender document.
+
+The practical implication: do not assume SLT applies, and do not assume it does not. **Read the specific tender's conditions.** If the document is silent or ambiguous on how a low price will be treated, that is exactly the kind of question to raise at the pre-bid meeting.
+
+---
+
+### What This Means for Your Bidding Strategy
+
+The old habit — cut to the bone and hope — is now actively dangerous. Here is how to think about pricing under PPR 2025:
+
+**Price from your actual costs, not from a guess about the competition.** Build the rate up from materials, labour, plant, overhead and a real margin. If your honest price cannot win, that tender was not yours to win.
+
+**Respect the official estimate.** It is one of the three inputs. A price wildly below it invites scrutiny.
+
+**Stop treating "lowest" as the goal.** Under the new system, "credible and lowest among the credible" is the goal. A bid you cannot actually deliver on is worth nothing even if it is accepted — and increasingly, it will not be.
+
+**Remember the removed cap cuts both ways.** With no ±10% band, there is no automatic protection from being undercut either. The discipline now has to come from your own costing.
+
+---
+
+### The Bigger Picture: Price Is the Last Battle
+
+Here is what gets overlooked. SLT only becomes relevant if your tender is **technically responsive in the first place.**
+
+Most bids never reach the price comparison. They fail earlier — on liquid assets net of commitments, on missing key personnel, on incomplete equipment lists, on a document that expired. Agonising over the last 2% of your rate is pointless if your bid is going to be thrown out at the eligibility stage.
+
+**Fix the eligibility problem first, then worry about price.**
+
+That is exactly what eGPTenderHub does. Upload the tender notice and the AI checks every criterion against your company profile — liquid assets net of ongoing commitments, personnel, equipment, documents, tender capacity — and tells you plainly whether you qualify and what is missing.
+
+**Win the eligibility battle before you fight the price battle. Check your position in minutes at egptenderhub.com.**
+      `,
+      contentBn: `
+## PPR 2025-এ SLT: যে নিয়ম দরপত্রের দর নির্ধারণের পদ্ধতি বদলে দিল
+
+বছরের পর বছর বাংলাদেশের সরকারি দরপত্রে কৌশলটা সহজ ছিল: ±১০% সীমার মধ্যে থেকে যতটা নিরাপদে পারা যায় কম দর দেওয়া। সেই কৌশল এখন অচল।
+
+২৮ সেপ্টেম্বর ২০২৫-এ জারি হওয়া PPR 2025 দুটো পরস্পর-সম্পর্কিত পরিবর্তন এনেছে, যা বেশিরভাগ ঠিকাদার এখনও পুরোপুরি বোঝেননি:
+
+১. জাতীয় works procurement-এ **±১০% মূল্য সীমা তুলে দেওয়া হয়েছে।**
+২. **Formula-ভিত্তিক SLT (Significantly Low-priced Tender) মূল্যায়ন সিস্টেম** চালু হয়েছে।
+
+এই দুটো মিলে অর্থ দাঁড়ায় — আপনার দরের নিচের মেঝেটা সরে গেছে, আর একটা নতুন স্বয়ংক্রিয় ব্যবস্থা এখন ঠিক করে আপনার কম দর বিশ্বাসযোগ্য নাকি বেপরোয়া। যদি সেটা SLT হিসেবে চিহ্নিত হয়, আপনার দরপত্র **non-responsive** ঘোষণা করা হবে।
+
+এই গাইডে ব্যাখ্যা করা হলো SLT কী, কীভাবে হিসাব হয়, কোথায় প্রযোজ্য, আর কীভাবে এতে না পড়ে দর দেবেন।
+
+---
+
+### SLT আসলে কী
+
+SLT মানে **অত্যধিক নিম্নমূল্যের দরপত্র** — এমন একটা দর যা কাজটার বাস্তব খরচের তুলনায় এতটাই কম যে ক্রয়কারী প্রতিষ্ঠান সন্দেহ করে আপনি আদৌ কাজটা করতে পারবেন কিনা।
+
+পুরনো ব্যবস্থায় এটা ±১০% সীমা দিয়ে মোটা দাগে সামলানো হতো — সীমার বাইরে গেলেই বাদ। PPR 2025 সেই স্থূল হাতিয়ারের বদলে একটা বস্তুনিষ্ঠ, formula-চালিত মূল্যায়ন এনেছে। উদ্দেশ্য হলো প্রক্রিয়া থেকে ব্যক্তিগত বিচার সরিয়ে দেওয়া — হিসাবই সিদ্ধান্ত নেবে, ঘরের কারো মতামত নয়।
+
+আপনার জন্য গুরুত্বপূর্ণ পরিণতি: **সর্বনিম্ন দরদাতা হওয়া আর জেতা এখন এক কথা নয়।** আপনি সবচেয়ে কম দর দিতে পারেন, কারিগরিভাবে responsive-ও হতে পারেন, তবু formula আপনার দরকে অবিশ্বাসযোগ্য চিহ্নিত করলে বাদ পড়বেন।
+
+---
+
+### মূল্যায়ন কীভাবে কাজ করে
+
+PPR 2025 অনুযায়ী SLT মূল্যায়নে তিনটি উপাদান বিবেচিত হয়:
+
+- **কারিগরিভাবে গ্রহণযোগ্য দরদাতাদের প্রস্তাবিত মূল্য** — গ্রহণযোগ্য দরগুলোর গড় প্রায় **৫০% weight** বহন করে।
+- ক্রয়কারী প্রতিষ্ঠানের তৈরি **দাপ্তরিক প্রাক্কলিত মূল্য**।
+- বর্তমান বাজারদর প্রতিফলিত করা **সাম্প্রতিক মূল্যসূচক**।
+
+e-GP সিস্টেমে এটা **মূল্যায়নের সময় স্বয়ংক্রিয়ভাবে** হিসাব হয়। আপনাকে এর জন্য বাড়তি কিছু জমা দিতে হয় না; প্রাপ্ত দরপত্রগুলোর উপর সিস্টেম নিজেই এটা চালায়।
+
+এই নকশা থেকে দুটো জিনিস বেরিয়ে আসে। প্রথমত, আপনার দর একা বিচার হয় না — প্রতিযোগীরা কী দিয়েছে তার বিপরীতে বিচার হয়। আঁটসাঁট দরের ভিড়ে যে দর আক্রমণাত্মক দেখায়, ঢিলেঢালা দরের ভিড়ে সেটাই স্বাভাবিক লাগতে পারে। দ্বিতীয়ত, যেহেতু গ্রহণযোগ্য দরের গড় অর্ধেক weight বহন করে, **আপনি আগে থেকে জানতে পারবেন না সীমারেখা ঠিক কোথায় পড়বে।** এটা নির্ভর করে আর কারা দর দিচ্ছে এবং কত দিচ্ছে তার উপর।
+
+> গুরুত্বপূর্ণ: সঠিক formula ও তার parameter বিধিমালা ও সংশ্লিষ্ট তফসিলে দেওয়া আছে। নিজে হিসাব করা যেকোনো সংখ্যাকে আনুমানিক হিসেবে দেখুন। প্রযোজ্য পদ্ধতি দরপত্র নথির সাথে মিলিয়ে নিন, আর অস্পষ্ট কিছু থাকলে pre-bid meeting-এ তুলুন — ক্রয়কারী প্রতিষ্ঠানের ব্যাখ্যাই চূড়ান্ত।
+
+---
+
+### SLT সব দরপত্রে প্রযোজ্য নয়
+
+এই বিষয়টা অনেক bidder এড়িয়ে যান। SLT চিহ্নিতকরণ ও মূল্যায়ন প্রক্রিয়া **সব ধরনের ক্রয়ে প্রযোজ্য নয়।** এটা নির্দিষ্ট কিছু ক্রয় পদ্ধতি ও শ্রেণিতে প্রযোজ্য, এবং প্রযোজ্য নিয়ম দরপত্র নথিতে প্রতিফলিত থাকবে।
+
+বাস্তব প্রয়োগ: ধরে নেবেন না যে SLT প্রযোজ্য, আবার ধরে নেবেন না যে প্রযোজ্য নয়। **নির্দিষ্ট দরপত্রের শর্ত পড়ুন।** নথিতে যদি কম দর কীভাবে বিবেচিত হবে সে বিষয়ে কিছু না থাকে বা অস্পষ্ট থাকে, তাহলে ঠিক সেই প্রশ্নটাই pre-bid meeting-এ তোলা উচিত।
+
+---
+
+### আপনার দরপত্র কৌশলের জন্য এর অর্থ
+
+পুরনো অভ্যাস — হাড় পর্যন্ত কেটে দর দিয়ে আশা করা — এখন সরাসরি বিপজ্জনক। PPR 2025-এর অধীনে দর নিয়ে যেভাবে ভাবা উচিত:
+
+**প্রতিযোগিতার অনুমান নয়, নিজের আসল খরচ থেকে দর তৈরি করুন।** মালামাল, শ্রম, যন্ত্রপাতি, overhead আর একটা বাস্তব margin দিয়ে rate গড়ুন। আপনার সৎ দর যদি জিততে না পারে, তাহলে সেই দরপত্র আপনার জন্য ছিল না।
+
+**দাপ্তরিক প্রাক্কলিত মূল্যকে সম্মান করুন।** এটা তিনটি উপাদানের একটি। এর চেয়ে অস্বাভাবিক কম দর যাচাইয়ের ডাক দেয়।
+
+**"সর্বনিম্ন" কে লক্ষ্য ভাবা বন্ধ করুন।** নতুন ব্যবস্থায় লক্ষ্য হলো "বিশ্বাসযোগ্যদের মধ্যে সর্বনিম্ন"। যে দরে আপনি আসলে কাজ করতে পারবেন না, সেটা গৃহীত হলেও মূল্যহীন — আর ক্রমশ সেটা গৃহীতই হবে না।
+
+**সীমা তুলে দেওয়াটা দুদিকেই কাটে মনে রাখুন।** ±১০% band না থাকায় অন্যের কম দরে কেটে যাওয়া থেকেও স্বয়ংক্রিয় সুরক্ষা নেই। শৃঙ্খলাটা এখন আপনার নিজের হিসাব থেকেই আসতে হবে।
+
+---
+
+### বড় ছবি: দাম হলো শেষ যুদ্ধ
+
+যেটা উপেক্ষিত থাকে সেটা হলো — SLT তখনই প্রাসঙ্গিক হয় যখন আপনার দরপত্র **প্রথমে কারিগরিভাবে responsive হয়।**
+
+বেশিরভাগ দরপত্র দাম তুলনার পর্যায়েই পৌঁছায় না। তারা আগেই বাদ পড়ে — চলমান প্রতিশ্রুতি বাদ দিয়ে liquid asset কম পড়ায়, key personnel না থাকায়, equipment তালিকা অসম্পূর্ণ থাকায়, বা একটা কাগজের মেয়াদ শেষ হওয়ায়। rate-এর শেষ ২% নিয়ে মাথা ঘামানো অর্থহীন যদি আপনার bid eligibility ধাপেই বাতিল হতে যায়।
+
+**আগে eligibility-র সমস্যা মেটান, তারপর দাম নিয়ে ভাবুন।**
+
+eGPTenderHub ঠিক এই কাজটাই করে। দরপত্রের notice upload করুন — AI প্রতিটি শর্ত আপনার company profile-এর সাথে যাচাই করে: চলমান প্রতিশ্রুতি বাদ দিয়ে net liquid assets, personnel, equipment, কাগজপত্র, tender capacity — এবং পরিষ্কারভাবে বলে দেয় আপনি যোগ্য কিনা আর কী missing।
+
+**দামের যুদ্ধে নামার আগে eligibility-র যুদ্ধ জিতুন। egptenderhub.com-এ মিনিটেই আপনার অবস্থান যাচাই করুন।**
+      `,
+    },
+{
       slug: 'why-tenders-become-non-responsive',
       title: lang === 'bn' ? 'দরপত্র Non-Responsive কেন হয়? ১০টি সাধারণ কারণ ও সমাধান (২০২৫)' : 'Why Tenders Become Non-Responsive: 10 Common Reasons & How to Fix Them (2025)',
       excerpt: lang === 'bn' ? 'বেশিরভাগ ঠিকাদার bid করে হেরে যান eligibility-র ভুলে, দামে নয়। এই গাইডে দরপত্র non-responsive হওয়ার ১০টি আসল কারণ এবং প্রতিটির সমাধান।' : 'Most contractors lose bids on eligibility mistakes, not price. This guide breaks down the 10 real reasons tenders are declared non-responsive and how to fix each one.',
