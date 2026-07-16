@@ -55,10 +55,46 @@ function writePage(filePath, html) {
   fs.writeFileSync(filePath, html);
 }
 
+function toIsoDate(dateStr) {
+  const parsed = new Date(dateStr);
+  if (Number.isNaN(parsed.getTime())) {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  }
+  return `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, '0')}-${String(parsed.getDate()).padStart(2, '0')}`;
+}
+
+function buildSitemap(urlEntries) {
+  const urlXml = urlEntries
+    .map(
+      ({ loc, lastmod }) => `  <url>
+    <loc>${loc}</loc>
+    <lastmod>${lastmod}</lastmod>
+  </url>`
+    )
+    .join('\n');
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urlXml}
+</urlset>
+`;
+}
+
+function buildRobotsTxt() {
+  return `User-agent: *
+Allow: /
+
+Sitemap: ${SITE_URL}/sitemap.xml
+`;
+}
+
 function main() {
   const enPosts = getBlogPosts('en');
   const bnPosts = getBlogPosts('bn');
   let count = 0;
+  const today = new Date().toISOString().slice(0, 10);
+  const urlEntries = [{ loc: `${SITE_URL}/`, lastmod: today }];
 
   enPosts.forEach((enPost, idx) => {
     const bnPost = bnPosts[idx];
@@ -75,6 +111,7 @@ function main() {
         bodyHtml: enBodyHtml,
       })
     );
+    urlEntries.push({ loc: `${SITE_URL}/blog/${slug}`, lastmod: toIsoDate(enPost.date) });
     count++;
 
     const bnBodyHtml = renderToStaticMarkup(React.createElement(ReactMarkdown, {}, bnPost.contentBn));
@@ -88,10 +125,16 @@ function main() {
         bodyHtml: bnBodyHtml,
       })
     );
+    urlEntries.push({ loc: `${SITE_URL}/blog/bn/${slug}`, lastmod: toIsoDate(bnPost.date) });
     count++;
   });
 
+  fs.writeFileSync(path.join(distDir, 'sitemap.xml'), buildSitemap(urlEntries));
+  fs.writeFileSync(path.join(distDir, 'robots.txt'), buildRobotsTxt());
+
   console.log(`Generated ${count} static blog pages in dist/blog/`);
+  console.log(`Generated dist/sitemap.xml with ${urlEntries.length} URLs`);
+  console.log('Generated dist/robots.txt');
 }
 
 main();
