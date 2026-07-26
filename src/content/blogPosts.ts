@@ -1,161 +1,425 @@
 export const getBlogPosts = (lang: 'en' | 'bn') => [
           {
              slug: 'slt-significantly-low-priced-tender-ppr-2025',
-      title: lang === 'bn' ? 'PPR 2025-এ SLT (অত্যধিক নিম্নমূল্যের দরপত্র) — কেন সবচেয়ে কম দর দিলেও এখন বাতিল হতে পারে' : 'SLT (Significantly Low-Priced Tender) in PPR 2025 — Why Your Lowest Bid Can Now Be Rejected',
-      excerpt: lang === 'bn' ? 'PPR 2025-এ ±১০% সীমা তুলে দিয়ে formula-ভিত্তিক SLT সিস্টেম চালু হয়েছে। সবচেয়ে কম দর দেওয়া এখন আর নিশ্চিত জয় নয় — এটা এখন ঝুঁকি। কী বদলালো এবং কীভাবে নিরাপদে দর দেবেন।' : 'PPR 2025 removed the ±10% cap and introduced a formula-based SLT system. Bidding lowest is no longer a guaranteed win — it is now a risk. Here is what changed and how to price safely.',
+            title: lang === 'bn' ? 'SLT (উল্লেখযোগ্যরূপে নিম্নমূল্যের দরপত্র) — PPR 2025 তফসিল-১৮-এর পূর্ণ সূত্র ও উদাহরণ' : 'SLT (Significantly Low-priced Tender) — The Full PPR 2025 Formula, With a Worked Example',
+      excerpt: lang === 'bn' ? 'PPR 2025-এর তফসিল-১৮ SLT নির্ণয়ের সঠিক সূত্র দিয়েছে — ভারযুক্ত গড় (০.৫০/০.৩০/০.২০), ওয়েটেড স্ট্যান্ডার্ড ডেভিয়েশন, আর নিম্নসীমা। গেজেটের নিজস্ব উদাহরণসহ ব্যাখ্যা।' : 'PPR 2025 Schedule-18 sets out the exact SLT calculation — weighted average (0.50/0.30/0.20), weighted standard deviation, and the cut-off. Explained with the Gazette\'s own worked example.',
       date: 'Jul 16, 2026',
       category: 'Compliance',
       contentEn: `
-## SLT in PPR 2025: The Rule That Changed How You Should Price a Tender
+## SLT Under PPR 2025: The Exact Formula That Decides If Your Low Bid Survives
 
-For years, the strategy in Bangladeshi public tendering was simple: stay within the ±10% band and bid as low as you safely could. That strategy is now obsolete.
+Under PPR 2025, submitting the lowest price no longer means winning. A formula now decides whether your price is credible — and if it falls below a calculated cut-off, your tender is rejected as a **Significantly Low-priced Tender (SLT)**.
 
-PPR 2025, issued on 28 September 2025, made two connected changes that most contractors have not fully absorbed:
-
-1. It **removed the ±10% price cap** for national works procurement.
-2. It **introduced a formula-based SLT (Significantly Low-priced Tender) evaluation system.**
-
-Together, these mean the floor under your pricing is gone — and a new, automatic mechanism now decides whether your low bid is credible or reckless. If it is judged an SLT, your tender is declared non-responsive.
-
-This guide explains what SLT is, how it is assessed, when it applies, and how to price without walking into it.
+This guide sets out the actual calculation as published in **Schedule-18 of PPR 2025 (framed under Rule 118(25) and (26))**, gazetted on 28 September 2025.
 
 ---
 
-### What SLT Actually Is
+### What Schedule-18 Defines as an SLT
 
-SLT stands for **Significantly Low-priced Tender** — a bid so far below what the work realistically costs that the procuring entity doubts you can deliver it.
+An SLT is a tender where the price and its components are so low — measured against the official cost estimate, recent market price indices, and the prices of other acceptable bidders — that the procuring entity has serious concern the bidder cannot perform the contract at that price.
 
-The old system handled this crudely with the ±10% cap: anything outside the band was simply out. PPR 2025 replaced that blunt instrument with an objective, formula-driven assessment. The stated purpose is to remove subjective judgement from the process — the calculation decides, not an opinion in the room.
-
-The important consequence for you: **being the lowest bidder is no longer the same as winning.** You can be lowest, be technically responsive, and still be knocked out because the formula flags your price as not credible.
+The Schedule is explicit about why this matters. A very low bid may look attractive on paper, but in practice it can lead to cost escalation, low-quality output, delays, and even contract termination. Some bidders quote unrealistically low simply to win, then cannot finish — leaving the procuring entity to manage a non-performing contractor or start over, costing more time and money.
 
 ---
 
-### How the Assessment Works
+### Where SLT Applies
 
-Under PPR 2025, the SLT evaluation weighs three inputs:
+Schedule-18 is headed as the process for **identification and evaluation of significantly low-priced tenders by the Tender Evaluation Committee in domestic (national) procurement**. That heading is your scope indicator: the mechanism sits with the TEC and is framed for domestic procurement.
 
-- **The prices of technically acceptable tenderers** — with the average of acceptable bids carrying roughly **50% weight**.
-- **The official estimate** prepared by the procuring entity.
-- **Recent price indices** reflecting current market rates.
+One related detail appears in paragraph 6. When the national price index is computed, procurement processes conducted under the **limited tendering method in domestic procurement are excluded** from that index calculation.
 
-In the e-GP system, this is calculated **automatically during evaluation**. You do not submit anything extra for it; the system runs it on the bids received.
-
-Two things follow from this design. First, your price is not judged in isolation — it is judged against what your competitors bid. A price that looks aggressive in a field of tight bids may look fine in a field of loose ones. Second, because the average of acceptable bids carries half the weight, **you cannot know in advance exactly where the line falls.** It depends on who else bids and what they offer.
-
-> Important: The exact formula and its parameters are set out in the Rules and the relevant Schedule. Treat any figure you calculate yourself as indicative. Confirm the applicable method against the tender document and raise it at the pre-bid meeting if anything is unclear — the procuring entity's clarification is authoritative.
+Beyond this, do not assume. If your tender document is silent on how a low price will be treated, that is precisely the question to raise at the pre-bid meeting.
 
 ---
 
-### SLT Does Not Apply to Every Tender
+### When the Index Figure Becomes Available
 
-This is a detail many bidders miss. The SLT identification and evaluation process is **not applicable to all types of procurement.** It applies to specific procurement methods and categories, and the applicable rules will be reflected in the tender document.
+Paragraph 6 and the Gazette's example together give the timing. The index is computed for the tender opening day plus the preceding 27 days, and the **e-GP portal publishes the figure shortly after midnight following the opening day**.
 
-The practical implication: do not assume SLT applies, and do not assume it does not. **Read the specific tender's conditions.** If the document is silent or ambiguous on how a low price will be treated, that is exactly the kind of question to raise at the pre-bid meeting.
-
----
-
-### What This Means for Your Bidding Strategy
-
-The old habit — cut to the bone and hope — is now actively dangerous. Here is how to think about pricing under PPR 2025:
-
-**Price from your actual costs, not from a guess about the competition.** Build the rate up from materials, labour, plant, overhead and a real margin. If your honest price cannot win, that tender was not yours to win.
-
-**Respect the official estimate.** It is one of the three inputs. A price wildly below it invites scrutiny.
-
-**Stop treating "lowest" as the goal.** Under the new system, "credible and lowest among the credible" is the goal. A bid you cannot actually deliver on is worth nothing even if it is accepted — and increasingly, it will not be.
-
-**Remember the removed cap cuts both ways.** With no ±10% band, there is no automatic protection from being undercut either. The discipline now has to come from your own costing.
+The practical consequence is unavoidable: the index that will be applied to your tender is not published until after you have already submitted and the tender has opened. You cannot price against it. You can only price against your own costs.
 
 ---
 
-### The Bigger Picture: Price Is the Last Battle
+### Step 1: The 10% Upper Filter (Applied First)
 
-Here is what gets overlooked. SLT only becomes relevant if your tender is **technically responsive in the first place.**
+Before any averaging happens, Schedule-18 paragraph 7 applies a filter to prevent distortion:
 
-Most bids never reach the price comparison. They fail earlier — on liquid assets net of commitments, on missing key personnel, on incomplete equipment lists, on a document that expired. Agonising over the last 2% of your rate is pointless if your bid is going to be thrown out at the eligibility stage.
+> Any tender priced **more than 10% above the official cost estimate** is excluded from both formulas — and is itself treated as non-responsive.
 
-**Fix the eligibility problem first, then worry about price.**
+This matters in two directions. A very high bid cannot be used to inflate the average and drag the cut-off upward. And if you bid more than 10% above the estimate, you are out at preliminary evaluation regardless of everything else.
 
-That is exactly what eGPTenderHub does. Upload the tender notice and the AI checks every criterion against your company profile — liquid assets net of ongoing commitments, personnel, equipment, documents, tender capacity — and tells you plainly whether you qualify and what is missing.
+---
 
-**Win the eligibility battle before you fight the price battle. Check your position in minutes at egptenderhub.com.**
+### Step 2: The Weighted Average (x̄)
+
+The weighted average is calculated from three inputs:
+
+**x̄ = 0.5 × (Σxᵢ / n) + 0.2 × x_OCE + 0.3 × x_NPPI**
+
+Where:
+
+- **xᵢ** = the price quoted by each technically acceptable (responsive) tenderer
+- **n** = the number of acceptable tenders
+- **x_OCE** = the official cost estimate for the package
+- **x_NPPI** = the price derived from the recent public procurement price index on the e-GP portal
+
+The weights are fixed by the Schedule:
+
+| Component | Weight |
+|---|---|
+| Average price of acceptable tenderers | **0.50** |
+| Price index (NPPI) based figure | **0.30** |
+| Official cost estimate (OCE) | **0.20** |
+
+Note the balance: half the weight rests on what your competitors actually bid. The other half is anchored to the official estimate and current market movement.
+
+---
+
+### How x_NPPI Is Determined
+
+The index is calculated per procurement category (goods, works, or physical services). For a given tender, it uses the **tender opening day plus the preceding 27 days — 28 days in total**.
+
+Across that window, the system takes all procurement processes in that category where a notification of award was issued (excluding limited tendering method cases in domestic procurement), and computes the national average percentage deviation between the official cost estimate and the awarded price.
+
+That national average deviation is then applied to your tender's official estimate to produce x_NPPI. In practice, if recent awards in your category have been settling around 8.32% below estimate, the index factor is 0.9168.
+
+---
+
+### Step 3: The Weighted Standard Deviation (Sd)
+
+**Sd = √{ Σ(xᵢ − x̄)² / n }**
+
+Where xᵢ is each tenderer's quoted price, x̄ is the weighted average from Step 2, and n is the number of acceptable tenders.
+
+---
+
+### Step 4: The Cut-off
+
+**Lower limit of acceptable price = x̄ − Sd**
+
+Any tender priced **below this line** is classified as a Significantly Low-priced Tender and is **cancelled**. Evaluation then proceeds among the tenders above the line.
+
+---
+
+### The Gazette's Own Worked Example
+
+Schedule-18 includes a full example. It is worth following closely, because it shows how quickly a competitive-looking bid can fall out.
+
+**The setup:** A procuring entity invites tenders for works with an official estimate of **Tk. 4,00,00,000**. Tender invited 20 August; submission and opening on 15 September. Seven bidders submit.
+
+**The index:** For 15 September and the preceding 27 days, the NPPI works out to 8.32% below estimate — a factor of **0.9168**.
+
+**Preliminary and technical screening:**
+
+| Bidder | Price (Tk.) | Status |
+|---|---|---|
+| ক | 3,40,57,525 | Acceptable |
+| খ | 3,65,37,500 | Acceptable |
+| গ | 3,82,58,655 | Acceptable |
+| ঘ | 4,11,45,689 | Acceptable |
+| ঙ | 4,48,76,900 | **Rejected — more than 10% above estimate** |
+| চ | 3,60,04,268 | Not acceptable |
+| ছ | 3,77,89,320 | Acceptable |
+
+Five bidders remain. Note that ঙ, at roughly 12% above the estimate, is knocked out by the 10% filter before any averaging.
+
+**The calculation:**
+
+- Average of the five acceptable prices = **Tk. 3,75,56,937.80**
+- x_OCE = Tk. 4,00,00,000
+- x_NPPI = 4,00,00,000 × 0.9168 = **Tk. 3,66,72,000**
+
+Weighted average:
+x̄ = 0.5 × 3,75,56,937.80 + 0.3 × 3,66,72,000 + 0.2 × 4,00,00,000
+**x̄ ≈ Tk. 3,77,80,068.90**
+
+Weighted standard deviation:
+**Sd ≈ Tk. 23,21,810.79**
+
+Cut-off:
+3,77,80,068.90 − 23,21,810.79 = **Tk. 3,54,58,267.10**
+
+**The outcome:** Bidder ক, at Tk. 3,40,57,525, is the lowest price in the room — and falls below the cut-off. Bidder ক is declared an SLT and rejected. The award goes to the lowest bidder above the line.
+
+That is the whole point of the rule in one example: the lowest bidder lost.
+
+---
+
+### How the Process Works Beyond Schedule-18 (Rule 118)
+
+Schedule-18 gives the SLT calculation. Rule 118 — the main evaluation rule — governs what happens around it. Reading them together answers the questions the Schedule alone leaves open.
+
+**Which price is tested — submitted or corrected?** The corrected one. Rule 118(25) is explicit: SLT identification happens *after* applying arithmetic correction, discounts, and other financial adjustments to the acceptable tenders. So the figure that goes into the formula is your evaluated price, not your raw submitted price. Rule 118(13) adds that any discount you offer is applied *after* arithmetic errors are corrected.
+
+**Do you get to explain a low price?** Not in the way many bidders hope. Under Rule 118(8), the evaluation committee chairman may ask you to clarify a point or provide a breakdown of your quoted unit rates — but the same sub-rule prohibits any clarification that would change the substance of the tender, such as price or delivery schedule. Rule 118(9) requires every clarification to be in writing over the chairman's signature. In short: you can be asked to *break down* your rates, but you cannot *revise* your price to escape the SLT cut-off.
+
+**What if the committee thinks your pricing is unbalanced?** Rule 118(15) covers this separately from SLT. If prices are not quoted in a balanced way, the committee can direct you to provide a full price breakdown, and in cases of front-loaded unit rates, it can recommend an increased performance security. This is a distinct mechanism from the SLT cut-off — one manages risk on an accepted bid, the other rejects a bid outright.
+
+**What happens after SLT bids are removed?** Rule 118(26) is clear: once significantly low-priced tenders are identified and treated as non-responsive, the lowest bidder among the *remaining* acceptable tenders is recommended for award. That is the direct consequence the worked example above demonstrated — the lowest overall bidder was cut, and the award moved up the list.
+
+**When must the committee stop evaluating you entirely?** Rule 118(17): if you fail to prove qualification under Rule 65, or you do not accept an arithmetic correction under 118(12), or your tender is simply not responsive, evaluation of your tender does not continue.
+
+---
+
+### What Still Sits Outside These Rules
+
+Even with Rule 118 and Schedule-18 together, two things are governed elsewhere and should be confirmed against the tender document and the Act:
+
+**Formal complaint and review.** If you believe the SLT calculation was applied wrongly, the complaint and review mechanism under the Public Procurement Act and Rules applies — but the specific steps and deadlines are outside Rule 118 itself.
+
+**Collusion checks.** Rule 118(31) notes that in tie situations the committee first examines for possible collusive practice and, if found, proceeds under Rule 149. If low bids across a tender look coordinated, that is a separate track from SLT.
+
+When any of this affects your bid, ask at the pre-bid meeting and keep the written clarification. The procuring entity's clarification is authoritative; an assumption is not.
+
+---
+
+### A Practical Pre-Submission Checklist
+
+The following is practical guidance, not a requirement of the Rules. It is aimed at one thing: being able to defend your price if it is ever questioned.
+
+**Build the price from the bottom up.** Materials, labour, plant and equipment, transport, overhead, and a real margin. A rate you cannot reconstruct is a rate you cannot defend.
+
+**Keep the evidence behind unusually efficient rates.** If you can genuinely do a line item cheaper — because you own the plant, have a supply agreement, or the site is close to your yard — write down why and keep the supporting quotation or agreement.
+
+**Sanity-check against the official estimate.** Remember the upper filter: more than 10% above and you are out immediately. Far below and you risk the SLT cut-off. Know where you sit relative to the estimate before you submit.
+
+**Do not price to beat a number you cannot see.** The cut-off depends on competitors' prices and an index published after opening. Pricing to "just clear" an imagined threshold is guesswork.
+
+**Retain your working papers.** If your bid is rejected and you want an explanation, your own cost build-up is the first document you will need.
+
+---
+
+### What This Means for How You Price
+
+**You cannot calculate the cut-off in advance.** Half the weight depends on what your competitors bid, which you do not know until opening. Any figure you work out beforehand is an estimate, not a threshold.
+
+**Both extremes are now dangerous.** More than 10% above estimate and you are out immediately. Below the calculated cut-off and you are out as an SLT. The safe zone is between them — and it is defined by real costs, not by guessing.
+
+**Price from your build-up.** Materials, labour, plant, overhead, and a genuine margin. If that honest number cannot win, the tender was not yours.
+
+---
+
+### But Price Is the Last Battle, Not the First
+
+SLT only becomes relevant if your tender reaches financial evaluation at all. Most do not.
+
+They fail earlier — liquid assets short once ongoing commitments are deducted, a required Site Engineer missing, an equipment list without ownership documents, a certificate that expired last month. In the example above, bidder চ never reached the formula: it was already not acceptable.
+
+**eGPTenderHub checks that first battle for you.** Upload the tender notice and the AI evaluates every criterion against your company profile — net available liquid assets, tender capacity, key personnel, equipment, and mandatory documents — and tells you plainly whether you qualify and what is missing.
+
+**Get past eligibility before you worry about the cut-off. Check your position at egptenderhub.com.**
+
+---
+
+*Source: Public Procurement Rules 2025, Schedule-18 (framed under Rule 118(25) and (26)), Bangladesh Gazette, 28 September 2025, published by BPPA. Confirm the applicable provisions against your specific tender document and raise any ambiguity at the pre-bid meeting — the procuring entity's clarification is authoritative.*
       `,
       contentBn: `
-## PPR 2025-এ SLT: যে নিয়ম দরপত্রের দর নির্ধারণের পদ্ধতি বদলে দিল
+## PPR 2025-এ SLT: যে সূত্র ঠিক করে আপনার কম দর টিকবে কিনা
 
-বছরের পর বছর বাংলাদেশের সরকারি দরপত্রে কৌশলটা সহজ ছিল: ±১০% সীমার মধ্যে থেকে যতটা নিরাপদে পারা যায় কম দর দেওয়া। সেই কৌশল এখন অচল।
+PPR 2025-এর অধীনে সবচেয়ে কম দর দেওয়া মানেই আর জেতা নয়। একটা সূত্র এখন ঠিক করে আপনার দর বিশ্বাসযোগ্য কিনা — এবং সেটা যদি হিসাব করা নিম্নসীমার নিচে পড়ে, আপনার দরপত্র **উল্লেখযোগ্যরূপে নিম্নমূল্যের দরপত্র (SLT)** হিসেবে বাতিল হবে।
 
-২৮ সেপ্টেম্বর ২০২৫-এ জারি হওয়া PPR 2025 দুটো পরস্পর-সম্পর্কিত পরিবর্তন এনেছে, যা বেশিরভাগ ঠিকাদার এখনও পুরোপুরি বোঝেননি:
-
-১. জাতীয় works procurement-এ **±১০% মূল্য সীমা তুলে দেওয়া হয়েছে।**
-২. **Formula-ভিত্তিক SLT (Significantly Low-priced Tender) মূল্যায়ন সিস্টেম** চালু হয়েছে।
-
-এই দুটো মিলে অর্থ দাঁড়ায় — আপনার দরের নিচের মেঝেটা সরে গেছে, আর একটা নতুন স্বয়ংক্রিয় ব্যবস্থা এখন ঠিক করে আপনার কম দর বিশ্বাসযোগ্য নাকি বেপরোয়া। যদি সেটা SLT হিসেবে চিহ্নিত হয়, আপনার দরপত্র **non-responsive** ঘোষণা করা হবে।
-
-এই গাইডে ব্যাখ্যা করা হলো SLT কী, কীভাবে হিসাব হয়, কোথায় প্রযোজ্য, আর কীভাবে এতে না পড়ে দর দেবেন।
+এই গাইডে **PPR 2025-এর তফসিল-১৮ (বিধি ১১৮(২৫) ও (২৬)-এর অধীনে প্রণীত)** অনুযায়ী প্রকৃত হিসাবটা তুলে ধরা হলো — যা ২৮ সেপ্টেম্বর ২০২৫-এর গেজেটে প্রকাশিত।
 
 ---
 
-### SLT আসলে কী
+### তফসিল-১৮ SLT বলতে কী বোঝায়
 
-SLT মানে **অত্যধিক নিম্নমূল্যের দরপত্র** — এমন একটা দর যা কাজটার বাস্তব খরচের তুলনায় এতটাই কম যে ক্রয়কারী প্রতিষ্ঠান সন্দেহ করে আপনি আদৌ কাজটা করতে পারবেন কিনা।
+SLT হলো এমন একটি দরপত্র, যেখানে দরপত্রদাতার প্রদত্ত মূল্য ও তার অন্যান্য উপাদান — দাপ্তরিক প্রাক্কলিত মূল্য, নিকট-সাম্প্রতিক বাজারমূল্য এবং অন্যান্য গ্রহণযোগ্য দরদাতাদের প্রদত্ত মূল্যের সাপেক্ষে — এতটাই কম যে দরপত্রদাতা সেই মূল্যে চুক্তি সম্পাদন করতে পারবেন না মর্মে ক্রয়কারীর নিকট গুরুতর উদ্বেগের সৃষ্টি হয়।
 
-পুরনো ব্যবস্থায় এটা ±১০% সীমা দিয়ে মোটা দাগে সামলানো হতো — সীমার বাইরে গেলেই বাদ। PPR 2025 সেই স্থূল হাতিয়ারের বদলে একটা বস্তুনিষ্ঠ, formula-চালিত মূল্যায়ন এনেছে। উদ্দেশ্য হলো প্রক্রিয়া থেকে ব্যক্তিগত বিচার সরিয়ে দেওয়া — হিসাবই সিদ্ধান্ত নেবে, ঘরের কারো মতামত নয়।
-
-আপনার জন্য গুরুত্বপূর্ণ পরিণতি: **সর্বনিম্ন দরদাতা হওয়া আর জেতা এখন এক কথা নয়।** আপনি সবচেয়ে কম দর দিতে পারেন, কারিগরিভাবে responsive-ও হতে পারেন, তবু formula আপনার দরকে অবিশ্বাসযোগ্য চিহ্নিত করলে বাদ পড়বেন।
+তফসিলটি কারণটাও স্পষ্ট করেছে। অত্যধিক নিম্নমূল্যের দরপত্র প্রাথমিকভাবে ক্রয়কারীর জন্য সুবিধাজনক মনে হতে পারে, কিন্তু বাস্তবে শেষ পর্যন্ত তা সার্বিক ব্যয়বৃদ্ধি, নিম্নমানের ফলাফল, চুক্তি সম্পাদনে বিলম্ব, এমনকি অপ্রত্যাশিতভাবে চুক্তির অবসানেরও কারণ হতে পারে। কিছু দরদাতা কেবল কাজ পাওয়ার লক্ষ্যে এমন নিম্নদর দেন যাতে ঘোষিতমূল্যে কাজ শেষ করতে সক্ষম নাও হতে পারেন। ফলে ক্রয়কারীকে একটি দুর্বল (non-performing) ইকোনমিক অপারেটরের সাথে চুক্তি ব্যবস্থাপনায় বা নতুন অপারেটর নির্বাচনে অতিরিক্ত সময় ও অর্থব্যয় করিতে হয়।
 
 ---
 
-### মূল্যায়ন কীভাবে কাজ করে
+### SLT কোথায় প্রযোজ্য
 
-PPR 2025 অনুযায়ী SLT মূল্যায়নে তিনটি উপাদান বিবেচিত হয়:
+তফসিল-১৮-এর শিরোনামেই প্রয়োগক্ষেত্র বলা আছে — **অভ্যন্তরীণ ক্রয়ের ক্ষেত্রে দরপত্র মূল্যায়ন কমিটি কর্তৃক** উল্লেখযোগ্যরূপে নিম্নমূল্যের দরপত্রসমূহকে চিহ্নিতকরণ ও মূল্যায়ন প্রক্রিয়া। অর্থাৎ এই ব্যবস্থাটি দরপত্র মূল্যায়ন কমিটির হাতে এবং অভ্যন্তরীণ ক্রয়ের জন্য প্রণীত।
 
-- **কারিগরিভাবে গ্রহণযোগ্য দরদাতাদের প্রস্তাবিত মূল্য** — গ্রহণযোগ্য দরগুলোর গড় প্রায় **৫০% weight** বহন করে।
-- ক্রয়কারী প্রতিষ্ঠানের তৈরি **দাপ্তরিক প্রাক্কলিত মূল্য**।
-- বর্তমান বাজারদর প্রতিফলিত করা **সাম্প্রতিক মূল্যসূচক**।
+সংশ্লিষ্ট একটা বিষয় অনুচ্ছেদ ৬-এ আছে। জাতীয় মূল্যসূচক গণনার সময় **অভ্যন্তরীণ ক্রয়ে সীমিত দরপত্র পদ্ধতির (LTM) ক্ষেত্রসমূহ বাদ** দেওয়া হয়।
 
-e-GP সিস্টেমে এটা **মূল্যায়নের সময় স্বয়ংক্রিয়ভাবে** হিসাব হয়। আপনাকে এর জন্য বাড়তি কিছু জমা দিতে হয় না; প্রাপ্ত দরপত্রগুলোর উপর সিস্টেম নিজেই এটা চালায়।
-
-এই নকশা থেকে দুটো জিনিস বেরিয়ে আসে। প্রথমত, আপনার দর একা বিচার হয় না — প্রতিযোগীরা কী দিয়েছে তার বিপরীতে বিচার হয়। আঁটসাঁট দরের ভিড়ে যে দর আক্রমণাত্মক দেখায়, ঢিলেঢালা দরের ভিড়ে সেটাই স্বাভাবিক লাগতে পারে। দ্বিতীয়ত, যেহেতু গ্রহণযোগ্য দরের গড় অর্ধেক weight বহন করে, **আপনি আগে থেকে জানতে পারবেন না সীমারেখা ঠিক কোথায় পড়বে।** এটা নির্ভর করে আর কারা দর দিচ্ছে এবং কত দিচ্ছে তার উপর।
-
-> গুরুত্বপূর্ণ: সঠিক formula ও তার parameter বিধিমালা ও সংশ্লিষ্ট তফসিলে দেওয়া আছে। নিজে হিসাব করা যেকোনো সংখ্যাকে আনুমানিক হিসেবে দেখুন। প্রযোজ্য পদ্ধতি দরপত্র নথির সাথে মিলিয়ে নিন, আর অস্পষ্ট কিছু থাকলে pre-bid meeting-এ তুলুন — ক্রয়কারী প্রতিষ্ঠানের ব্যাখ্যাই চূড়ান্ত।
+এর বাইরে অনুমান করবেন না। আপনার দরপত্র নথিতে যদি কম দর কীভাবে বিবেচিত হবে সে বিষয়ে কিছু না থাকে, সেটাই pre-bid meeting-এ তোলার প্রশ্ন।
 
 ---
 
-### SLT সব দরপত্রে প্রযোজ্য নয়
+### সূচকের সংখ্যাটা কখন জানা যায়
 
-এই বিষয়টা অনেক bidder এড়িয়ে যান। SLT চিহ্নিতকরণ ও মূল্যায়ন প্রক্রিয়া **সব ধরনের ক্রয়ে প্রযোজ্য নয়।** এটা নির্দিষ্ট কিছু ক্রয় পদ্ধতি ও শ্রেণিতে প্রযোজ্য, এবং প্রযোজ্য নিয়ম দরপত্র নথিতে প্রতিফলিত থাকবে।
+অনুচ্ছেদ ৬ আর গেজেটের উদাহরণ মিলিয়ে সময়টা স্পষ্ট। সূচক নির্ণয় হয় দরপত্র উন্মুক্তকরণের দিন ও পূর্ববর্তী ২৭ দিনের জন্য, আর **ই-জিপি পোর্টাল সেই সংখ্যা প্রকাশ করে উন্মুক্তকরণের দিন রাত ১২টা অতিবাহিত হওয়ার পর দ্রুততম সময়ের মধ্যে।**
 
-বাস্তব প্রয়োগ: ধরে নেবেন না যে SLT প্রযোজ্য, আবার ধরে নেবেন না যে প্রযোজ্য নয়। **নির্দিষ্ট দরপত্রের শর্ত পড়ুন।** নথিতে যদি কম দর কীভাবে বিবেচিত হবে সে বিষয়ে কিছু না থাকে বা অস্পষ্ট থাকে, তাহলে ঠিক সেই প্রশ্নটাই pre-bid meeting-এ তোলা উচিত।
-
----
-
-### আপনার দরপত্র কৌশলের জন্য এর অর্থ
-
-পুরনো অভ্যাস — হাড় পর্যন্ত কেটে দর দিয়ে আশা করা — এখন সরাসরি বিপজ্জনক। PPR 2025-এর অধীনে দর নিয়ে যেভাবে ভাবা উচিত:
-
-**প্রতিযোগিতার অনুমান নয়, নিজের আসল খরচ থেকে দর তৈরি করুন।** মালামাল, শ্রম, যন্ত্রপাতি, overhead আর একটা বাস্তব margin দিয়ে rate গড়ুন। আপনার সৎ দর যদি জিততে না পারে, তাহলে সেই দরপত্র আপনার জন্য ছিল না।
-
-**দাপ্তরিক প্রাক্কলিত মূল্যকে সম্মান করুন।** এটা তিনটি উপাদানের একটি। এর চেয়ে অস্বাভাবিক কম দর যাচাইয়ের ডাক দেয়।
-
-**"সর্বনিম্ন" কে লক্ষ্য ভাবা বন্ধ করুন।** নতুন ব্যবস্থায় লক্ষ্য হলো "বিশ্বাসযোগ্যদের মধ্যে সর্বনিম্ন"। যে দরে আপনি আসলে কাজ করতে পারবেন না, সেটা গৃহীত হলেও মূল্যহীন — আর ক্রমশ সেটা গৃহীতই হবে না।
-
-**সীমা তুলে দেওয়াটা দুদিকেই কাটে মনে রাখুন।** ±১০% band না থাকায় অন্যের কম দরে কেটে যাওয়া থেকেও স্বয়ংক্রিয় সুরক্ষা নেই। শৃঙ্খলাটা এখন আপনার নিজের হিসাব থেকেই আসতে হবে।
+এর বাস্তব পরিণতি এড়ানো যায় না: আপনার দরপত্রে যে সূচক প্রয়োগ হবে, সেটা প্রকাশিতই হয় আপনার জমা দেওয়া ও দরপত্র উন্মুক্ত হওয়ার পর। ওটার বিপরীতে দর সাজানো সম্ভব নয়। কেবল নিজের খরচের বিপরীতেই সাজানো যায়।
 
 ---
 
-### বড় ছবি: দাম হলো শেষ যুদ্ধ
+### ধাপ ১: ১০% ঊর্ধ্বসীমার ছাঁকনি (প্রথমেই প্রযোজ্য)
 
-যেটা উপেক্ষিত থাকে সেটা হলো — SLT তখনই প্রাসঙ্গিক হয় যখন আপনার দরপত্র **প্রথমে কারিগরিভাবে responsive হয়।**
+কোনো গড় হিসাব শুরুর আগেই তফসিল-১৮-এর অনুচ্ছেদ ৭ একটা ছাঁকনি প্রয়োগ করে, যাতে হিসাবে অযাচিত প্রভাব না পড়ে:
 
-বেশিরভাগ দরপত্র দাম তুলনার পর্যায়েই পৌঁছায় না। তারা আগেই বাদ পড়ে — চলমান প্রতিশ্রুতি বাদ দিয়ে liquid asset কম পড়ায়, key personnel না থাকায়, equipment তালিকা অসম্পূর্ণ থাকায়, বা একটা কাগজের মেয়াদ শেষ হওয়ায়। rate-এর শেষ ২% নিয়ে মাথা ঘামানো অর্থহীন যদি আপনার bid eligibility ধাপেই বাতিল হতে যায়।
+> দাপ্তরিক প্রাক্কলিত মূল্যের চেয়ে **১০%-এর অধিক উপরে** কোনো দরপ্রস্তাব উভয় ফর্মুলায় বিবেচনা করা যাবে না — এবং সেই দরপত্রসমূহ নিজেরাও **অগ্রহণযোগ্য (non-responsive)** হিসেবে গণ্য হবে।
 
-**আগে eligibility-র সমস্যা মেটান, তারপর দাম নিয়ে ভাবুন।**
+এটা দুদিকেই কাজ করে। অতি উচ্চ দর দিয়ে গড় বাড়িয়ে নিম্নসীমা উপরে টেনে তোলা যাবে না। আবার আপনি নিজে যদি প্রাক্কলিত মূল্যের ১০%-এর বেশি উপরে দর দেন, বাকি সব ঠিক থাকলেও প্রাথমিক মূল্যায়নেই বাদ।
 
-eGPTenderHub ঠিক এই কাজটাই করে। দরপত্রের notice upload করুন — AI প্রতিটি শর্ত আপনার company profile-এর সাথে যাচাই করে: চলমান প্রতিশ্রুতি বাদ দিয়ে net liquid assets, personnel, equipment, কাগজপত্র, tender capacity — এবং পরিষ্কারভাবে বলে দেয় আপনি যোগ্য কিনা আর কী missing।
+---
 
-**দামের যুদ্ধে নামার আগে eligibility-র যুদ্ধ জিতুন। egptenderhub.com-এ মিনিটেই আপনার অবস্থান যাচাই করুন।**
+### ধাপ ২: ভারযুক্ত গড় (x̄)
+
+ভারযুক্ত গড় তিনটি উপাদান থেকে নির্ণয় করা হয়:
+
+**x̄ = 0.5 × (Σxᵢ / n) + 0.2 × x_OCE + 0.3 × x_NPPI**
+
+যেখানে:
+
+- **xᵢ** = কারিগরিভাবে গ্রহণযোগ্য প্রতিটি দরদাতার প্রস্তাবিত মূল্য
+- **n** = গ্রহণযোগ্য দরপত্রের সংখ্যা
+- **x_OCE** = প্যাকেজের দাপ্তরিক প্রাক্কলিত মূল্য
+- **x_NPPI** = ই-জিপি পোর্টালে সরকারি ক্রয় প্রক্রিয়ায় সাম্প্রতিক মূল্যসূচকের ভিত্তিতে প্রাপ্ত দর
+
+তফসিল অনুযায়ী নির্ধারিত ভার:
+
+| উপাদান | ভার (Weight) |
+|---|---|
+| গ্রহণযোগ্য দরদাতাদের মূল্যের গড় | **০.৫০** |
+| মূল্যসূচক (NPPI) ভিত্তিক দর | **০.৩০** |
+| দাপ্তরিক প্রাক্কলিত মূল্য (OCE) | **০.২০** |
+
+ভারসাম্যটা লক্ষ্য করুন: অর্ধেক ভার নির্ভর করে আপনার প্রতিযোগীরা আসলে কত দিয়েছে তার উপর। বাকি অর্ধেক বাঁধা দাপ্তরিক প্রাক্কলন আর বাজারের সাম্প্রতিক গতিবিধির সাথে।
+
+---
+
+### x_NPPI কীভাবে নির্ধারিত হয়
+
+মূল্যসূচক ক্রয়ের ক্যাটেগরি অনুযায়ী নির্ণীত হয় — পণ্য, কার্য বা ভৌতসেবা। কোনো দরপত্রের ক্ষেত্রে এটি ব্যবহার করে **দরপত্র উন্মুক্তকরণের দিন এবং তার পূর্ববর্তী ২৭ দিন — মোট ২৮ দিন।**
+
+ওই সময়কালে সংশ্লিষ্ট ক্যাটেগরিতে চুক্তিসম্পাদনের নোটিশ জারি হওয়া সকল ক্রয় প্রক্রিয়ার (অভ্যন্তরীণ ক্রয়ে সীমিত দরপত্র পদ্ধতির ক্ষেত্র ব্যতিরেকে) দাপ্তরিক প্রাক্কলিত মূল্যের সাথে চুক্তিপ্রাপ্ত দরদাতার মূল্যের শতকরা ব্যবধানের জাতীয় গড় নির্ণয় করা হয়।
+
+সেই জাতীয় গড় ব্যবধান আপনার দরপত্রের প্রাক্কলিত মূল্যে প্রয়োগ করে x_NPPI পাওয়া যায়। বাস্তবে, আপনার ক্যাটেগরিতে সাম্প্রতিক চুক্তিগুলো যদি প্রাক্কলনের ৮.৩২% নিচে হয়ে থাকে, তাহলে সূচকের গুণক দাঁড়ায় ০.৯১৬৮।
+
+---
+
+### ধাপ ৩: ওয়েটেড স্ট্যান্ডার্ড ডেভিয়েশন (Sd)
+
+**Sd = √{ Σ(xᵢ − x̄)² / n }**
+
+যেখানে xᵢ = প্রতিটি দরদাতার প্রস্তাবিত মূল্য, x̄ = ধাপ ২-এর ভারযুক্ত গড়, এবং n = গ্রহণযোগ্য দরদাতাদের সংখ্যা।
+
+---
+
+### ধাপ ৪: নিম্নসীমা
+
+**গ্রহণযোগ্য মূল্যের নিম্নসীমা = x̄ − Sd**
+
+এই সীমার **নিচে** থাকা সকল দর উল্লেখযোগ্যরূপে নিম্নমূল্যের দরপত্র হিসেবে বিবেচিত হবে এবং **বাতিল** বলিয়া গণ্য হবে। এরপর সীমার উপরে থাকা দরপত্রগুলোর মধ্যে মূল্যায়ন চলবে।
+
+---
+
+### গেজেটের নিজস্ব উদাহরণ
+
+তফসিল-১৮-এ একটা পূর্ণ উদাহরণ দেওয়া আছে। এটা মন দিয়ে দেখা দরকার, কারণ এতে বোঝা যায় প্রতিযোগিতামূলক দেখতে একটা দর কত দ্রুত বাদ পড়তে পারে।
+
+**প্রেক্ষাপট:** ৪ কোটি টাকা দাপ্তরিক প্রাক্কলিত ব্যয়ের একটি কার্যক্রমের জন্য দরপত্র আহ্বান করা হয় ২০ আগস্ট। দরপত্র জমা ও উন্মুক্তকরণ ১৫ সেপ্টেম্বর। সাতটি প্রতিষ্ঠান দরপত্র দাখিল করে।
+
+**সূচক:** ১৫ সেপ্টেম্বর ও পূর্ববর্তী ২৭ দিনের জন্য NPPI দাঁড়ায় ৮.৩২% নিম্নে — অর্থাৎ গুণক **০.৯১৬৮**।
+
+**প্রাথমিক ও কারিগরি বাছাই:**
+
+| দরদাতা | দরমূল্য (টাকা) | অবস্থান |
+|---|---|---|
+| ক | ৩,৪০,৫৭,৫২৫ | গ্রহণযোগ্য |
+| খ | ৩,৬৫,৩৭,৫০০ | গ্রহণযোগ্য |
+| গ | ৩,৮২,৫৮,৬৫৫ | গ্রহণযোগ্য |
+| ঘ | ৪,১১,৪৫,৬৮৯ | গ্রহণযোগ্য |
+| ঙ | ৪,৪৮,৭৬,৯০০ | **বাদ — প্রাক্কলনের ১০%-এর অধিক ঊর্ধ্বে** |
+| চ | ৩,৬০,০৪,২৬৮ | অগ্রহণযোগ্য |
+| ছ | ৩,৭৭,৮৯,৩২০ | গ্রহণযোগ্য |
+
+পাঁচজন টিকে থাকে। লক্ষ্য করুন, ঙ প্রাক্কলনের প্রায় ১২% উপরে থাকায় কোনো গড় হিসাবের আগেই ১০% ছাঁকনিতে বাদ পড়ে।
+
+**হিসাব:**
+
+- পাঁচটি গ্রহণযোগ্য দরের গড় = **৩,৭৫,৫৬,৯৩৭.৮০ টাকা**
+- x_OCE = ৪,০০,০০,০০০ টাকা
+- x_NPPI = ৪,০০,০০,০০০ × ০.৯১৬৮ = **৩,৬৬,৭২,০০০ টাকা**
+
+ভারযুক্ত গড়:
+x̄ = ০.৫ × ৩,৭৫,৫৬,৯৩৭.৮০ + ০.৩ × ৩,৬৬,৭২,০০০ + ০.২ × ৪,০০,০০,০০০
+**x̄ ≈ ৩,৭৭,৮০,০৬৮.৯০ টাকা**
+
+ওয়েটেড স্ট্যান্ডার্ড ডেভিয়েশন:
+**Sd ≈ ২৩,২১,৮১০.৭৯ টাকা**
+
+নিম্নসীমা:
+৩,৭৭,৮০,০৬৮.৯০ − ২৩,২১,৮১০.৭৯ = **৩,৫৪,৫৮,২৬৭.১০ টাকা**
+
+**ফলাফল:** দরদাতা ক-এর দর ৩,৪০,৫৭,৫২৫ টাকা — উপস্থিত সবার মধ্যে সর্বনিম্ন — কিন্তু নিম্নসীমার নিচে। ক SLT হিসেবে চিহ্নিত ও বাতিল। কাজ পান সীমার উপরে থাকা সর্বনিম্ন দরদাতা।
+
+একটা উদাহরণেই পুরো নিয়মের মর্মার্থ: **সর্বনিম্ন দরদাতা হেরে গেলেন।**
+
+---
+
+### তফসিল-১৮-এর বাইরে প্রক্রিয়াটি কীভাবে চলে (বিধি ১১৮)
+
+তফসিল-১৮ SLT-র হিসাব দেয়। বিধি ১১৮ — মূল মূল্যায়ন বিধি — তার চারপাশের প্রক্রিয়া নিয়ন্ত্রণ করে। দুটো একসাথে পড়লে তফসিল যা খোলা রাখে সেই প্রশ্নগুলোর উত্তর মেলে।
+
+**কোন মূল্য যাচাই হয় — দাখিলকৃত নাকি সংশোধিত?** সংশোধিতটা। বিধি ১১৮(২৫) স্পষ্ট: গাণিতিক সংশোধন, মূল্যছাড় প্রয়োগ ও অন্যান্য আর্থিক প্রভাব বিবেচনার **পর** SLT চিহ্নিত হয়। অর্থাৎ সূত্রে যে সংখ্যা যায় সেটা আপনার evaluated price, কাঁচা দাখিলকৃত মূল্য নয়। বিধি ১১৮(১৩) যোগ করে — আপনার দেওয়া মূল্যছাড় গাণিতিক ত্রুটি সংশোধনের **পরে** বিবেচিত হয়।
+
+**কম দরের ব্যাখ্যা দেওয়ার সুযোগ পান কি?** অনেকে যেভাবে আশা করেন সেভাবে নয়। বিধি ১১৮(৮) অনুযায়ী মূল্যায়ন কমিটির সভাপতি কোনো বিষয়ের ব্যাখ্যা বা উদ্ধৃত এককদরের বিভাজন চাইতে পারেন — কিন্তু একই উপবিধি নিষেধ করে এমন কোনো ব্যাখ্যা, যা দরপত্রের বিষয়বস্তু (যেমন মূল্য বা সরবরাহের সময়সূচি) পরিবর্তন করে। বিধি ১১৮(৯) অনুযায়ী প্রতিটি ব্যাখ্যা লিখিত ও সভাপতির স্বাক্ষরে হতে হবে। সংক্ষেপে: আপনাকে rate-এর **বিভাজন** চাওয়া যেতে পারে, কিন্তু SLT নিম্নসীমা এড়াতে আপনি **দাম পরিবর্তন** করতে পারবেন না।
+
+**কমিটি যদি মনে করে আপনার দর ভারসাম্যহীন?** বিধি ১১৮(১৫) এটা SLT থেকে আলাদাভাবে ধরে। দর ভারসাম্যমূলকভাবে উদ্ধৃত না হলে কমিটি পূর্ণ বিভাজন চাইতে পারে, এবং একক দরের front loading-এর ক্ষেত্রে কার্যসম্পাদন জামানত বৃদ্ধির সুপারিশ করতে পারে। এটা SLT নিম্নসীমার থেকে ভিন্ন ব্যবস্থা — একটা গৃহীত দরের ঝুঁকি সামলায়, অন্যটা দর সরাসরি বাতিল করে।
+
+**SLT দরপত্র বাদ পড়ার পর কী হয়?** বিধি ১১৮(২৬) পরিষ্কার: উল্লেখযোগ্যরূপে নিম্নমূল্যের দরপত্র চিহ্নিত ও অগ্রহণযোগ্য হিসেবে গণ্য হওয়ার পর, **অবশিষ্ট** গ্রহণযোগ্য দরপত্রগুলোর মধ্যে সর্বনিম্ন দরদাতাকে award-এর জন্য সুপারিশ করা হয়। উপরের উদাহরণ ঠিক এটাই দেখিয়েছে — সামগ্রিকভাবে সর্বনিম্ন দরদাতা বাদ পড়লেন, award তালিকায় উপরে উঠল।
+
+**কমিটি কখন আপনার মূল্যায়ন সম্পূর্ণ বন্ধ করে?** বিধি ১১৮(১৭): বিধি ৬৫-এর অধীন যোগ্যতা প্রমাণে ব্যর্থ হলে, বা ১১৮(১২)-এর গাণিতিক সংশোধন গ্রহণ না করলে, বা দরপত্র গ্রহণযোগ্য না হলে — আপনার দরপত্রের মূল্যায়ন অব্যাহত থাকে না।
+
+---
+
+### এখনও যা এই বিধিগুলোর বাইরে
+
+বিধি ১১৮ ও তফসিল-১৮ একসাথেও দুটো বিষয় অন্যত্র নিয়ন্ত্রিত, যা দরপত্র নথি ও আইনের সাথে মিলিয়ে নেওয়া উচিত:
+
+**আনুষ্ঠানিক অভিযোগ ও রিভিউ।** SLT হিসাব ভুলভাবে প্রয়োগ হয়েছে মনে করলে পাবলিক প্রকিউরমেন্ট আইন ও বিধিমালার অধীন অভিযোগ ও রিভিউ ব্যবস্থা প্রযোজ্য — তবে নির্দিষ্ট ধাপ ও সময়সীমা বিধি ১১৮-এর বাইরে।
+
+**চক্রান্ত যাচাই।** বিধি ১১৮(৩১) বলে, সমতার ক্ষেত্রে কমিটি প্রথমে সম্ভাব্য চক্রান্তমূলক কর্ম (collusive practice) খতিয়ে দেখে এবং পাওয়া গেলে বিধি ১৪৯ অনুযায়ী ব্যবস্থা নেয়। একটা দরপত্রে কম দরগুলো সমন্বিত মনে হলে সেটা SLT থেকে আলাদা পথ।
+
+এর কোনোটি আপনার দরপত্রে প্রভাব ফেললে pre-bid meeting-এ জিজ্ঞেস করুন এবং লিখিত ব্যাখ্যা সংরক্ষণ করুন। ক্রয়কারী প্রতিষ্ঠানের ব্যাখ্যাই চূড়ান্ত; অনুমান নয়।
+
+---
+
+### দাখিলের আগে একটি ব্যবহারিক চেকলিস্ট
+
+নিচেরটি ব্যবহারিক পরামর্শ, বিধিমালার শর্ত নয়। লক্ষ্য একটাই — আপনার দর যদি কখনো প্রশ্নের মুখে পড়ে, তা যেন আপনি যুক্তি দিয়ে দাঁড় করাতে পারেন।
+
+**দর গড়ুন নিচ থেকে উপরে।** মালামাল, শ্রম, যন্ত্রপাতি, পরিবহন, overhead আর একটা প্রকৃত margin। যে rate আপনি নিজে পুনর্গঠন করতে পারবেন না, সেটা রক্ষাও করতে পারবেন না।
+
+**অস্বাভাবিক কম rate-এর পেছনের প্রমাণ রাখুন।** কোনো item যদি সত্যিই কম খরচে করতে পারেন — যন্ত্রপাতি নিজের, সরবরাহ চুক্তি আছে, বা সাইট আপনার ইয়ার্ডের কাছে — কারণটা লিখে রাখুন এবং সহায়ক quotation বা চুক্তি সংরক্ষণ করুন।
+
+**প্রাক্কলিত মূল্যের সাপেক্ষে যাচাই করুন।** ঊর্ধ্বসীমার কথা মনে রাখুন: ১০%-এর বেশি উপরে গেলে সাথে সাথেই বাদ। অনেক নিচে গেলে SLT নিম্নসীমার ঝুঁকি। জমা দেওয়ার আগে জানুন আপনি প্রাক্কলনের তুলনায় কোথায় দাঁড়িয়ে।
+
+**যে সংখ্যা দেখতেই পাচ্ছেন না, তাকে হারাতে দর সাজাবেন না।** নিম্নসীমা নির্ভর করে প্রতিযোগীদের দর আর উন্মুক্তকরণের পরে প্রকাশিত সূচকের উপর। কাল্পনিক সীমা "সামান্য পার করার" দর অনুমান ছাড়া কিছু নয়।
+
+**আপনার হিসাবের কাগজ সংরক্ষণ করুন।** দরপত্র বাতিল হলে ব্যাখ্যা চাইতে গেলে আপনার নিজের ব্যয়-বিন্যাসই প্রথম প্রয়োজনীয় নথি।
+
+---
+
+### আপনার দর নির্ধারণে এর অর্থ
+
+**নিম্নসীমা আগে থেকে হিসাব করা যায় না।** অর্ধেক ভার নির্ভর করে প্রতিযোগীরা কত দেবে তার উপর, যা উন্মুক্তকরণের আগে জানার উপায় নেই। আগে থেকে বের করা যেকোনো সংখ্যা আনুমানিক, নির্ধারিত সীমা নয়।
+
+**এখন দুই প্রান্তই বিপজ্জনক।** প্রাক্কলনের ১০%-এর বেশি উপরে গেলে সাথে সাথে বাদ। হিসাব করা নিম্নসীমার নিচে গেলে SLT হিসেবে বাদ। নিরাপদ পরিসর এই দুইয়ের মাঝে — আর সেটা নির্ধারিত হয় বাস্তব খরচ দিয়ে, অনুমান দিয়ে নয়।
+
+**নিজের হিসাব থেকে দর গড়ুন।** মালামাল, শ্রম, যন্ত্রপাতি, overhead আর একটা প্রকৃত margin। সেই সৎ সংখ্যা যদি জিততে না পারে, দরপত্রটা আপনার জন্য ছিল না।
+
+---
+
+### তবে দাম শেষ যুদ্ধ, প্রথম নয়
+
+SLT তখনই প্রাসঙ্গিক হয় যখন আপনার দরপত্র আর্থিক মূল্যায়ন পর্যন্ত পৌঁছায়। বেশিরভাগ পৌঁছায় না।
+
+তারা আগেই বাদ পড়ে — চলমান প্রতিশ্রুতি বাদ দিলে liquid asset কম পড়ায়, প্রয়োজনীয় Site Engineer না থাকায়, মালিকানার কাগজবিহীন equipment তালিকায়, বা গত মাসে মেয়াদোত্তীর্ণ একটা সনদে। উপরের উদাহরণে দরদাতা চ সূত্র পর্যন্তই পৌঁছাননি — তিনি আগেই অগ্রহণযোগ্য।
+
+**eGPTenderHub সেই প্রথম যুদ্ধটা আপনার জন্য যাচাই করে।** দরপত্রের notice upload করুন — AI প্রতিটি শর্ত আপনার company profile-এর সাথে মিলিয়ে দেখে: net available liquid assets, tender capacity, key personnel, equipment, বাধ্যতামূলক কাগজপত্র — এবং পরিষ্কারভাবে বলে দেয় আপনি যোগ্য কিনা আর কী missing।
+
+**নিম্নসীমা নিয়ে ভাবার আগে eligibility পার হন। egptenderhub.com-এ আপনার অবস্থান যাচাই করুন।**
+
+---
+
+*সূত্র: পাবলিক প্রকিউরমেন্ট বিধিমালা ২০২৫, তফসিল-১৮ (বিধি ১১৮(২৫) ও (২৬)-এর অধীনে প্রণীত), বাংলাদেশ গেজেট, অতিরিক্ত সংখ্যা, ২৮ সেপ্টেম্বর ২০২৫, প্রকাশক BPPA। প্রযোজ্য বিধান আপনার নির্দিষ্ট দরপত্র নথির সাথে মিলিয়ে নিন এবং অস্পষ্টতা pre-bid meeting-এ তুলুন — ক্রয়কারী প্রতিষ্ঠানের ব্যাখ্যাই চূড়ান্ত।*
       `,
     },
 {
