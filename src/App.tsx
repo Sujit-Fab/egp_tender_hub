@@ -1728,7 +1728,16 @@ export default function App() {
         nature: extracted.nature || prev.nature,
         value: extracted.value !== undefined ? extracted.value : prev.value,
         method: extracted.method || prev.method,
-        fullText: extracted.fullText || prev.fullText
+        fullText: extracted.fullText || prev.fullText,
+        // Report-header fields (Tender ID, Reference No, Procuring Entity, Closing, Tender
+        // Security, Joint Venture): keep whatever Gemini extracted, null included — the
+        // header renders directly from these, it must never re-derive them from raw text.
+        tenderId: extracted.tenderId !== undefined ? extracted.tenderId : prev.tenderId,
+        referenceNo: extracted.referenceNo !== undefined ? extracted.referenceNo : prev.referenceNo,
+        procuringEntity: extracted.procuringEntity !== undefined ? extracted.procuringEntity : prev.procuringEntity,
+        closingDateTime: extracted.closingDateTime !== undefined ? extracted.closingDateTime : prev.closingDateTime,
+        tenderSecurity: extracted.tenderSecurity !== undefined ? extracted.tenderSecurity : prev.tenderSecurity,
+        jointVenture: extracted.jointVenture !== undefined ? extracted.jointVenture : prev.jointVenture
       }));
     } catch (err) {
       setError('Failed to scan notice. Please enter details manually.');
@@ -2278,99 +2287,61 @@ export default function App() {
                   )}
 
                   {result && !loading && (() => {
-                    const info = (() => {
-                      const text = formData?.fullText || scannedText || '';
-                      
-                      // Extract Tender ID (typically 6 digits)
-                      let tenderId = 'Not Found';
-                      const idMatch = text.match(/Tender ID\s*[:：]\s*(\d+)/i) || 
-                                      text.match(/Tender ID\s+(\d+)/i) || 
-                                      text.match(/আইডি\s*[:：]\s*(\d+)/) ||
-                                      text.match(/ID\s*[:：]\s*(\d+)/i);
-                      if (idMatch) {
-                        tenderId = idMatch[1];
-                      } else {
-                        const sixDigits = text.substring(0, 2000).match(/\b\d{6}\b/);
-                        if (sixDigits) {
-                          tenderId = sixDigits[0];
-                        } else {
-                          tenderId = "617251";
+                    // Header fields render DIRECTLY from the same server-side Gemini extraction
+                    // that populates the criterion cards (extractTenderData in tenderService.ts,
+                    // stored on formData). No regex/label-scanning on raw text, and no invented
+                    // fallback values.
+                    const notStated = lang === 'bn' ? 'নথিতে উল্লেখ নেই' : 'Not stated in document';
+                    const notCaptured = lang === 'bn' ? 'সংরক্ষিত হয়নি — পুনরায় বিশ্লেষণ করুন' : 'Not captured — re-run analysis to populate';
+
+                    // A record saved BEFORE this fix never had these keys written to Firestore at
+                    // all (they're `undefined`, not `null`) because the old code dropped them before
+                    // saving. That's a different case from a fresh extraction that ran and genuinely
+                    // found nothing (`null`): "Not stated in document" would falsely claim the source
+                    // document lacked the data, when really this app just never captured it. Detect
+                    // that legacy case and label it honestly instead — no Gemini call is triggered.
+                    const isLegacyRecord = formData
+                      && formData.tenderId === undefined
+                      && formData.referenceNo === undefined
+                      && formData.procuringEntity === undefined
+                      && formData.closingDateTime === undefined
+                      && formData.tenderSecurity === undefined;
+                    const missingLabel = isLegacyRecord ? notCaptured : notStated;
+
+                    const formatTenderSecurity = (sec: TenderData['tenderSecurity']): string => {
+                      if (!sec) return missingLabel;
+                      const parts: string[] = [];
+                      if (sec.bdt != null) parts.push(`BDT ${sec.bdt.toLocaleString('en-US')}`);
+                      if (sec.foreign && sec.foreign.currency && sec.foreign.amount != null) {
+                        parts.push(`(${sec.foreign.currency} ${sec.foreign.amount.toLocaleString('en-US')})`);
+                      }
+                      if (parts.length > 0) return parts.join(' ');
+                      if (sec.verbatim) return sec.verbatim;
+                      return missingLabel;
+                    };
+
+                    const jv = formData?.jointVenture;
+                    const jvLine = jv && jv.clausePresent
+                      ? {
+                          text: `Joint Venture${jv.clauseRef ? ` (${jv.clauseRef})` : ''}: ${
+                            jv.allowed === true ? 'ALLOWED' : jv.allowed === false ? 'NOT ALLOWED' : notStated
+                          }`,
+                          textBn: `যৌথ উদ্যোগ${jv.clauseRef ? ` (${jv.clauseRef})` : ''}: ${
+                            jv.allowed === true ? 'অনুমোদিত' : jv.allowed === false ? 'অনুমোদিত নয়' : notStated
+                          }`,
+                          allowed: jv.allowed,
                         }
-                      }
+                      : null;
 
-                      // Extract Ref + Date
-                      let refNo = 'Not Found';
-                      const refMatch = text.match(/(?:Invitation|Memo|Ref)\s*(?:No|)\s*[:.\s]+([^\n,;]+)/i) || 
-                                       text.match(/স্মারক\s*নম্বর\s*[:.\s]+([^\n,;]+)/) ||
-                                       text.match(/সূত্র\s*[:.\s]+([^\n,;]+)/);
-                      if (refMatch) {
-                        refNo = refMatch[1].trim();
-                      } else {
-                        refNo = "EE/PWD/DHK/2025-26/T-04";
-                      }
-
-                      let dateStr = '';
-                      const dateMatch = text.match(/(?:Date|তারিখ)\s*[:.\s]+([0-9\-\/A-Za-z ]+)/i);
-                      if (dateMatch) {
-                        dateStr = dateMatch[1].trim();
-                      } else {
-                        dateStr = "07-Jun-2026";
-                      }
-                      const refAndDate = `${refNo} (${dateStr})`;
-
-                      // Extract Procuring Entity
-                      let procuringEntity = 'Not Found';
-                      const peMatch = text.match(/(?:Procuring|Executive|Superintending|Chief)\s+Engineer[^\n]+/i) ||
-                                      text.match(/(?:Procuring\s+Entity|PE)\s*[:.\s]+([^\n]+)/i) ||
-                                      text.match(/দপ্তর\/সংস্থা\s*[:.\s]+([^\n]+)/) ||
-                                      text.match(/নির্বাহী\s+প্রকৌশলী[^\n]+/);
-                      if (peMatch) {
-                        procuringEntity = peMatch[0].trim();
-                        if (procuringEntity.toLowerCase().includes('entity:')) {
-                          procuringEntity = procuringEntity.split(/entity:/i)[1].trim();
-                        }
-                      } else {
-                        procuringEntity = "Executive Engineer, Dhaka PWD Division-1, Dhaka";
-                      }
-
-                      // Brief
-                      const brief = formData?.title || result?.tenderSubject || "Procurement of Works/Goods";
-
-                      // Closing
-                      let closing = 'Not Found';
-                      const closingMatch = text.match(/(?:Closing|Opening)\s*(?:Date|Time|)\s*[:.\s]+([0-9\-\/A-Za-z :]+)/i) ||
-                                           text.match(/বন্ধের\s*তারিখ\s*[:.\s]+([^\n]+)/);
-                      if (closingMatch) {
-                        closing = closingMatch[1].trim();
-                      } else {
-                        closing = "28-Jun-2026 12:00 PM";
-                      }
-
-                      // Tender Security
-                      let security = 'Not Found';
-                      const securityMatch = text.match(/(?:Security|জামানত)\s*[:.\s]+(?:BDT|Tk\.|৳)?\s*([0-9,]+)/i) ||
-                                            text.match(/(?:Tender Security|বিজনেস জামানত)[^\n]+/i);
-                      if (securityMatch) {
-                        security = securityMatch[0].trim();
-                        if (security.toLowerCase().includes('security:')) {
-                          security = security.split(/security:/i)[1].trim();
-                        }
-                      } else if (formData?.value) {
-                        const securityAmt = Math.round(formData.value * 0.025);
-                        security = `৳ ${securityAmt.toLocaleString()} BDT (Estimated 2.5%)`;
-                      } else {
-                        security = "৳ 2,50,000 BDT";
-                      }
-
-                      return {
-                        tenderId,
-                        refAndDate,
-                        procuringEntity,
-                        brief,
-                        closing,
-                        security
-                      };
-                    })();
+                    const info = {
+                      tenderId: formData?.tenderId || missingLabel,
+                      refAndDate: formData?.referenceNo || missingLabel,
+                      procuringEntity: formData?.procuringEntity || missingLabel,
+                      brief: formData?.title || result?.tenderSubject || notStated,
+                      closing: formData?.closingDateTime || missingLabel,
+                      security: formatTenderSecurity(formData?.tenderSecurity),
+                      jvLine
+                    };
 
                     const isClauseSatisfied = (clauseText: string) => {
                       const lowerClause = clauseText.toLowerCase();
@@ -2439,7 +2410,7 @@ export default function App() {
                               <div className="space-y-0.5">
                                 <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Tender ID / দরপত্র আইডি</span>
                                 <p className="font-extrabold text-headings-navy dark:text-blue-300 text-sm">
-                                  #{info.tenderId}
+                                  {info.tenderId === missingLabel ? info.tenderId : `#${info.tenderId}`}
                                 </p>
                               </div>
                               <div className="space-y-0.5">
@@ -2474,15 +2445,17 @@ export default function App() {
                               </div>
                             </div>
                             
+                            {info.jvLine && (
                             <div className="pt-3 border-t border-slate-200/50 dark:border-slate-800/80 flex items-center justify-between">
                               <div className="flex items-center gap-2">
-                                <span className="w-1.5 h-1.5 rounded-full bg-fail-red" />
-                                <span className="text-xs font-black text-fail-red uppercase tracking-wider">
-                                  {lang === 'bn' ? 'যৌথ উদ্যোগ (ITT 17.1): অনুমোদিত নয়' : 'Joint Venture (ITT 17.1): Not allowed'}
+                                <span className={cn("w-1.5 h-1.5 rounded-full", info.jvLine.allowed === false ? "bg-fail-red" : "bg-emerald-500")} />
+                                <span className={cn("text-xs font-black uppercase tracking-wider", info.jvLine.allowed === false ? "text-fail-red" : "text-emerald-600 dark:text-emerald-400")}>
+                                  {lang === 'bn' ? info.jvLine.textBn : info.jvLine.text}
                                 </span>
                               </div>
                               <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500">PPR 2025 compliant</span>
                             </div>
+                            )}
                           </div>
                         </div>
 

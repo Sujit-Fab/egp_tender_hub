@@ -12,14 +12,29 @@ export interface TenderData {
   isOutsourcing?: boolean; // For Physical Services
   consultantType?: 'Firm' | 'Individual'; // For Consultancy
   paymentType?: 'Lump-Sum' | 'Time-Based'; // For Consultancy
-  // Document metadata for the report header (AI-extracted, format-agnostic)
-  tenderId?: string;
-  referenceNo?: string;
-  procuringEntity?: string;
-  closingDateTime?: string;
-  tenderSecurity?: string;
+  // Document metadata for the report header (AI-extracted, format-agnostic).
+  // null means the field is genuinely absent from the document — the renderer
+  // must display "Not stated in document" for null, never a placeholder or a guess.
+  tenderId?: string | null;
+  referenceNo?: string | null;
+  procuringEntity?: string | null;
+  closingDateTime?: string | null;
+  tenderSecurity?: TenderSecurity | null;
+  jointVenture?: JointVenture | null;
   fullText?: string;
   tokensUsed?: number;
+}
+
+export interface TenderSecurity {
+  bdt: number | null;
+  foreign: { currency: string; amount: number } | null;
+  verbatim: string | null; // always kept for audit, even when bdt/foreign parsed cleanly
+}
+
+export interface JointVenture {
+  clausePresent: boolean; // false when the document has NO Joint Venture clause at all (e.g. most Goods TDS)
+  allowed: boolean | null; // only meaningful when clausePresent is true
+  clauseRef: string | null; // e.g. "ITT 17.1"
 }
 
 export interface KeyPersonnelRow {
@@ -155,19 +170,32 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
       * paymentType: "Lump-Sum" or "Time-Based".
     - Outsourcing: For Physical Services, determine if it involves "Hiring Service Personnel through Outsourcing Policy" (isOutsourcing: true) or other physical services like maintenance, cleaning, etc. (isOutsourcing: false).
     - Development Partner Funded: Set to true if the notice mentions funding from World Bank, ADB, JICA, or other international agencies.
-    - Tender ID: The tender/proposal ID number (look for "Tender/Proposal ID", "Tender ID"). Empty string if not present.
-    - Reference No: The invitation/memo reference number (look for "Invitation Reference No.", "Tender Ref", "Memo No", "স্মারক নম্বর"). Copy the ENTIRE reference string exactly, including any trailing parenthetical suffix (e.g. "37.07.0000.014.20.101.24.2660(3)" must be copied in full — do NOT truncate it, and do NOT borrow digits from a nearby, separate "Date:" field). Empty string if not present.
-    - Procuring Entity: The procuring entity / office name (look for "Procuring Entity", "Executive Engineer ...", "নির্বাহী প্রকৌশলী ..."). Return ONLY the entity name, WITHOUT the "Procuring Entity:" prefix. Empty string if not present.
+    - Tender ID: The tender/proposal ID number (look for "Tender/Proposal ID", "Tender ID"). null if not present.
+    - Reference No: The invitation/memo reference number (look for "Invitation Reference No.", "Tender Ref", "Memo No", "স্মারক নম্বর"). Copy the ENTIRE reference string exactly, including any trailing parenthetical suffix and, if the document prints a date alongside the reference (e.g. "Dt: 7/9/26"), include that too as part of the same string (e.g. "37.07.0000.014.20.101.24.2660(3)" or "CMSD/GR-2613/ICT/2026-27/ProcD-4/17, Dt: 7/9/26" must be copied in full — do NOT truncate it, and do NOT borrow digits from an unrelated, separate "Date:" field elsewhere in the header). null if not present.
+    - Procuring Entity: The procuring entity / office name (look for "Procuring Entity", "Executive Engineer ...", "নির্বাহী প্রকৌশলী ..."). Return ONLY the entity name — NEVER include the "Procuring Entity" label or its colon in the value, however that label is punctuated (e.g. "Procuring Entity:", "Procuring Entity :", "PE:"). null if not present.
     - Closing Date/Time: The tender closing (submission deadline) date and time exactly as stated (e.g. "14-Jun-2026 14:00"). The header often lists several adjacent date/time fields back-to-back on one line, e.g.
         "Date: 01.01.2026  Closing Date and Time: 25-Jun-2026 15:00  Opening Date and Time: 25-Jun-2026 15:00"
       Treat "Date", "and", "Time" here as part of the FIELD LABEL, never as part of the value — extract
       only the actual date-time string that follows the "Closing Date and Time:" label's colon. Do NOT
       confuse it with the plain "Date:" field (that's the notice/invitation date, a different field) or
-      with "Opening Date and Time:" (a different field). If your extracted value is a bare word like
-      "and", "Date", or "Time" rather than an actual date/time, that is wrong — re-read the label and
-      re-extract the real value after its colon.
-    - Tender Security: The tender security amount or stated text (e.g. "Tk. 2,50,000" or "As per e-Tender Notice"). This must be a monetary amount or an explicit "as stated" phrase — never a bare clause/article number (e.g. do not return something like "32" or "Security 32" just because a clause such as "ITT Clause 32" is nearby; that is a clause reference, not the security amount). Empty string if not present.
-    IMPORTANT for the five fields above: copy values EXACTLY from the document; if a field is not present, return an EMPTY STRING — never guess or invent. Never let one field's label text or a neighboring field's digits leak into another field's value.
+      with "Opening Date and Time:" (a different field). Your extracted value must be an actual date/time
+      string — if what you are about to return is a bare word like "and", "Date", or "Time" rather than a
+      date/time, that is wrong; re-read the label and re-extract the real value after its colon. null if
+      the document truly has no closing date/time.
+    - Tender Security: Return an OBJECT (never a bare string), built like this:
+        { "bdt": number|null, "foreign": {"currency": string, "amount": number}|null, "verbatim": string|null }
+      * "verbatim": copy the tender security sentence/phrase exactly as printed (e.g. "BDT 6,52,108 (or USD 5,301)" or "As per e-Tender Notice"). null only if the document has no tender security field at all.
+      * "bdt": the security amount converted to a PLAIN INTEGER of BDT (Taka). South Asian digit grouping uses the last 3 digits, then groups of 2 — convert it: "BDT 6,52,108" -> 652108, "Tk. BDT 1,95,63,000" -> 19563000, "25 Lac" -> 2500000, "1.5 Crore" -> 15000000. null if no BDT amount is stated (e.g. the field only says "As per e-Tender Notice", or is entirely foreign-currency).
+      * "foreign": if the document ALSO states a foreign-currency equivalent (e.g. "or USD 5,301"), capture it as {"currency": "USD", "amount": 5301}. null if no foreign-currency equivalent is stated.
+      * This must be the actual monetary amount — NEVER a bare clause/article number (e.g. do not return 63 or 32 as "bdt" just because a clause such as "ITT Clause 63" or "ITT Clause 30.1" is nearby; that is a clause reference, not the security amount).
+      * If the tender security field is entirely absent from the document, return {"bdt": null, "foreign": null, "verbatim": null}.
+    - Joint Venture: Search the ENTIRE document (not just the header) for a Joint Venture / JV eligibility clause — this is commonly ITT 17 for Works, ITT 16 for Physical Services; many Goods tenders have NO such clause at all. Return an OBJECT:
+        { "clausePresent": boolean, "allowed": boolean|null, "clauseRef": string|null }
+      * "clausePresent": true only if the document contains an actual clause discussing whether Joint Ventures may bid. false if there is no such clause anywhere in the document — this is common and correct for many Goods tenders; do NOT default to true and do NOT invent a determination when there is no clause.
+      * "clauseRef": the clause number/label (e.g. "ITT 17.1"), only when clausePresent is true; otherwise null.
+      * "allowed": when clausePresent is true, true if the clause permits JV bidding, false if it states JVs are not allowed/not permitted. null only if clausePresent is true but the clause's own text does not clearly state either way — never guess.
+      * When clausePresent is false, "allowed" and "clauseRef" MUST both be null.
+    IMPORTANT for all fields above: copy/derive values EXACTLY from the document; if a field is genuinely not present, return null (or the null-object shape shown above) — NEVER guess, invent, or fall back to a plausible-looking example value. Never let one field's label text or a neighboring field's digits leak into another field's value.
     - Full Text: Reproduce the COMPLETE text of the document VERBATIM — every clause, number, date and threshold exactly as written. Do NOT summarize, paraphrase, shorten or omit anything (especially qualification/financial clause values such as experience years, turnover, similar-contract values, liquid assets, supply capacity). This raw text drives the clause-by-clause analysis, so completeness and exactness are critical.
 
     Return the response strictly in JSON format:
@@ -180,11 +208,12 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
       "paymentType": "Lump-Sum" | "Time-Based",
       "isOutsourcing": boolean,
       "isDPFunded": boolean,
-      "tenderId": "string",
-      "referenceNo": "string",
-      "procuringEntity": "string",
-      "closingDateTime": "string",
-      "tenderSecurity": "string",
+      "tenderId": "string" | null,
+      "referenceNo": "string" | null,
+      "procuringEntity": "string" | null,
+      "closingDateTime": "string" | null,
+      "tenderSecurity": { "bdt": number|null, "foreign": {"currency": "string", "amount": number}|null, "verbatim": "string"|null },
+      "jointVenture": { "clausePresent": boolean, "allowed": boolean|null, "clauseRef": "string"|null },
       "fullText": "string"
     }
   `;
@@ -266,6 +295,29 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
     const rawText = (resData && resData.rawText) ? String(resData.rawText).trim() : "";
     const verbatimText = rawText.length > 200 ? rawText : ""; // scanned/image PDFs yield little -> fall back to model text
 
+    // Header fields: pass through Gemini's null when genuinely absent. Never substitute
+    // a placeholder/example value here — the renderer is responsible for displaying
+    // "Not stated in document" for null, and must never receive an invented fallback.
+    const tenderSecurity: TenderSecurity | null = result.tenderSecurity
+      ? {
+          bdt: typeof result.tenderSecurity.bdt === 'number' ? result.tenderSecurity.bdt : null,
+          foreign: result.tenderSecurity.foreign && typeof result.tenderSecurity.foreign.amount === 'number'
+            ? { currency: result.tenderSecurity.foreign.currency || '', amount: result.tenderSecurity.foreign.amount }
+            : null,
+          verbatim: result.tenderSecurity.verbatim || null,
+        }
+      : null;
+
+    const jointVenture: JointVenture | null = result.jointVenture
+      ? {
+          clausePresent: result.jointVenture.clausePresent === true,
+          allowed: result.jointVenture.clausePresent === true
+            ? (typeof result.jointVenture.allowed === 'boolean' ? result.jointVenture.allowed : null)
+            : null,
+          clauseRef: result.jointVenture.clausePresent === true ? (result.jointVenture.clauseRef || null) : null,
+        }
+      : null;
+
     return {
       title: result.title || "",
       nature: result.nature || "Works",
@@ -275,11 +327,12 @@ export async function extractTenderData(fileBase64: string, mimeType: string, fi
       paymentType: result.paymentType,
       isOutsourcing: result.isOutsourcing || false,
       isDPFunded: result.isDPFunded || false,
-      tenderId: result.tenderId || "",
-      referenceNo: result.referenceNo || "",
-      procuringEntity: result.procuringEntity || "",
-      closingDateTime: result.closingDateTime || "",
-      tenderSecurity: result.tenderSecurity || "",
+      tenderId: result.tenderId || null,
+      referenceNo: result.referenceNo || null,
+      procuringEntity: result.procuringEntity || null,
+      closingDateTime: result.closingDateTime || null,
+      tenderSecurity,
+      jointVenture,
       fullText: verbatimText || result.fullText || "",
       tokensUsed: resData.tokensUsed || 0
     };
