@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Bell } from "lucide-react";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
@@ -56,26 +57,26 @@ export default function TenderRadarSettings({ userId, subscriptionTier }: Props)
     return (
       <div style={{ background:"#FFF7ED", border:"1px solid #FED7AA", borderRadius:10, padding:"20px 24px" }}>
         <div style={{ fontSize:16, fontWeight:700, color:"#92400E", marginBottom:6 }}>
-          ?? Tender Radar — Pro Feature
+          ?? Tender Radar â€” Pro Feature
         </div>
         <div style={{ fontSize:13, color:"#B45309", marginBottom:14 }}>
           Get daily emails of new e-GP tenders filtered by your categories.
           Upgrade to Pro to unlock this feature.
         </div>
         <a href="/pricing" style={{ background:"#D97706", color:"#fff", padding:"8px 18px", borderRadius:7, fontSize:13, fontWeight:600, textDecoration:"none" }}>
-          Upgrade to Pro — ?999/month
+          Upgrade to Pro â€” ?999/month
         </a>
       </div>
     );
   }
 
-  if (loading) return <div style={{ color:"#6B7280", fontSize:13 }}>Loading your preferences…</div>;
+  if (loading) return <div style={{ color:"#6B7280", fontSize:13 }}>Loading your preferencesâ€¦</div>;
 
   return (
     <div style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:12, padding:"24px 28px" }}>
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:6 }}>
         <div>
-          <div style={{ fontSize:17, fontWeight:700, color:"#111827" }}>??? Tender Radar</div>
+          <div style={{ display:"flex", alignItems:"center", gap:8, fontSize:17, fontWeight:700, color:"#111827" }}><Bell size={20} /> Tender Radar</div>
           <div style={{ fontSize:13, color:"#6B7280", marginTop:2 }}>
             Select categories to receive in your daily e-GP tender email
           </div>
@@ -131,7 +132,7 @@ export default function TenderRadarSettings({ userId, subscriptionTier }: Props)
             cursor: selected.length === 0 ? "not-allowed" : "pointer",
           }}
         >
-          {saving ? "Saving…" : "Save Preferences"}
+          {saving ? "Savingâ€¦" : "Save Preferences"}
         </button>
 
         {selected.length > 0 && (

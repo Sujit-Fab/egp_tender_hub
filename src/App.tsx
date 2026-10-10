@@ -1622,7 +1622,7 @@ export default function App() {
       
       if (isForeignMode || userData?.subscriptionTier === 'enterprise') {
         try {
-          fInsights = await generateForeignPartnerInsights(formData, lang, companyProfile);
+          fInsights = await generateForeignPartnerInsights(formData, lang);
           if (fInsights.tokensUsed) totalTokens += fInsights.tokensUsed;
           setForeignInsights(fInsights);
         } catch (err) {
