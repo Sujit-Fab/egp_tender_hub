@@ -134,7 +134,7 @@ export function TenderRadarPreferencesView({ state, select, save, reload, onUpgr
               {selected.length === 0 ? "No categories selected. Save to opt out of future notifications." : `${selected.length} categories selected.`}
             </p>
             <div className="mt-4 flex gap-3">
-              <button type="submit" className="rounded-lg bg-blue-700 px-5 py-2 text-sm font-semibold text-white disabled:opacity-50">{saving ? "Saving…" : "Save preferences"}</button>
+              <button type="submit" disabled={saving} className="rounded-lg bg-blue-700 px-5 py-2 text-sm font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed">{saving ? "Saving…" : "Save preferences"}</button>
               <button type="button" onClick={() => select([])} disabled={selected.length === 0} className="rounded-lg border px-4 py-2 text-sm">Clear all</button>
             </div>
           </fieldset>

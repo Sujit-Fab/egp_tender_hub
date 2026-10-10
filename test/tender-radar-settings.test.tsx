@@ -168,9 +168,16 @@ test('static component output has native named checkboxes, enabled empty save an
     assert.ok(html.includes(`id="tender-radar-category-${index}"`));
     assert.ok(html.includes(`for="tender-radar-category-${index}"`));
     assert.ok(html.includes(`aria-describedby="tender-radar-category-${index}-description"`));
+    const description = html.match(new RegExp(`<span id="tender-radar-category-${index}-description" class="([^"]*)"`));
+    assert.ok(description);
+    const tokens = description[1].split(/\s+/);
+    assert.ok(tokens.includes('text-slate-600'));
+    assert.ok(tokens.includes('dark:text-slate-300'));
   }
   assert.match(html, /<legend[^>]*>Tender categories/);
   assert.match(html, /<button type="submit" class="[^"]*">Save preferences<\/button>/);
+  assert.doesNotMatch(html.match(/<button type="submit"[^>]*>/)![0], /\bdisabled=/);
+  assert.match(render({ saving: true }), /<button type="submit" disabled="" class="[^"]*disabled:cursor-not-allowed/);
   assert.match(html, /Save to opt out/);
   assert.match(render({ saving: true }), /<fieldset disabled=""/);
   assert.match(render({ error: 'Could not save preferences.' }), /role="alert"/);
