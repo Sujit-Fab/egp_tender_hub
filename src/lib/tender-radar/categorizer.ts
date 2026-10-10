@@ -1,13 +1,22 @@
-export type TenderCategory =
-  | "Road & Highway"
-  | "Building & Civil"
-  | "Medical & Hospital"
-  | "IT & Equipment"
-  | "Water & Drainage"
-  | "Power & Electrical"
-  | "Vehicles & Spare Parts"
-  | "Food & Ration"
-  | "Others";
+export const TENDER_CATEGORIES = [
+  { id: "Road & Highway", desc: "RHD, LGED roads, bridges, pavement" },
+  { id: "Building & Civil", desc: "PWD, EED buildings, renovation, repair" },
+  { id: "Medical & Hospital", desc: "DGHS, hospital supplies, medicines" },
+  { id: "IT & Equipment", desc: "Computers, software, network, ICT" },
+  { id: "Water & Drainage", desc: "BWDB, WASA, irrigation, flood control" },
+  { id: "Power & Electrical", desc: "BPDB, REB, transformers, solar, grid" },
+  { id: "Vehicles & Spare Parts", desc: "Railway, ferry, trucks, spare parts" },
+  { id: "Food & Ration", desc: "Police ration, hospital diet, groceries" },
+  { id: "Others", desc: "All other procurement categories" },
+] as const;
+
+export type TenderCategory = (typeof TENDER_CATEGORIES)[number]["id"];
+export const TENDER_CATEGORY_KEYS: readonly TenderCategory[] = TENDER_CATEGORIES.map(category => category.id);
+
+export function normalizeTenderCategories(value: unknown): TenderCategory[] {
+  if (!Array.isArray(value)) return [];
+  return TENDER_CATEGORY_KEYS.filter(key => value.includes(key));
+}
 
 export interface ParsedTender {
   serial_no: number;

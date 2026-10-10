@@ -1,15 +1,71 @@
 # Standalone e-GP All Tenders parser
 
+## PR #35: foundation only
+
+This PR provides the standalone parser/verifier, canonical frontend category
+definitions and matcher (`src/lib/tender-radar/categorizer.ts`), and authenticated
+category preference settings using the existing application view navigation.
+The existing matcher keyword order and substring behavior are preserved.
+The Functions module retains only its existing API and Storage exports; the
+Tender Radar upload/trigger routes, scheduler, duplicated matcher and email HTML
+builder have been removed. No replacement backend endpoint is introduced.
+
+Production PDF upload, production scheduling/email delivery, durable delivery
+idempotency, backend runtime category packaging and Step 4 Admin PDF Upload UI
+are explicitly deferred. Saving preferences does not send email. Empty saved
+preferences represent opting out of future notifications. Future production
+delivery must enforce authenticated administrator access, bounded validation,
+the intended Firestore database, HTML escaping, recipient eligibility/opt-out,
+and durable claims/results with provider reconciliation before being enabled.
+
+Firestore rules and CI workflows are not changed by this remediation. Existing
+rules enforce ordinary user ownership but do not validate tenderCategories
+against a bounded category allowlist; client normalization is not a security
+boundary. The existing deployment workflow runs on main pushes, does not provide
+PR validation, and masks deployment failures with `|| echo`. These require
+separate owner approval before edits. Removing source exports does not prove
+that any previously deployed scheduler/function has been removed from Firebase;
+deployment state must be reviewed separately. This remediation does not deploy.
+
+## Fixture provenance and owner review
+
+`test/fixtures/egp-all-tenders-2026-09-28.pdf` is a test-only integration fixture
+(2,690,405 bytes), not a production upload or customer document store.
+Repository evidence associates the table format with the e-GP portal
+`https://www.eprocure.gov.bd/` (see the parser's expected print-footer URL), but
+does not establish the exact public download/source URL, acquisition date,
+publisher permission or independently verified public-export status.
+`2026-09-28` is the filename's date label, not a verified acquisition/source date.
+The fixture must not be represented as synthetic or cleared of all sensitive
+data based only on its name or successful parsing.
+
+Owner review must establish the actual source URL/date and permission to retain
+the fixture. If that evidence cannot be established, removing/replacing this
+fixture is recommended in a separately approved change. The fixture is retained
+unchanged in this remediation. Do not print its extracted contents during tests.
+
 Run from the repository root with existing dependencies (no installation needed):
 
 ```powershell
 node --import tsx --test test/tender-radar.test.ts
+node --test test/tender-radar-functions.test.cjs
+node --import tsx --test test/tender-radar-categories.test.ts test/tender-radar-settings.test.tsx
 node --import tsx scripts/tender-radar/parse-pdf.ts test/fixtures/egp-all-tenders-2026-09-28.pdf
 node --import tsx scripts/tender-radar/inspect-pdf.ts test/fixtures/egp-all-tenders-2026-09-28.pdf 1,2,16,17,34
 ```
 
 The CLIs only read the supplied PDF and print to stdout. The test uses Node's
 built-in test runner and the already-installed `tsx` and `pdfjs-dist` packages.
+
+Functions tests use inert SDK/Express doubles to exercise module load, export
+contracts and actual route registration without Firebase/SMTP/network calls.
+Settings tests exercise the production session logic with controlled stores and
+render the production view with React's server renderer and inert Firebase
+imports. They cover current-user binding, opt-out, tier restriction, errors,
+duplicate submissions, stale requests and native checkbox/status markup.
+No DOM component-test framework is installed, so mounted Auth subscription,
+browser focus/keyboard interaction and deployed Firestore rules still require
+separate browser/emulator verification. No new test dependency is installed.
 
 ## API and separation
 

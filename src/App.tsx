@@ -62,6 +62,7 @@ import { Blog } from './components/Blog';
 import { TermsAndConditions } from './components/TermsAndConditions';
 import { PaymentModal } from './components/PaymentModal';
 import { NoticeBoard } from './components/NoticeBoard';
+import TenderRadarSettings from './components/TenderRadarSettings';
 
 const AICreditWidget = ({ userData, lang, setView }: any) => {
   if (!userData) return null;
@@ -1389,7 +1390,7 @@ const trackEvent = (name: string, params: Record<string, any> = {}) => {
 
 export default function App() {
   const [lang, setLang] = useState<'en' | 'bn'>('en');
-  const [view, setView] = useState<'landing' | 'dashboard' | 'library' | 'guide' | 'manage' | 'qna' | 'sop' | 'history' | 'pricing' | 'sor' | 'profile' | 'manual' | 'support' | 'blog' | 'terms' | 'noticeboard'>('landing');
+  const [view, setView] = useState<'landing' | 'dashboard' | 'library' | 'guide' | 'manage' | 'qna' | 'sop' | 'history' | 'pricing' | 'sor' | 'profile' | 'manual' | 'support' | 'blog' | 'terms' | 'noticeboard' | 'tender-radar'>('landing');
   const [activeMobileMenu, setActiveMobileMenu] = useState<'tools' | 'profile' | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<any>(null);
@@ -1932,6 +1933,7 @@ export default function App() {
                   <span onClick={() => setView('pricing')} className={cn("px-4 py-2.5 text-sm flex items-center gap-2 transition-colors cursor-pointer", view === 'pricing' ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700")}><TrendingUp className="w-4 h-4"/> {lang === 'bn' ? 'কাস্টম প্ল্যান' : 'Pricing & Upgrade'}</span>
                   <span onClick={() => setView('manage')} className={cn("px-4 py-2.5 text-sm flex items-center gap-2 transition-colors cursor-pointer", view === 'manage' ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700")}><Settings className="w-4 h-4"/> {lang === 'bn' ? 'এসটিডি পরিচালনা' : 'Manage STDs'}</span>
                   <span onClick={() => setView('support')} className={cn("px-4 py-2.5 text-sm flex items-center gap-2 transition-colors cursor-pointer", view === 'support' ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700")}><LifeBuoy className="w-4 h-4"/> {lang === 'bn' ? 'সাহায্য ও সাপোর্ট' : 'Help & Support'}</span>
+                  <button type="button" onClick={() => setView('tender-radar')} className={cn("px-4 py-2.5 text-sm flex items-center gap-2 transition-colors text-left", view === 'tender-radar' ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700")}><Settings className="w-4 h-4"/> {lang === 'bn' ? 'টেন্ডার রাডার' : 'Tender Radar'}</button>
                   <div className="border-t border-slate-100 dark:border-slate-700">
                     <button onClick={logout} className="w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 font-medium transition-colors"><X className="w-4 h-4"/> Logout</button>
                   </div>
@@ -2816,6 +2818,8 @@ export default function App() {
               <AICreditWidget userData={userData} lang={lang} setView={setView} />
               <CompanyProfileSettings profile={companyProfile} onSave={saveCompanyProfile} lang={lang} />
             </>
+          ) : view === 'tender-radar' ? (
+            user ? <TenderRadarSettings key={user.uid} onUpgrade={() => setView('pricing')} /> : <p role="status">{lang === 'bn' ? 'টেন্ডার রাডার সেটিংসের জন্য লগইন করুন।' : 'Sign in to manage Tender Radar settings.'}</p>
           ) : view === 'manual' ? (
             <UserManual lang={lang} />
           ) : view === 'support' ? (
@@ -2975,7 +2979,7 @@ export default function App() {
             onClick={() => setActiveMobileMenu(prev => prev === 'profile' ? null : 'profile')}
             className={cn(
               "flex flex-col items-center justify-center w-16 h-12 rounded-xl transition-colors outline-none",
-              ['profile', 'pricing', 'manage'].includes(view) || activeMobileMenu === 'profile' ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+              ['profile', 'pricing', 'manage', 'tender-radar'].includes(view) || activeMobileMenu === 'profile' ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
             )}
           >
             {user ? (
@@ -2996,6 +3000,7 @@ export default function App() {
                 <span onClick={() => { setView('pricing'); setActiveMobileMenu(null); }} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><TrendingUp className="w-4 h-4"/> Pricing</span>
                 <span onClick={() => { setView('manage'); setActiveMobileMenu(null); }} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><Settings className="w-4 h-4"/> STDs</span>
                 <span onClick={() => { setView('support'); setActiveMobileMenu(null); }} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 cursor-pointer"><LifeBuoy className="w-4 h-4"/> Support</span>
+                <button type="button" onClick={() => { setView('tender-radar'); setActiveMobileMenu(null); }} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 active:bg-slate-50 dark:active:bg-slate-700 flex items-center gap-2 text-left"><Settings className="w-4 h-4"/> {lang === 'bn' ? 'টেন্ডার রাডার' : 'Tender Radar'}</button>
                 <span onClick={() => { logout(); setActiveMobileMenu(null); }} className="px-4 py-3 text-sm text-red-600 active:bg-red-50 dark:active:bg-red-900/20 flex items-center gap-2 cursor-pointer"><X className="w-4 h-4"/> Logout</span>
               </>
             ) : (
