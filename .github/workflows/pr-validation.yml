@@ -1,0 +1,54 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-validation-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: PR Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run lint
+
+      - name: Test Tender Radar parser
+        run: node --import tsx --test test/tender-radar.test.ts
+
+      - name: Test categories and settings
+        run: node --import tsx --test test/tender-radar-categories.test.ts test/tender-radar-settings.test.tsx
+
+      - name: Test Functions foundation
+        run: node --import tsx --test test/tender-radar-functions.test.cjs
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Check pull request diff whitespace
+        run: git diff --check "${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}"
