@@ -35,8 +35,14 @@ jobs:
       - name: Install root dependencies
         run: npm ci
 
+      - name: Install locked Functions dependencies
+        run: npm ci --prefix functions --ignore-scripts
+
       - name: Type check
         run: npm run lint
+
+      - name: Build Tender Radar Functions parser runtime
+        run: npm run build:tender-radar
 
       - name: Test Tender Radar parser
         run: node --import tsx --test test/tender-radar.test.ts
@@ -49,6 +55,9 @@ jobs:
 
       - name: Test Tender Radar admin authorization and error privacy
         run: node --test test/tender-radar-admin-auth.test.cjs test/tender-radar-admin-privacy.test.cjs
+
+      - name: Test Tender Radar ingestion and admin preview
+        run: node --import tsx --test test/tender-radar-ingestion.test.cjs test/tender-radar-admin-upload.test.tsx
 
       - name: Build frontend
         run: npm run build

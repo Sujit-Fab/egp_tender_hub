@@ -5,7 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
+    "predev": "npm run build:tender-radar",
     "start": "tsx server.ts",
+    "prestart": "npm run build:tender-radar",
+    "build:tender-radar": "node scripts/tender-radar/build-runtime.mjs",
+    "pretest:tender-radar": "npm run build:tender-radar",
+    "test:tender-radar": "node --import tsx --test test/tender-radar.test.ts test/tender-radar-categories.test.ts test/tender-radar-settings.test.tsx test/tender-radar-functions.test.cjs test/tender-radar-admin-auth.test.cjs test/tender-radar-admin-privacy.test.cjs test/tender-radar-ingestion.test.cjs test/tender-radar-admin-upload.test.tsx",
+    "prebuild": "npm run build:tender-radar",
     "build": "vite build",
     "postbuild": "tsx scripts/generate-blog-pages.mjs",
     "preview": "vite preview",

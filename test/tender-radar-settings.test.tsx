@@ -18,6 +18,7 @@ const context = {
   exports: {},
   require(name: string) {
     if (name === '../firebase') return firebase;
+    if (name === './TenderRadarAdminUpload') return { default: () => null };
     if (name === 'firebase/firestore') return {
       doc: () => { throw new Error('Unexpected Firestore call'); },
       getDoc: () => { throw new Error('Unexpected Firestore read'); },

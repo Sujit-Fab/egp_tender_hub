@@ -3,6 +3,7 @@ import { Bell } from "lucide-react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db, onAuthStateChanged } from "../firebase";
 import { normalizeTenderCategories, TENDER_CATEGORIES, type TenderCategory } from "../lib/tender-radar/categorizer";
+import TenderRadarAdminUpload from './TenderRadarAdminUpload';
 
 export interface PreferencesState {
   uid: string | null;
@@ -146,7 +147,7 @@ export function TenderRadarPreferencesView({ state, select, save, reload, onUpgr
   );
 }
 
-export default function TenderRadarSettings({ onUpgrade }: { onUpgrade?: () => void }) {
+export default function TenderRadarSettings({ onUpgrade, lang = 'en' }: { onUpgrade?: () => void; lang?: 'en' | 'bn' }) {
   const [state, setState] = useState<PreferencesState | null>(null);
   const session = useRef<ReturnType<typeof createTenderRadarSession> | null>(null);
   useEffect(() => {
@@ -174,7 +175,7 @@ export default function TenderRadarSettings({ onUpgrade }: { onUpgrade?: () => v
 
   if (!auth.currentUser) return <p role="status">Sign in to manage your Tender Radar preferences.</p>;
   if (!state || state.uid !== auth.currentUser.uid) return <p role="status">Loading your preferences…</p>;
-  return <TenderRadarPreferencesView state={state} onUpgrade={onUpgrade}
+  return <><TenderRadarPreferencesView state={state} onUpgrade={onUpgrade}
     select={values => session.current?.select(values)} save={() => { void session.current?.save(); }}
-    reload={() => { void session.current?.load(); }} />;
+    reload={() => { void session.current?.load(); }} /><TenderRadarAdminUpload lang={lang} /></>;
 }

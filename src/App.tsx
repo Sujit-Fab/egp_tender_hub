@@ -2819,7 +2819,7 @@ export default function App() {
               <CompanyProfileSettings profile={companyProfile} onSave={saveCompanyProfile} lang={lang} />
             </>
           ) : view === 'tender-radar' ? (
-            user ? <TenderRadarSettings key={user.uid} onUpgrade={() => setView('pricing')} /> : <p role="status">{lang === 'bn' ? 'টেন্ডার রাডার সেটিংসের জন্য লগইন করুন।' : 'Sign in to manage Tender Radar settings.'}</p>
+            user ? <TenderRadarSettings key={user.uid} lang={lang} onUpgrade={() => setView('pricing')} /> : <p role="status">{lang === 'bn' ? 'টেন্ডার রাডার সেটিংসের জন্য লগইন করুন।' : 'Sign in to manage Tender Radar settings.'}</p>
           ) : view === 'manual' ? (
             <UserManual lang={lang} />
           ) : view === 'support' ? (

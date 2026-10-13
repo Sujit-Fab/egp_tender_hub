@@ -26,7 +26,9 @@ test('unknown/raw exceptions cannot select codes or expose any private fields', 
   assert.equal(getErrorStatus(raw), 500); shape(response); safe(response);
 });
 test('public errors serialize only allowlisted predefined data', () => {
-  for (const [code, status, retryable] of [['AUTH_REQUIRED', 401, false], ['ADMIN_REQUIRED', 403, false], ['SERVICE_UNAVAILABLE', 503, true], ['INTERNAL_ERROR', 500, false]]) {
+  for (const [code, status, retryable] of [['AUTH_REQUIRED', 401, false], ['ADMIN_REQUIRED', 403, false], ['SERVICE_UNAVAILABLE', 503, true], ['INTERNAL_ERROR', 500, false],
+    ['INVALID_PDF', 422, false], ['INVALID_COUNT', 400, false], ['PDF_TOO_LARGE', 413, false], ['PARSER_FAILED', 422, false],
+    ['PARSER_TIMEOUT', 422, false], ['PREVIEW_CHANGED', 409, false], ['TENDER_CONFLICT', 409, false]]) {
     const error = createPublicError(code);
     Object.assign(error, { message: markers[3], stack: markers[4], cause: markers[5], token: markers[0], email: markers[1], claims: markers[2] });
     const response = serializeError(error, { createRequestId: () => requestId });

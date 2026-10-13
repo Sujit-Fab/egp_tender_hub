@@ -1,5 +1,13 @@
 # Standalone e-GP All Tenders parser
 
+## Current admin ingestion stage
+
+PR #36 integrates this parser with authorized admin
+preview/confirmation. See `functions/tender-radar/README.md` for the confirmed
+database, validation limits, atomic duplicate/conflict handling and packaging.
+Email delivery remains disabled. The PR #35 notes below describe the earlier
+foundation; admin ingestion is now implemented. No deployment occurred.
+
 ## PR #35: foundation only
 
 This PR provides the standalone parser/verifier, canonical frontend category
@@ -21,8 +29,9 @@ and durable claims/results with provider reconciliation before being enabled.
 Firestore rules and CI workflows are not changed by this remediation. Existing
 rules enforce ordinary user ownership but do not validate tenderCategories
 against a bounded category allowlist; client normalization is not a security
-boundary. The existing deployment workflow runs on main pushes, does not provide
-PR validation, and masks deployment failures with `|| echo`. These require
+boundary. The existing deployment workflow runs on main pushes and masks
+deployment failures with `|| echo`. Separate PR validation now checks the parser,
+preferences, admin authorization/privacy and ingestion stage. Deployment fixes require
 separate owner approval before edits. Removing source exports does not prove
 that any previously deployed scheduler/function has been removed from Firebase;
 deployment state must be reviewed separately. This remediation does not deploy.

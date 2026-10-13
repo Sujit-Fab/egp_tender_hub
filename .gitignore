@@ -7,3 +7,4 @@ coverage/
 .env*
 !.env.example
 stds.json
+functions/tender-radar/runtime/

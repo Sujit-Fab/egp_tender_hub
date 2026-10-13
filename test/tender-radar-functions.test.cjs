@@ -27,6 +27,9 @@ function loadFunctions() {
         onObjectFinalized: (options, handler) => { definitions.storage = options; return handler; },
       };
       if (name === 'firebase-admin') return admin;
+      if (name === 'firebase-admin/firestore') return { getFirestore() { throw new Error('Unexpected database access'); } };
+      if (name === './database-config') return require('../functions/database-config');
+      if (name === './tender-radar/routes') return require('../functions/tender-radar/routes');
       if (name === 'express') return express;
       if (name === 'cors') return () => () => {};
       if (name === 'multer') return multer;
@@ -53,17 +56,17 @@ test('Functions module loads and preserves the existing API/Storage exports only
   assert.equal(loaded.definitions.storage.region, 'asia-south1');
 });
 
-test('existing Express routes register without any Tender Radar routes', () => {
+test('existing Express routes are preserved alongside admin preview/confirmation only', () => {
   const loaded = loadFunctions();
   loaded.exports.api({}, {});
   assert.deepEqual(loaded.routes.map(({ method, route }) => `${method.toUpperCase()} ${route}`), [
+    'POST /api/tender-radar/preview', 'POST /api/tender-radar/confirm',
     'GET /api/notices', 'GET /api/stds', 'POST /api/stds/upload', 'DELETE /api/stds/:id',
     'POST /api/ai/extract', 'POST /api/ai/extract-file', 'POST /api/ai/analyze',
     'POST /api/ai/qa', 'POST /api/ai/foreign', 'POST /api/support/send', 'POST /api/pdf/extract',
   ]);
-  assert.equal(loaded.routes.some(({ route }) => route.startsWith('/api/tender-radar')), false);
   assert.equal(loaded.routes.some(({ route }) => route === '/api/tender-radar/upload'), false);
   assert.equal(loaded.routes.some(({ route }) => route === '/api/tender-radar/trigger'), false);
   loaded.exports.api({}, {});
-  assert.equal(loaded.routes.length, 11, 'cached app does not register routes twice');
+  assert.equal(loaded.routes.length, 13, 'cached app does not register routes twice');
 });

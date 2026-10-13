@@ -17,8 +17,9 @@ function multiply(a: Matrix, b: Matrix): Matrix {
  * This PDF.js 5 operator adapter is deliberately separate from row parsing.
  * Unsupported/unmarked layouts fail in the parser instead of guessing columns.
  */
-async function headerBoxes(page: PDFPageProxy): Promise<Box[]> {
+async function headerBoxes(page: PDFPageProxy, maxOperators: number): Promise<Box[]> {
   const operators = await page.getOperatorList();
+  if (operators.fnArray.length > maxOperators) throw new Error('PDF operator limit exceeded.');
   let matrix = identity();
   const matrices: Matrix[] = [];
   const tags: string[] = [];
@@ -50,26 +51,40 @@ async function headerBoxes(page: PDFPageProxy): Promise<Box[]> {
 }
 
 /** No filesystem, network, app, or Firebase dependency. Caller owns byte loading. */
-export async function extractPdfPages(bytes: Uint8Array): Promise<PdfPage[]> {
+export interface PdfExtractionLimits {
+  maxPages?: number;
+  maxItems?: number;
+  maxTextCharacters?: number;
+  maxOperatorsPerPage?: number;
+}
+
+export async function extractPdfPages(bytes: Uint8Array, limits: PdfExtractionLimits = {}): Promise<PdfPage[]> {
   // PDF.js may transfer/detach its input; never detach the caller's buffer.
   const task = getDocument({ data: new Uint8Array(bytes), useSystemFonts: true,
-    isEvalSupported: false, stopAtErrors: true });
+    isEvalSupported: false, stopAtErrors: true, verbosity: 0 });
   try {
     const document = await task.promise;
+    if (document.numPages > (limits.maxPages ?? Infinity)) throw new Error('PDF page limit exceeded.');
     const pages: PdfPage[] = [];
+    let itemCount = 0;
+    let textCharacters = 0;
     for (let number = 1; number <= document.numPages; number++) {
       const page = await document.getPage(number);
       const content = await page.getTextContent({ includeMarkedContent: true });
+      itemCount += content.items.length;
+      if (itemCount > (limits.maxItems ?? Infinity)) throw new Error('PDF text item limit exceeded.');
       const ids: (string | undefined)[] = [];
       const items: TextItem[] = [];
       for (const item of content.items) {
         if ('str' in item) {
+          textCharacters += item.str.length;
+          if (textCharacters > (limits.maxTextCharacters ?? Infinity)) throw new Error('PDF text limit exceeded.');
           if (item.str.trim()) items.push({ text: item.str, x: item.transform[4], y: item.transform[5],
             width: item.width, height: item.height, hasEOL: item.hasEOL, contentId: ids.at(-1) });
         } else if (item.type === 'endMarkedContent') ids.pop();
         else ids.push(item.id);
       }
-      pages.push({ page: number, items, headerBoxes: await headerBoxes(page) });
+      pages.push({ page: number, items, headerBoxes: await headerBoxes(page, limits.maxOperatorsPerPage ?? Infinity) });
       page.cleanup();
     }
     return pages;
