@@ -107,6 +107,48 @@ staging review before release.
 
 ## Isolated acceptance required before release
 
+### Automated local acceptance
+
+The dedicated harness uses `demo-tender-radar` and explicitly configures both
+the named and default emulator databases with the actual repository rules.
+Only Auth and Firestore emulators start; no Functions trigger, Hosting deployment,
+scheduler or email code starts. Local ports are checked before startup so a test
+cannot silently reuse an unrelated service.
+
+```powershell
+npm ci --prefix test/acceptance --ignore-scripts --strict-ssl=true
+node scripts/tender-radar/install-acceptance.mjs
+npm run test:tender-radar:acceptance
+```
+
+Java 21 and Node 22.13+ are required. Tool versions are pinned in the separate
+acceptance lockfile; application dependency resolutions are unchanged. Browser
+and emulator downloads use normal TLS verification. All generated tooling and
+sanitized aggregate results live under ignored `.cache/tender-radar`.
+
+The runner removes credential/project environment variables and uses an isolated
+Firebase CLI configuration directory. The harness requires exact loopback
+emulator hosts, supplies a synthetic SDK certificate generated only in memory
+whose access-token method always rejects, and blocks
+non-loopback Node sockets. Browser request interception permits only the three
+local service ports and rejects unexpected WebSockets. The browser entry uses a
+dummy demo configuration and connects before any Auth/Firestore operation; it
+never imports the production Firebase bootstrap or loads application `.env` files.
+
+Real deployed Functions Auth/Firestore/Express dependencies and the actual PDF
+worker/service/store are used with dependency injection, preserving the
+production project guard. Chromium generates tagged synthetic PDFs in memory;
+no existing fixture contents, tokens, PDFs, screenshots or traces are logged.
+Commit rollback is tested using a deliberately failing real SDK create
+precondition alongside the staged tender and receipt writes. Direct browser SDK
+create/update/delete denials include nested paths and the explicit named database;
+a permitted ordinary-user profile creation also verifies rules are evaluated.
+
+CI runs the same acceptance command in its own job. Aggregate results distinguish
+passed, failed, skipped and blocked checks. These emulator checks do not prove
+production limits, indexes or deployed rules, and browser acceptance exercises
+the production upload component in a dedicated page rather than the entire SPA.
+
 1. Use an ephemeral `demo-tender-radar` project with Auth and Firestore emulators
    bound to loopback. Use no production credentials, imported production data or
    live accounts. Block outbound network access during acceptance. Configure the
@@ -141,7 +183,9 @@ staging review before release.
    scheduler, email provider or production Firebase endpoint is contacted.
 
 Record versions, aggregate results and sanitized failure evidence for review.
-These emulator/browser checks have not yet been run. Production deployment,
+Local acceptance is incomplete; see `test/acceptance/README.md` for the paused
+handoff, verified isolation/diagnostic checks, blocked suite results and resume
+commands. Required HTTP/rules/browser acceptance remains unverified. Production deployment,
 rules rollout, any real admin claim and email enablement require separate review.
 
 Scheduled email delivery remains disabled. This stage does not merge, deploy,

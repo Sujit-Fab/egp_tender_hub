@@ -1,0 +1,12 @@
+{
+  "name": "tender-radar-isolated-acceptance",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "firebase-tools": "15.33.0",
+    "playwright": "1.64.0"
+  },
+  "dependencies": {
+    "react-example": "file:../.."
+  }
+}

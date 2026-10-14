@@ -57,7 +57,7 @@ jobs:
         run: node --test test/tender-radar-admin-auth.test.cjs test/tender-radar-admin-privacy.test.cjs
 
       - name: Test Tender Radar ingestion and admin preview
-        run: node --import tsx --test test/tender-radar-ingestion.test.cjs test/tender-radar-admin-upload.test.tsx
+        run: node --import tsx --test test/tender-radar-ingestion.test.cjs test/tender-radar-admin-upload.test.tsx test/tender-radar-acceptance-isolation.test.mjs
 
       - name: Build frontend
         run: npm run build

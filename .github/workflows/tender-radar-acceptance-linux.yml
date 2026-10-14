@@ -1,0 +1,66 @@
+name: Tender Radar demo acceptance on Linux
+
+# PR acceptance works without publishing workflow_dispatch on the default branch.
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.2'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            functions/package-lock.json
+            test/acceptance/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21.0.12'
+      - name: Install locked dependencies in the fresh Linux runner
+        run: |
+          npm ci
+          npm ci --prefix functions --ignore-scripts
+          npm ci --prefix test/acceptance --ignore-scripts
+      - name: Prepare existing pinned browser and emulator tooling
+        run: node scripts/tender-radar/install-acceptance.mjs --with-deps
+      - name: Build the parser runtime for this fresh checkout
+        run: npm run build:tender-radar
+      - name: Record installed runtime compatibility
+        run: node test/acceptance/compatibility.mjs
+      - name: Verify isolation
+        run: node --test test/tender-radar-acceptance-isolation.test.mjs
+      - name: Check evidence gate and workflow configuration
+        run: node test/acceptance/check-preparation.mjs
+      - name: Run synthetic bounded parser reproduction before acceptance
+        run: bash scripts/tender-radar/acceptance-linux.sh preflight
+      - name: Run demo project with loopback Auth and Firestore only
+        run: bash scripts/tender-radar/acceptance-linux.sh
+      - name: Require completed acceptance and verified cleanup
+        run: node test/acceptance/verify-results.mjs
+      - name: Preserve sanitized evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tender-radar-demo-evidence-${{ github.run_id }}
+          if-no-files-found: warn
+          path: |
+            .cache/tender-radar/results*.json
+            .cache/tender-radar/progress-*.json
+            .cache/tender-radar/compatibility.json
+            .cache/tender-radar/current-run.json
+            .cache/tender-radar/worker-repro-*/results.json
+            .cache/tender-radar/worker-repro-*/*.jsonl
