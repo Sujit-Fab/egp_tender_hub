@@ -1,5 +1,44 @@
 # Tender Radar acceptance handoff
 
+## Resume on 2026-10-15: Linux browser failures diagnosed
+
+Recovered artifact **11911377318** from Linux run **38597573330**, source
+`48f9132fc81a50a5423d2dce8f4f9d5f18d3fb1a`: **14 passed, 5 failed,
+0 skipped, 0 blocked**. Evidence was complete and cleanup verified. The real
+HTTP parser, authorization, transactions/idempotency/overlap/rollback/conflicts,
+invalid input and named-database direct-write rules checks passed. Four browser
+checks timed out; the browser network assertion failed. PR Validation passed.
+
+Diagnostic commit `b2b24cad7686787dd921076bd62e4b24299440e5`, Linux run
+**38686692057**, artifact **11950627646**, reproduced those same counts with
+verified cleanup. Allowlisted source locations identify confirmation clicks in
+both languages. The network failure was **11 blocked WebSocket attempts**, with
+zero non-loopback browser requests, unexpected loopback ports, Node blocked
+sockets or credential fallbacks. Vite's injected development client connects
+even when the HMR server is disabled. The harness now serves its fixed HTML
+without that unnecessary injection; module transformation and every network
+guard/assertion remain active.
+
+Linux run **38687892573**, source
+`79353b484b5cacf34c76c4f473bd70bd70b7f7de`, artifact **11950989361**:
+**15 passed, 4 failed, 0 skipped, 0 blocked**, complete with verified cleanup.
+The network assertion now passes. All four remaining failures report pointer
+interception at confirmation clicks. The installed Auth emulator SDK injects
+a fixed bottom warning with z-index 10000, covering controls in this unstyled
+harness. The acceptance HTML now keeps that warning visible in normal document
+flow. Normal Playwright actionability, real clicks, all 19 assertions, parser
+limits, both database rules checks and every isolation guard are unchanged.
+Check PR #36's latest exact-head CI/artifact for the result of this correction;
+these historical failure counts are not a passing result for the new head.
+
+The verified artifact helper stores ZIPs under ignored
+`.cache/tender-radar/artifact-<id>/evidence.zip`. Read results and current-run
+identity together; the older Windows `results.json` is not Linux evidence.
+No dependencies were reinstalled locally. Existing changes to
+`.github/workflows/deploy-functions.yml` and `package-lock.json` were preserved
+and excluded from commits. No acceptance Node/Java process or Git operation was
+left running at resume. PR #36 remains draft; production restrictions remain.
+
 ## Publication and Linux CI review
 
 The owner subsequently authorized committing and pushing acceptance tooling to

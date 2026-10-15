@@ -2,7 +2,8 @@
 
 Windows diagnosis and evidence are in `README.md` and
 `.cache/tender-radar/worker-repro-*/results.json`. They are diagnostics and
-interrupted results, not completed acceptance. No Linux run has been executed.
+interrupted results, not completed acceptance. Linux CI has now executed; see
+the current handoff in `README.md` and PR #36 for exact commits, runs and counts.
 
 The prepared manual workflow is
 `.github/workflows/tender-radar-acceptance-linux.yml`. It uses Ubuntu 24.04,
@@ -82,4 +83,5 @@ database, the rules hash, zero external sockets/credential fallbacks, a finished
 run, and verified cleanup. Interrupted/progress artifacts are rejected even if
 their individual checks passed. CI uploads sanitized JSON evidence on success
 or failure; it does not upload PDFs, browser auth state, raw emulator logs, or
-production configuration. A completed Linux result remains pending.
+production configuration. Match the latest PR head to its CI artifact before
+claiming acceptance; historical failed results are recorded in `README.md`.

@@ -183,9 +183,11 @@ the production upload component in a dedicated page rather than the entire SPA.
    scheduler, email provider or production Firebase endpoint is contacted.
 
 Record versions, aggregate results and sanitized failure evidence for review.
-Local acceptance is incomplete; see `test/acceptance/README.md` for the paused
-handoff, verified isolation/diagnostic checks, blocked suite results and resume
-commands. Required HTTP/rules/browser acceptance remains unverified. Production deployment,
+Windows acceptance remains blocked by a reproduced native worker lifecycle crash.
+Linux CI has exercised the real HTTP parser, SDK transactions and named-database
+rules; see `test/acceptance/README.md` and PR #36 for exact source commits, run
+counts, browser harness corrections and the latest exact-head acceptance status.
+Production deployment,
 rules rollout, any real admin claim and email enablement require separate review.
 
 Scheduled email delivery remains disabled. This stage does not merge, deploy,
