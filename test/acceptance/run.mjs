@@ -26,7 +26,8 @@ async function check(name, action) {
   try { await action(); results.push({ name, status: 'passed' }); console.log(`PASSED: ${name}`); }
   catch (error) {
     results.push({ name, status: 'failed', reason: error.message?.startsWith('ACCEPTANCE:') ? error.message : error.name,
-      frames: error.stack?.split('\n').slice(1).map(frame => frame.replaceAll('\\', '/').match(/(run\.mjs:\d+:\d+)/)?.[1]).filter(Boolean).slice(0, 4) });
+      frames: error.stack?.split('\n').slice(1).map(frame => frame.replaceAll('\\', '/').match(/(run\.mjs:\d+:\d+)/)?.[1]).filter(Boolean).slice(0, 4),
+      actionHints: ['element is not enabled', 'intercepts pointer events', 'element is not stable', 'outside of the viewport', 'element was detached'].filter(hint => error.message?.includes(hint)) });
     console.error(`FAILED: ${name} (${results.at(-1).reason})`);
   }
   await saveProgress();

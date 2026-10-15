@@ -85,8 +85,10 @@ export async function startHarness(setPhase = () => {}) {
       return null;
     } }, react()],
   });
-  app.get('/', async (request, response) => response.type('html').send(await vite.transformIndexHtml('/',
-    await readFile('test/acceptance/index.html', 'utf8'))));
+  // This fixed harness entry needs module transformation, not Vite's injected
+  // development client (which opens WebSockets even with server HMR disabled).
+  app.get('/', async (request, response) => response.type('html').send(
+    await readFile('test/acceptance/index.html', 'utf8')));
   app.use(vite.middlewares);
   server = await new Promise((resolve, reject) => {
     const instance = app.listen(4178, '127.0.0.1', () => resolve(instance)); instance.once('error', reject);
