@@ -12,7 +12,7 @@ sudo -- unshare --net -- bash -c '
   set -euo pipefail
   ip link set lo up
   if [[ "$6" == preflight ]]; then
-    args=(test/acceptance/reproduce-worker.mjs bounded raw-natural)
+    args=(test/acceptance/reproduce-worker.mjs production-fixture bounded raw-natural)
   else
     args=(scripts/tender-radar/acceptance.mjs)
   fi

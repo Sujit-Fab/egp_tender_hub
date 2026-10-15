@@ -287,17 +287,37 @@ test('worker timeouts terminate parsing; worker failures never forward messages 
   await rejects(() => createBoundedParser({ WorkerClass: BrokenWorker })(pdf, 1), 'PARSER_FAILED', 422);
 });
 
-test('packaged worker verifies the actual 345-row fixture with canonical categories, without logging contents', { timeout: 240000 }, async () => {
+test('packaged worker verifies the actual 345-row fixture within the production deadline, without logging contents', { timeout: 75000 }, async () => {
   const path = require('node:path');
   const pdfjsPackage = require.resolve('pdfjs-dist/package.json', { paths: [path.join(__dirname, '../functions')] });
   assert.ok(pdfjsPackage.startsWith(path.resolve(__dirname, '../functions/node_modules') + path.sep),
     'worker integration must use the deployable Functions dependency, not a root fallback');
   assert.equal(JSON.parse(readFileSync(pdfjsPackage, 'utf8')).version, '5.5.207');
   const bytes = readFileSync(require('node:path').join(__dirname, 'fixtures/egp-all-tenders-2026-09-28.pdf'));
-  // Shared developer machines can be throttled during builds/installations.
-  // The independent timeout test covers termination; production stays at 45s.
-  const parse = createBoundedParser({ timeoutMs: 180000 });
-  const result = await parse(bytes, 345);
+  // Exercise the deployed 45-second deadline, including worker startup.
+  const { Worker } = require('node:worker_threads');
+  let cleanupStarted;
+  let cleanupFinished;
+  class TimedWorker extends Worker {
+    terminate() {
+      cleanupStarted = performance.now();
+      return super.terminate().then(code => { cleanupFinished = performance.now(); return code; });
+    }
+  }
+  const parse = createBoundedParser({ WorkerClass: TimedWorker });
+  const started = performance.now();
+  let result;
+  let totalElapsedMs;
+  try { result = await parse(bytes, 345); }
+  finally {
+    totalElapsedMs = performance.now() - started;
+    console.log('Production fixture timing:', JSON.stringify({ deadlineMs: 45000,
+      processingElapsedMs: cleanupStarted === undefined ? null : cleanupStarted - started,
+      cleanupMs: cleanupFinished === undefined ? null : cleanupFinished - cleanupStarted,
+      totalElapsedMs, cleanupVerified: cleanupFinished !== undefined }));
+  }
+  assert.ok(cleanupFinished !== undefined, 'real worker cleanup must complete');
+  assert.ok(totalElapsedMs <= 45000, 'fixture including cleanup must finish within the actual production deadline');
   assert.equal(result.records.length, 345);
   assert.equal(new Set(result.records.map(r => r.tender_id)).size, 345);
   const keys = (await categories).TENDER_CATEGORY_KEYS;

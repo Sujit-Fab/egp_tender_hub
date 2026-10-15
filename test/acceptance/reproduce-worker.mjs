@@ -1,4 +1,5 @@
-// Synthetic-only crash diagnosis. No emulators, credentials, HTTP harness or real PDFs.
+// Isolated parser diagnosis using synthetic PDFs or the approved repository fixture.
+// No emulators, credentials or HTTP harness. PDF contents are never logged.
 import { appendFileSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { Worker } from 'node:worker_threads';
@@ -9,7 +10,7 @@ import { acceptanceEnvironment, assertEmulators, blockExternalSockets, isolation
 
 const script = fileURLToPath(import.meta.url);
 const environment = acceptanceEnvironment(process.cwd());
-const modes = ['bounded', 'direct', 'raw-natural', 'canvas-natural', 'canvas-terminate', 'pdfjs-natural', 'pdfjs-terminate', 'pdfjs-batch', 'canvas-batch', 'empty-batch'];
+const modes = ['bounded', 'production-fixture', 'direct', 'raw-natural', 'canvas-natural', 'canvas-terminate', 'pdfjs-natural', 'pdfjs-terminate', 'pdfjs-batch', 'canvas-batch', 'empty-batch'];
 const childMode = process.argv[2] === '--child' ? process.argv[3] : undefined;
 if (childMode) {
   assertEmulators();
@@ -17,6 +18,8 @@ if (childMode) {
   const eventFile = process.argv[5];
   const event = (phase, details = {}) => appendFileSync(eventFile, JSON.stringify({ at: new Date().toISOString(), phase, ...details }) + '\n');
   event('child-start', { executable: process.execPath, node: process.version, platform: process.platform, arch: process.arch, pid: process.pid });
+  let cleanupStarted;
+  let cleanupFinished;
   class TracedWorker extends Worker {
     constructor(...args) {
       super(...args);
@@ -26,16 +29,38 @@ if (childMode) {
       this.on('error', error => event('worker-error', { type: error.name, code: error.code }));
       this.on('exit', code => event('worker-exit', { code }));
     }
-    terminate() { event('worker-terminate-start'); return super.terminate().then(code => { event('worker-terminate-end', { code }); return code; }); }
+    terminate() {
+      cleanupStarted = performance.now();
+      event('worker-terminate-start');
+      return super.terminate().then(code => {
+        cleanupFinished = performance.now();
+        event('worker-terminate-end', { code }); return code;
+      });
+    }
   }
   try {
-      const bytes = ['bounded', 'direct', 'raw-natural'].includes(childMode) ? readFileSync(process.argv[4]) : undefined;
+    const bytes = ['bounded', 'production-fixture', 'direct', 'raw-natural'].includes(childMode) ? readFileSync(process.argv[4]) : undefined;
     const sdkRequire = createRequire(new URL('../../functions/index.js', import.meta.url));
-    if (childMode === 'bounded') {
+    if (childMode === 'bounded' || childMode === 'production-fixture') {
       const { createBoundedParser } = sdkRequire('./tender-radar/parser.js');
+      const count = childMode === 'production-fixture' ? 345 : 2;
       event('bounded-parse-start', { timeoutMs: 45000 });
-      const result = await createBoundedParser({ WorkerClass: TracedWorker })(bytes, 2);
-      event('bounded-parse-end', { ok: result.ok, count: result.records?.length });
+      const parseStarted = performance.now();
+      let result;
+      let totalElapsedMs;
+      try { result = await createBoundedParser({ WorkerClass: TracedWorker })(bytes, count); }
+      finally {
+        totalElapsedMs = performance.now() - parseStarted;
+        event('bounded-timing', { deadlineMs: 45000,
+          processingElapsedMs: cleanupStarted === undefined ? null : cleanupStarted - parseStarted,
+          cleanupMs: cleanupFinished === undefined ? null : cleanupFinished - cleanupStarted,
+          totalElapsedMs, cleanupVerified: cleanupFinished !== undefined });
+      }
+      if (result.ok !== true || result.records?.length !== count || new Set(result.records.map(record => record.tender_id)).size !== count) {
+        throw new Error('Bounded parser verification failed');
+      }
+      event('bounded-parse-end', { ok: result.ok, count: result.records.length });
+      if (cleanupFinished === undefined || totalElapsedMs > 45000) throw new Error('Production deadline exceeded or cleanup unverified');
     } else if (childMode === 'direct') {
       event('direct-import-start');
       const { parseAllTendersPdf, verifyTenders } = await import('../../functions/tender-radar/runtime/index.mjs');
@@ -87,28 +112,32 @@ if (childMode) {
   let browser;
   try {
     const fixture = path.join(directory, 'synthetic.pdf');
-    if (selected.some(mode => ['bounded', 'direct', 'raw-natural'].includes(mode))) {
-    const { chromium } = await import('playwright');
-    browser = await chromium.launch({ headless: true, args: ['--disable-background-networking', '--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1'] });
-    evidence.chromium = { executable: chromium.executablePath(), version: browser.version() };
-    const { syntheticPdf } = await import('./pdf.mjs');
-    writeFileSync(fixture, await syntheticPdf(browser, [{ id: '910001' }, { id: '910002' }]));
-    await browser.close(); browser = undefined;
-    evidence.browserClosedBeforeParser = true; save();
-    }
+    let syntheticPrepared = false;
     for (const mode of selected) {
+      if (!syntheticPrepared && ['bounded', 'direct', 'raw-natural'].includes(mode)) {
+        const { chromium } = await import('playwright');
+        browser = await chromium.launch({ headless: true, args: ['--disable-background-networking', '--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1'] });
+        evidence.chromium = { executable: chromium.executablePath(), version: browser.version() };
+        const { syntheticPdf } = await import('./pdf.mjs');
+        writeFileSync(fixture, await syntheticPdf(browser, [{ id: '910001' }, { id: '910002' }]));
+        await browser.close(); browser = undefined;
+        evidence.browserClosedBeforeParser = true; syntheticPrepared = true; save();
+      }
       const eventFile = path.join(directory, `${mode}.jsonl`);
       writeFileSync(eventFile, '');
       const result = await new Promise(resolve => {
-        const child = spawn(process.execPath, [script, '--child', mode, fixture, eventFile], { env: environment, stdio: 'ignore', windowsHide: true });
+        const input = mode === 'production-fixture' ? path.resolve('test/fixtures/egp-all-tenders-2026-09-28.pdf') : fixture;
+        const child = spawn(process.execPath, [script, '--child', mode, input, eventFile], { env: environment, stdio: 'ignore', windowsHide: true });
         let timedOut = false;
         const timer = setTimeout(() => { timedOut = true; child.kill(); }, mode.endsWith('-batch') ? 180000 : 120000);
         child.once('error', error => { clearTimeout(timer); resolve({ mode, type: error.name, code: error.code }); });
         child.once('exit', (code, signal) => { clearTimeout(timer); resolve({ mode, executable: process.execPath, pid: child.pid, code, signal, timedOut }); });
       });
       result.events = readFileSync(eventFile, 'utf8').trim().split('\n').filter(Boolean).map(line => JSON.parse(line));
+      result.timing = result.events.find(event => event.phase === 'bounded-timing');
       evidence.cases.push(result); save();
-      console.log(JSON.stringify({ mode, code: result.code, signal: result.signal, timedOut: result.timedOut, lastPhase: result.events.at(-1)?.phase, evidence: path.join(directory, 'results.json') }));
+      console.log(JSON.stringify({ mode, code: result.code, signal: result.signal, timedOut: result.timedOut,
+        timing: result.timing, lastPhase: result.events.at(-1)?.phase, evidence: path.join(directory, 'results.json') }));
     }
   } finally {
     await browser?.close(); await guard.closeConnections();
