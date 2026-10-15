@@ -331,8 +331,6 @@ test('prepared database configuration matches the owner-confirmed frontend and r
   assert.equal(PROJECT_ID, config.projectId);
   assert.equal(FIRESTORE_DATABASE_ID, config.firestoreDatabaseId);
   assert.equal(firebase.firestore[0].database, FIRESTORE_DATABASE_ID);
-  const functions = readFileSync(require.resolve('../functions/index.js'), 'utf8');
-  assert.equal(functions.includes('admin.firestore()'), false);
 });
 
 test('actual route wiring selects the named database and rejects another project before accessing it', async () => {
@@ -367,7 +365,7 @@ test('actual route wiring selects the named database and rejects another project
     return { selected, response };
   }
   const correct = await invoke(PROJECT_ID);
-  assert.deepEqual(correct.selected, [FIRESTORE_DATABASE_ID]);
+  assert.deepEqual(correct.selected, ['ai-studio-7e6a1daf-95b8-46d0-a6ba-7cf295cd1701']);
   assert.equal(correct.response.code, 403);
   const wrong = await invoke('another-project');
   assert.equal(wrong.selected.length, 0); assert.equal(wrong.response.code, 503);

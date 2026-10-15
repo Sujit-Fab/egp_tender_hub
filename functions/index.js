@@ -7,7 +7,7 @@ const getApp = () => {
   if (expressApp) return expressApp;
 
   const admin = require("firebase-admin");
-  const { PROJECT_ID, FIRESTORE_DATABASE_ID } = require("./database-config");
+  const { PROJECT_ID } = require("./database-config");
   if (!admin.apps.length) admin.initializeApp({ projectId: PROJECT_ID });
   const { getFirestore } = require("firebase-admin/firestore");
 
@@ -144,7 +144,7 @@ const getApp = () => {
  // ── STD routes (Firestore) ───────────────────────────────────────────────────
   app.get("/api/stds", async (req, res) => {
     try {
-      const db = getFirestore(admin.app(), FIRESTORE_DATABASE_ID);
+      const db = getFirestore(admin.app());
       const snapshot = await db.collection("stds").orderBy("uploadedAt", "desc").get();
       const stds = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       res.json(stds);
@@ -157,7 +157,7 @@ const getApp = () => {
     try {
       const { category, method, valueMin, valueMax, title } = req.body;
       if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-      const db = getFirestore(admin.app(), FIRESTORE_DATABASE_ID);
+      const db = getFirestore(admin.app());
       const newStd = {
         title: title || req.file.originalname,
         filename: req.file.originalname,
@@ -177,7 +177,7 @@ const getApp = () => {
   app.delete("/api/stds/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      const db = getFirestore(admin.app(), FIRESTORE_DATABASE_ID);
+      const db = getFirestore(admin.app());
       const docRef = db.collection("stds").doc(id);
       const doc = await docRef.get();
       if (!doc.exists) return res.status(404).json({ error: "STD not found" });

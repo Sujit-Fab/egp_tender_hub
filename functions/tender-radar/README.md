@@ -27,11 +27,20 @@ Before this stage, project `gen-lang-client-0089421810` selected three databases
 
 The owner explicitly confirmed `ai-studio-7e6a1daf-95b8-46d0-a6ba-7cf295cd1701`
 and reported existing users/analyses/payments/SoR/support collections there.
-`functions/database-config.js` selects that named database. Radar persistence and
-Functions STD routes use explicit `getFirestore(app, id)`; `firebase.json` targets
-rules at that database. Frontend configuration and rules text are unchanged.
+`functions/database-config.js` selects that named database. Radar persistence
+uses explicit `getFirestore(app, id)`; `firebase.json` targets rules at that
+database. Legacy Functions STD routes retain `(default)` via `getFirestore(app)`.
+Frontend configuration and rules text are unchanged.
 These configuration corrections do not migrate or deploy data. No existing
 collections are deleted or copied.
+
+The STD database selection restores pre-PR behavior and only removes PR #36's
+regression redirecting unauthenticated legacy HTTP routes into the named database.
+Existing STD authorization issues remain unresolved: these routes still have no
+token, role or ownership checks and use the Admin SDK, bypassing client rules.
+No routes are retired and no new consumer authorization policy is introduced.
+External consumers are unknown; absence of frontend HTTP callers does not prove
+these routes are unused. Default-database exposure remains a separate issue.
 
 ## Admin preview and confirmation
 
