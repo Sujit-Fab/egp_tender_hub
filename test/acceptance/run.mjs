@@ -25,7 +25,8 @@ const requireCheck = (condition, label) => { if (!condition) throw new Error(`AC
 async function check(name, action) {
   try { await action(); results.push({ name, status: 'passed' }); console.log(`PASSED: ${name}`); }
   catch (error) {
-    results.push({ name, status: 'failed', reason: error.message?.startsWith('ACCEPTANCE:') ? error.message : error.name });
+    results.push({ name, status: 'failed', reason: error.message?.startsWith('ACCEPTANCE:') ? error.message : error.name,
+      frames: error.stack?.split('\n').slice(1).map(frame => frame.replaceAll('\\', '/').match(/(run\.mjs:\d+:\d+)/)?.[1]).filter(Boolean).slice(0, 4) });
     console.error(`FAILED: ${name} (${results.at(-1).reason})`);
   }
   await saveProgress();
@@ -184,7 +185,7 @@ try {
     await ctx.route('**/*', route => {
       const url = new URL(route.request().url());
       if (url.protocol === 'http:' && url.hostname === '127.0.0.1' && ['4178', '9098', '8085'].includes(url.port)) return route.continue();
-      blockedRequests.push('external-request'); return route.abort();
+      blockedRequests.push(url.hostname === '127.0.0.1' ? 'unexpected-loopback-port' : 'non-loopback-request'); return route.abort();
     });
     await ctx.routeWebSocket('**/*', socket => { blockedRequests.push('unexpected-websocket'); socket.close(); });
     return ctx;
@@ -333,7 +334,7 @@ try {
   }
   await check('Isolation: browser and SDK made no non-loopback requests or credential fallback attempts', async () => {
     requireCheck(blockedRequests.length === 0 && isolationStats.blockedSockets === 0 && isolationStats.credentialAttempts === 0,
-      'all browser/SDK connections are emulator/local only with no credential fallback');
+      `all browser/SDK connections are emulator/local only with no credential fallback (non-loopback=${blockedRequests.filter(value => value === 'non-loopback-request').length}, loopback-port=${blockedRequests.filter(value => value === 'unexpected-loopback-port').length}, websocket=${blockedRequests.filter(value => value === 'unexpected-websocket').length}, sockets=${isolationStats.blockedSockets}, credentials=${isolationStats.credentialAttempts})`);
   });
 } catch (error) {
   results.push({ name: 'Acceptance prerequisites/harness', status: 'blocked', reason: phase,
