@@ -3,11 +3,20 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import test from 'node:test';
 import ts from 'typescript';
-import { demoBootstrap } from './build.mjs';
+import { demoBootstrap, assertLoopbackLinks } from './build.mjs';
 import { validateSpaReport } from './verify.mjs';
 import { requiredSpaChecks } from './checks.mjs';
 
 const source = readFileSync('src/firebase.ts', 'utf8');
+test('namespace guard requires exactly one active loopback link and rejects all additional interfaces', () => {
+  const lo = { ifname: 'lo', flags: ['LOOPBACK', 'UP', 'LOWER_UP'] };
+  assert.doesNotThrow(() => assertLoopbackLinks([lo]));
+  for (const links of [[], null, {}, [lo, { ifname: 'eth0', flags: ['UP'] }],
+    [{ ifname: 'eth0', flags: ['UP'] }], [{ ifname: 'lo', flags: ['LOOPBACK'] }],
+    [{ ifname: 'lo', flags: ['UP'] }], [{ ifname: 'lo' }]]) {
+    assert.throws(() => assertLoopbackLinks(links), /loopback-only/);
+  }
+});
 function load(origin = 'http://127.0.0.1:4179') {
   const calls = [];
   const transformed = ts.transpileModule(demoBootstrap(source), {

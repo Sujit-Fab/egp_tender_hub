@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile, appendFile, readdir } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, appendFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { createRequire } from 'node:module';
 import path from 'node:path';
@@ -7,10 +7,13 @@ import { assertEmulators, PROJECT_ID, DATABASE_ID, FIRESTORE_HOST, emulatorCrede
   blockExternalSockets, isolationStats } from '../acceptance/isolation.mjs';
 import { loadAcceptanceRules } from '../acceptance/rules.mjs';
 import { syntheticPdf } from '../acceptance/pdf.mjs';
+import { assertLoopbackNamespace } from './build.mjs';
 
 assertEmulators();
-if (process.platform !== 'linux' || process.env.FIREBASE_STORAGE_EMULATOR_HOST !== '127.0.0.1:9198' ||
-    JSON.stringify(await readdir('/sys/class/net')) !== '["lo"]') throw new Error('Manual session requires loopback-only Linux namespace.');
+if (process.platform !== 'linux' || process.env.FIREBASE_STORAGE_EMULATOR_HOST !== '127.0.0.1:9198') {
+  throw new Error('Manual session requires loopback-only Linux namespace.');
+}
+assertLoopbackNamespace();
 const guard = blockExternalSockets();
 const sdk = createRequire(new URL('../../functions/index.js', import.meta.url));
 const express = sdk('express');

@@ -1,10 +1,11 @@
 import { spawn } from 'node:child_process';
-import { readFile, mkdir, readdir, writeFile } from 'node:fs/promises';
+import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import net from 'node:net';
 import { acceptanceEnvironment, PROJECT_ID } from '../../test/acceptance/isolation.mjs';
+import { assertLoopbackNamespace } from '../../test/manual-spa/build.mjs';
 
 const mode = process.argv[2];
 const environment = acceptanceEnvironment(process.cwd());
@@ -44,8 +45,7 @@ if (mode === 'prepare' || mode === 'prepare-storage') {
   await buildManualSpa();
 } else if (mode === 'manual' || mode === 'ci') {
   if (process.platform !== 'linux') throw new Error('Use the Linux namespace wrapper.');
-  const interfaces = (await readdir('/sys/class/net')).sort();
-  if (interfaces.length !== 1 || interfaces[0] !== 'lo') throw new Error('Loopback-only network namespace required.');
+  assertLoopbackNamespace();
   await readFile(path.join(cache, 'build/index.html'));
   environment.TENDER_RADAR_SPA_RUN_ID = randomUUID();
   await writeFile(path.join(cache, 'launch.json'), JSON.stringify({

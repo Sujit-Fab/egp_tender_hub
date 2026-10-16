@@ -4,6 +4,17 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 
 export const output = path.resolve('.cache/tender-radar/manual-spa/build');
+export function assertLoopbackLinks(links) {
+  if (!Array.isArray(links) || links.length !== 1 || links[0].ifname !== 'lo' ||
+      !Array.isArray(links[0].flags) || !links[0].flags.includes('LOOPBACK') || !links[0].flags.includes('UP')) {
+    throw new Error('An active loopback-only network namespace is required.');
+  }
+}
+export function assertLoopbackNamespace() {
+  // Query the current network namespace directly. A mounted sysfs can retain
+  // the host namespace's interface inventory after unshare --net.
+  assertLoopbackLinks(JSON.parse(execFileSync('ip', ['-j', 'link', 'show'], { encoding: 'utf8' })));
+}
 export function demoBootstrap(source) {
   const replacements = [
     ["import firebaseConfig from '../firebase-applet-config.json';", `import { connectAuthEmulator, signInWithEmailAndPassword } from 'firebase/auth';
