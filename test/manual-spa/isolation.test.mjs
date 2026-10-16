@@ -71,7 +71,8 @@ test('SPA evidence gate rejects stale, incomplete, skipped, unsafe and wrong-sou
   const launch = { runId: 'synthetic-unique-run-identity', sourceRevision: 'source', startedAt: '2026-10-16T00:00:00Z' };
   const report = { ...launch, build: { sourceRevision: 'source' }, finishedAt: '2026-10-16T00:01:00Z',
     project: 'demo-tender-radar', database: 'ai-studio-7e6a1daf-95b8-46d0-a6ba-7cf295cd1701', rulesHash: 'rules',
-    automated: true, complete: true, cleanupVerified: true, isolationStats: { blockedSockets: 0, credentialAttempts: 0 },
+    automated: true, complete: true, cleanupVerified: true, activeCheck: null, firstFailure: null,
+    isolationStats: { blockedSockets: 0, credentialAttempts: 0 },
     checks: requiredSpaChecks.map(name => ({ name, status: 'passed' })),
     visual: { sourceRevision: 'source', runId: launch.runId,
       captures: requiredScreenshots.map(item => ({ ...item, sha256: 'a'.repeat(64) })) } };
@@ -83,6 +84,8 @@ test('SPA evidence gate rejects stale, incomplete, skipped, unsafe and wrong-sou
     r => { r.checks.pop(); }, r => { r.project = 'production'; }, r => { r.rulesHash = 'different'; },
     r => { r.isolationStats.blockedSockets = 1; }, r => { r.isolationStats.credentialAttempts = 1; },
     r => { r.visual.captures.pop(); }, r => { r.visual.runId = 'stale'; },
+    r => { r.activeCheck = requiredSpaChecks[0]; },
+    r => { r.firstFailure = { name: requiredSpaChecks[0], status: 'failed' }; },
   ]) {
     const changed = structuredClone(report); mutate(changed);
     assert.throws(() => validateSpaReport(changed, launch, 'source', 'rules'));

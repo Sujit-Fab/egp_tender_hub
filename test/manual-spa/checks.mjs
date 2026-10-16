@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { checkStdPersistence } from './std-persistence.mjs';
 import { captureSyntheticView, validateVisualManifest } from './screenshots.mjs';
+import { withDemoAccountPrompt } from './harness.mjs';
 
 export const requiredSpaChecks = [
   'Built SPA mounts with real styles and landing navigation',
@@ -20,15 +21,10 @@ export const requiredSpaChecks = [
   'No uncaught browser errors or production connection attempts',
 ];
 
-export async function runSpaChecks({ page, context, db, auth, directory, record, pageErrors, blockedRequests, visual }) {
-  const results = [];
+export async function runSpaChecks({ page, context, db, auth, directory, record, pageErrors, blockedRequests, visual, progress }) {
+  const results = progress.results;
   const check = async (name, action) => {
-    try { await action(); results.push({ name, status: 'passed' }); }
-    catch (error) {
-      // Keep evidence free of document text, tokens and SDK exception messages.
-      results.push({ name, status: 'failed', error: error.name,
-        location: error.stack?.split('\n').find(line => line.includes('/test/manual-spa/'))?.trim() });
-    }
+    await progress.check(name, action);
     await record(results.at(-1));
   };
   const header = page.locator('header');
@@ -46,8 +42,7 @@ export async function runSpaChecks({ page, context, db, auth, directory, record,
     }
     const button = header.getByRole('button', { name: 'Login', exact: true });
     await button.waitFor({ state: 'visible' });
-    page.once('dialog', dialog => dialog.accept(account));
-    await button.click();
+    await withDemoAccountPrompt(page, account, () => button.click());
     await header.getByAltText('Profile', { exact: true }).waitFor({ state: 'visible' });
     if (lang === 'bn') await header.getByRole('button', { name: 'বাংলা', exact: true }).click();
     await menu();

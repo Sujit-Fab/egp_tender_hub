@@ -52,7 +52,7 @@ jobs:
       - name: Require completed acceptance and verified cleanup
         run: node test/acceptance/verify-results.mjs
       - name: Verify full SPA demo bootstrap and evidence gate
-        run: node --test test/manual-spa/isolation.test.mjs
+        run: node --test test/manual-spa/isolation.test.mjs test/manual-spa/harness.test.mjs
       - name: Prepare Storage emulator for the full SPA demo
         run: node scripts/tender-radar/manual-spa.mjs prepare-storage
       - name: Build the actual SPA and PWA with demo-only Firebase services
@@ -77,5 +77,6 @@ jobs:
             .cache/tender-radar/manual-spa/build.json
             .cache/tender-radar/manual-spa/launch.json
             .cache/tender-radar/manual-spa/latest-session.json
+            .cache/tender-radar/manual-spa/run-*/progress.json
             .cache/tender-radar/manual-spa/run-*/screenshots/*.png
             .cache/tender-radar/manual-spa/run-*/screenshots/manifest.json

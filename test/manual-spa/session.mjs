@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile, appendFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, appendFile, rename } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { createRequire } from 'node:module';
 import path from 'node:path';
@@ -8,6 +8,8 @@ import { assertEmulators, PROJECT_ID, DATABASE_ID, FIRESTORE_HOST, emulatorCrede
 import { loadAcceptanceRules } from '../acceptance/rules.mjs';
 import { syntheticPdf } from '../acceptance/pdf.mjs';
 import { assertLoopbackNamespace } from './build.mjs';
+import { createCheckProgress, guardUnexpectedDialogs, sanitizedFailure } from './harness.mjs';
+import { requiredSpaChecks } from './checks.mjs';
 
 assertEmulators();
 if (process.platform !== 'linux' || process.env.FIREBASE_STORAGE_EMULATOR_HOST !== '127.0.0.1:9198') {
@@ -45,7 +47,15 @@ report.coverage = { stdOwnerFiltering: 'UI-only; not authorization or confidenti
   storageRules: 'demo-only permissive signed-in stds access; production policy unverified',
   profileBehavior: 'not tested or changed', humanVisualReview: 'not_run', pwaInstallation: 'not_run' };
 report.complete = false;
-await writeFile(path.join(root, 'latest-session.json'), JSON.stringify(report, null, 2));
+const atomicWrite = async (file, bytes) => {
+  await writeFile(file + '.tmp', bytes);
+  await rename(file + '.tmp', file);
+};
+const progress = createCheckProgress(report, requiredSpaChecks, async bytes => {
+  await atomicWrite(path.join(directory, 'progress.json'), bytes);
+  await atomicWrite(path.join(root, 'latest-session.json'), bytes);
+});
+await progress.checkpoint();
 const record = value => appendFile(path.join(directory, 'events.jsonl'), JSON.stringify({ at: new Date().toISOString(), ...value }) + '\n');
 await writeFile(path.join(directory, 'failures.md'), '# Manual full-SPA/PWA results\n\nRecord each checklist item as PASS / FAIL / BLOCKED / NOT RUN.\n\n| Item | Status | Account / language | Steps | Expected | Actual | Console source line |\n|---|---|---|---|---|---|---|\n');
 console.log(`Manual run evidence: ${directory}`);
@@ -55,6 +65,9 @@ let db;
 let server;
 let browser;
 let context;
+const disposeDialogGuards = [];
+let progressWriteFailed = false;
+let suiteReturned = false;
 let phase = 'rules';
 try {
   report.rulesHash = await loadAcceptanceRules();
@@ -118,6 +131,10 @@ try {
     // Keep native prompts/confirmations visible for the human, rather than
     // Playwright's default automatic dismissal when no dialog listener exists.
     if (!automated) page.on('dialog', () => {});
+    else disposeDialogGuards.push(guardUnexpectedDialogs(page, error => {
+      pageErrors.push('HarnessError');
+      void progress.noteFailure(error).catch(() => { progressWriteFailed = true; process.exitCode = 1; });
+    }));
   });
   const page = await context.newPage();
   await page.goto('http://127.0.0.1:4179');
@@ -127,9 +144,9 @@ try {
   if (automated) {
     const { runSpaChecks } = await import('./checks.mjs');
     report.checks = await runSpaChecks({ page, context, db, auth, directory, record, pageErrors, blockedRequests,
-      visual: report.visual });
-    report.complete = true;
-    if (report.checks.some(check => check.status !== 'passed')) process.exitCode = 1;
+      visual: report.visual, progress });
+    suiteReturned = true;
+    if (report.firstFailure || report.checks.some(check => check.status !== 'passed')) process.exitCode = 1;
   } else {
   console.log(`DEMO manual SPA ready: http://127.0.0.1:4179 (use ONLY the Chromium window opened here).\nEvidence and synthetic PDF: ${directory}\nSign in prompts for admin, ordinary, other, owner-a or owner-b. Close every manual browser window to stop.\nDo not use real documents or accounts. Live AI/email/support endpoints are disabled.`);
   await new Promise(resolve => context.once('close', resolve));
@@ -137,7 +154,8 @@ try {
   }
 } catch (error) {
   report.failedPhase = phase;
-  await record({ type: 'startup-failure', phase, name: error.name });
+  await progress.noteFailure(error).catch(() => { progressWriteFailed = true; });
+  await record({ type: 'startup-failure', phase, ...sanitizedFailure(error) });
   console.error(`Manual environment failed during ${phase}; see ${directory}.`);
   process.exitCode = 1;
 } finally {
@@ -145,16 +163,18 @@ try {
     context?.close(), browser?.close(), db?.terminate(),
     server && new Promise((resolve, reject) => { server.close(error => error ? reject(error) : resolve()); server.closeAllConnections(); }),
   ]);
-  if (sdkApp) await deleteApp(sdkApp);
-  await guard.closeConnections();
-  report.cleanupVerified = outcomes.every(result => result.status === 'fulfilled');
+  for (const dispose of disposeDialogGuards) dispose();
+  outcomes.push(...await Promise.allSettled([sdkApp && deleteApp(sdkApp), guard.closeConnections()]));
+  await progress.flush().catch(() => { progressWriteFailed = true; });
+  report.cleanupVerified = !progressWriteFailed && outcomes.every(result => result.status === 'fulfilled');
+  report.complete = automated && suiteReturned && report.checks.length === requiredSpaChecks.length && !progressWriteFailed;
   report.finishedAt = new Date().toISOString();
-  await writeFile(path.join(directory, 'session.json'), JSON.stringify(report, null, 2));
-  await writeFile(path.join(root, 'latest-session.json'), JSON.stringify(report, null, 2));
+  await atomicWrite(path.join(directory, 'session.json'), JSON.stringify(report, null, 2));
+  await atomicWrite(path.join(root, 'latest-session.json'), JSON.stringify(report, null, 2));
   if (automated) console.log('Full SPA acceptance:', JSON.stringify({
     sourceRevision: report.sourceRevision, complete: report.complete, cleanupVerified: report.cleanupVerified,
     passed: report.checks?.filter(check => check.status === 'passed').length ?? 0,
     failed: report.checks?.filter(check => check.status === 'failed').length ?? 0,
   }));
-  if (!report.cleanupVerified || isolationStats.blockedSockets || isolationStats.credentialAttempts) process.exitCode = 1;
+  if (report.firstFailure || !report.cleanupVerified || isolationStats.blockedSockets || isolationStats.credentialAttempts) process.exitCode = 1;
 }

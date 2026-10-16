@@ -15,6 +15,8 @@ export function validateSpaReport(report, launch, sourceRevision, rulesHash) {
   assert.equal(report.project, PROJECT_ID); assert.equal(report.database, DATABASE_ID);
   assert.equal(report.rulesHash, rulesHash);
   assert.equal(report.automated, true); assert.equal(report.complete, true); assert.equal(report.cleanupVerified, true);
+  assert.equal(report.activeCheck, null);
+  assert.equal(report.firstFailure, null);
   assert.equal(report.isolationStats.blockedSockets, 0); assert.equal(report.isolationStats.credentialAttempts, 0);
   assert.equal(report.checks.length, requiredSpaChecks.length);
   assert.deepEqual(report.checks.map(c => c.name).sort(), [...requiredSpaChecks].sort());
