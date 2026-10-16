@@ -6,6 +6,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { withDemoAccountPrompt, guardUnexpectedDialogs, DEMO_PROMPT,
   HarnessError, createCheckProgress } from './harness.mjs';
+import { waitForCommittedDeletion } from './std-persistence.mjs';
 
 function deferred() {
   let resolve, reject;
@@ -151,4 +152,16 @@ test('checkpoint write failure aborts and out-of-order checks cannot be accepted
   assert.equal(report.checks.length, 0);
   const progress = createCheckProgress({}, ['first'], async () => {});
   await assert.rejects(progress.check('other', async () => {}), code('INVALID_CHECK_SEQUENCE'));
+});
+
+test('optimistic UI removal cannot pass until independent server deletion is observed', async () => {
+  let reads = 0;
+  await waitForCommittedDeletion(async () => ++reads < 3, { timeoutMs: 1000, intervalMs: 0 });
+  assert.equal(reads, 3);
+});
+
+test('persistent, stalled and malformed deletion reads fail closed within the bound', async () => {
+  await assert.rejects(waitForCommittedDeletion(async () => true, { timeoutMs: 20, intervalMs: 1 }));
+  await assert.rejects(waitForCommittedDeletion(() => new Promise(() => {}), { timeoutMs: 20 }));
+  await assert.rejects(waitForCommittedDeletion(async () => undefined));
 });

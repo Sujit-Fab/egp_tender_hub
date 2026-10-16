@@ -2,6 +2,24 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
+export async function waitForCommittedDeletion(readExists, { timeoutMs = 15000, intervalMs = 50 } = {}) {
+  const deadline = performance.now() + timeoutMs;
+  for (;;) {
+    const remaining = deadline - performance.now();
+    assert.ok(remaining > 0, 'Committed STD deletion was not observed before the deadline');
+    let timer;
+    let exists;
+    try {
+      exists = await Promise.race([Promise.resolve().then(readExists), new Promise((resolve, reject) => {
+        timer = setTimeout(() => reject(new Error('Committed STD deletion read timed out')), remaining);
+      })]);
+    } finally { clearTimeout(timer); }
+    assert.equal(typeof exists, 'boolean');
+    if (exists === false) return;
+    await new Promise(resolve => setTimeout(resolve, Math.min(intervalMs, Math.max(0, deadline - performance.now()))));
+  }
+}
+
 export function demoStorageUrl(data) {
   assert.ok(typeof data.storagePath === 'string' && /^stds\/\d+-synthetic-two-rows\.pdf$/.test(data.storagePath));
   const url = new URL(data.url);
@@ -60,7 +78,9 @@ export async function checkStdPersistence({ page, db, auth, directory, login, ma
     await row.getByRole('button').click();
     await uploaded().getByRole('heading', { name: ownTitle, exact: true }).waitFor({ state: 'hidden' });
     const { id, url } = stored.get(account);
-    assert.equal((await db.doc(`stds/${id}`).get()).exists, false);
+    // The client listener removes rows optimistically, before its write is
+    // acknowledged. Require actual server absence within a fixed deadline.
+    await waitForCommittedDeletion(async () => (await db.doc(`stds/${id}`).get()).exists);
     const response = await fetch(url, { redirect: 'error', signal: AbortSignal.timeout(10000) });
     assert.equal(response.status, 404, 'Storage object must be deleted, not just hidden from the list');
     await response.body?.cancel();
