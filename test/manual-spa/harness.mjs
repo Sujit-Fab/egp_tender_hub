@@ -7,6 +7,28 @@ export class HarnessError extends Error {
   constructor(code) { super(code); this.name = 'HarnessError'; this.code = code; }
 }
 
+export function createDemoAccountSession(adapter) {
+  let signedIn = false;
+  const logout = async () => {
+    // A restored Firebase session initially renders the signed-out header.
+    // Track completed harness actions instead of trusting that transient view.
+    if (signedIn) {
+      await adapter.waitForRestoredSession();
+      await adapter.signOut();
+    }
+    await adapter.waitForSignedOut();
+    signedIn = false;
+  };
+  return {
+    logout,
+    async login(account) {
+      await logout();
+      await adapter.signIn(account);
+      signedIn = true;
+    },
+  };
+}
+
 export async function withDemoAccountPrompt(page, account, trigger, { timeoutMs = 15000 } = {}) {
   if (!accounts.includes(account)) throw new HarnessError('INVALID_DEMO_ACCOUNT');
   if (activePrompts.has(page)) throw new HarnessError('PROMPT_OVERLAP');

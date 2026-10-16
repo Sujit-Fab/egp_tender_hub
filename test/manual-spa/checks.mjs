@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { checkStdPersistence } from './std-persistence.mjs';
 import { captureSyntheticView, validateVisualManifest } from './screenshots.mjs';
-import { withDemoAccountPrompt } from './harness.mjs';
+import { withDemoAccountPrompt, createDemoAccountSession } from './harness.mjs';
 
 export const requiredSpaChecks = [
   'Built SPA mounts with real styles and landing navigation',
@@ -30,20 +30,22 @@ export async function runSpaChecks({ page, context, db, auth, directory, record,
   const header = page.locator('header');
   const admin = page.locator('section[aria-labelledby="radar-admin-heading"]');
   async function menu() { await header.getByAltText('Profile', { exact: true }).hover(); }
+  const accountSession = createDemoAccountSession({
+    waitForRestoredSession: () => header.getByAltText('Profile', { exact: true }).waitFor({ state: 'visible' }),
+    async signOut() { await menu(); await header.getByRole('button', { name: 'Logout', exact: true }).click(); },
+    waitForSignedOut: () => header.getByRole('button', { name: 'Login', exact: true }).waitFor({ state: 'visible' }),
+    async signIn(account) {
+      const button = header.getByRole('button', { name: 'Login', exact: true });
+      await withDemoAccountPrompt(page, account, () => button.click());
+      await header.getByAltText('Profile', { exact: true }).waitFor({ state: 'visible' });
+    },
+  });
   async function login(account, lang = 'en') {
     await context.setOffline(false);
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto('http://127.0.0.1:4179');
     await page.waitForFunction(() => document.querySelector('#root header'));
-    // Auth persistence is asynchronous: wait until either stable header state is available.
-    await page.waitForFunction(() => [...document.querySelectorAll('header button')].some(b => b.textContent.includes('Login')) || document.querySelector('header img[alt="Profile"]'));
-    if (await header.getByAltText('Profile', { exact: true }).count()) {
-      await menu(); await header.getByRole('button', { name: 'Logout', exact: true }).click();
-    }
-    const button = header.getByRole('button', { name: 'Login', exact: true });
-    await button.waitFor({ state: 'visible' });
-    await withDemoAccountPrompt(page, account, () => button.click());
-    await header.getByAltText('Profile', { exact: true }).waitFor({ state: 'visible' });
+    await accountSession.login(account);
     if (lang === 'bn') await header.getByRole('button', { name: 'বাংলা', exact: true }).click();
     await menu();
     await header.getByRole('button', { name: lang === 'en' ? 'Tender Radar' : 'টেন্ডার রাডার', exact: true }).click();
@@ -119,7 +121,7 @@ export async function runSpaChecks({ page, context, db, auth, directory, record,
   });
   await check(requiredSpaChecks[6], async () => {
     await login('admin'); await choose(); await preview();
-    await menu(); await header.getByRole('button', { name: 'Logout', exact: true }).click();
+    await accountSession.logout();
     await admin.waitFor({ state: 'hidden' });
     await login('other'); assert.equal(await admin.count(), 0); assert.deepEqual(await counts(), [2, 1]);
   });

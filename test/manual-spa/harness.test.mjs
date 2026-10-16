@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { withDemoAccountPrompt, guardUnexpectedDialogs, DEMO_PROMPT,
-  HarnessError, createCheckProgress } from './harness.mjs';
+  HarnessError, createCheckProgress, createDemoAccountSession } from './harness.mjs';
 import { waitForCommittedDeletion } from './std-persistence.mjs';
 
 function deferred() {
@@ -164,4 +164,42 @@ test('persistent, stalled and malformed deletion reads fail closed within the bo
   await assert.rejects(waitForCommittedDeletion(async () => true, { timeoutMs: 20, intervalMs: 1 }));
   await assert.rejects(waitForCommittedDeletion(() => new Promise(() => {}), { timeoutMs: 20 }));
   await assert.rejects(waitForCommittedDeletion(async () => undefined));
+});
+
+test('persisted session restoration must finish before logout or a subsequent login', async () => {
+  const restore = deferred();
+  const calls = [];
+  const session = createDemoAccountSession({
+    async waitForRestoredSession() { calls.push('restoring'); await restore.promise; calls.push('restored'); },
+    async signOut() { calls.push('sign-out'); },
+    async waitForSignedOut() { calls.push('signed-out'); },
+    async signIn(account) { calls.push(account); },
+  });
+  await session.login('ordinary');
+  assert.deepEqual(calls, ['signed-out', 'ordinary']);
+  const next = session.login('owner-a');
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(calls, ['signed-out', 'ordinary', 'restoring']);
+  restore.resolve(); await next;
+  assert.deepEqual(calls, ['signed-out', 'ordinary', 'restoring', 'restored', 'sign-out', 'signed-out', 'owner-a']);
+});
+
+test('explicit logout prevents the next login from waiting for an already-ended session', async () => {
+  let restores = 0, signOuts = 0;
+  const session = createDemoAccountSession({
+    async waitForRestoredSession() { restores++; }, async signOut() { signOuts++; },
+    async waitForSignedOut() {}, async signIn() {},
+  });
+  await session.login('admin'); await session.logout(); await session.login('other');
+  assert.equal(restores, 1); assert.equal(signOuts, 1);
+});
+
+test('failed sign-in is not recorded as a restored session', async () => {
+  let restores = 0, attempts = 0;
+  const session = createDemoAccountSession({
+    async waitForRestoredSession() { restores++; }, async signOut() {}, async waitForSignedOut() {},
+    async signIn() { if (++attempts === 1) throw new HarnessError('PROMPT_TIMEOUT'); },
+  });
+  await assert.rejects(session.login('admin'), code('PROMPT_TIMEOUT'));
+  await session.login('other'); assert.equal(restores, 0);
 });
