@@ -6,7 +6,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { withDemoAccountPrompt, guardUnexpectedDialogs, DEMO_PROMPT,
   HarnessError, createCheckProgress, createDemoAccountSession } from './harness.mjs';
-import { waitForCommittedDeletion } from './std-persistence.mjs';
+import { waitForCommittedDeletion, waitForCommittedUpload } from './std-persistence.mjs';
 
 function deferred() {
   let resolve, reject;
@@ -202,4 +202,19 @@ test('failed sign-in is not recorded as a restored session', async () => {
   });
   await assert.rejects(session.login('admin'), code('PROMPT_TIMEOUT'));
   await session.login('other'); assert.equal(restores, 0);
+});
+
+test('optimistic upload requires exactly one independently committed document', async () => {
+  let reads = 0;
+  const committed = { size: 1, docs: ['synthetic-document'] };
+  const result = await waitForCommittedUpload(async () => ++reads < 3 ? { size: 0 } : committed,
+    { timeoutMs: 1000, intervalMs: 0 });
+  assert.equal(result, committed); assert.equal(reads, 3);
+});
+
+test('duplicate and never-committed uploads cannot pass the server-state wait', async () => {
+  let duplicateReads = 0;
+  await assert.rejects(waitForCommittedUpload(async () => { duplicateReads++; return { size: 2 }; }));
+  assert.equal(duplicateReads, 1);
+  await assert.rejects(waitForCommittedUpload(async () => ({ size: 0 }), { timeoutMs: 20, intervalMs: 1 }));
 });

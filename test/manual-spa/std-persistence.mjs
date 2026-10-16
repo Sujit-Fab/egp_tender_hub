@@ -2,22 +2,41 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-export async function waitForCommittedDeletion(readExists, { timeoutMs = 15000, intervalMs = 50 } = {}) {
+export async function waitForCommittedState(readSatisfied, { timeoutMs = 15000, intervalMs = 50 } = {}) {
   const deadline = performance.now() + timeoutMs;
   for (;;) {
     const remaining = deadline - performance.now();
-    assert.ok(remaining > 0, 'Committed STD deletion was not observed before the deadline');
+    assert.ok(remaining > 0, 'Committed STD state was not observed before the deadline');
     let timer;
-    let exists;
+    let satisfied;
     try {
-      exists = await Promise.race([Promise.resolve().then(readExists), new Promise((resolve, reject) => {
-        timer = setTimeout(() => reject(new Error('Committed STD deletion read timed out')), remaining);
+      satisfied = await Promise.race([Promise.resolve().then(readSatisfied), new Promise((resolve, reject) => {
+        timer = setTimeout(() => reject(new Error('Committed STD state read timed out')), remaining);
       })]);
     } finally { clearTimeout(timer); }
-    assert.equal(typeof exists, 'boolean');
-    if (exists === false) return;
+    assert.equal(typeof satisfied, 'boolean');
+    if (satisfied === true) return;
     await new Promise(resolve => setTimeout(resolve, Math.min(intervalMs, Math.max(0, deadline - performance.now()))));
   }
+}
+
+export async function waitForCommittedDeletion(readExists, options) {
+  await waitForCommittedState(async () => {
+    const exists = await readExists();
+    assert.equal(typeof exists, 'boolean');
+    return exists === false;
+  }, options);
+}
+
+export async function waitForCommittedUpload(readDocuments, options) {
+  let documents;
+  await waitForCommittedState(async () => {
+    documents = await readDocuments();
+    assert.ok(Number.isInteger(documents.size) && documents.size >= 0);
+    assert.ok(documents.size <= 1, 'Duplicate STD documents must fail immediately');
+    return documents.size === 1;
+  }, options);
+  return documents;
 }
 
 export function demoStorageUrl(data) {
@@ -45,7 +64,9 @@ export async function checkStdPersistence({ page, db, auth, directory, login, ma
     await form.locator('input[type="file"]').setInputFiles(path.join(directory, 'synthetic-two-rows.pdf'));
     await form.getByRole('button', { name: 'Upload Document', exact: true }).click();
     await uploaded().getByRole('heading', { name: title, exact: true }).waitFor();
-    const docs = await db.collection('stds').where('authorUid', '==', account).get();
+    // A rendered row may still be an optimistic local write. Require the
+    // independent server query to observe exactly one committed document.
+    const docs = await waitForCommittedUpload(() => db.collection('stds').where('authorUid', '==', account).get());
     assert.equal(docs.size, 1);
     const snapshot = docs.docs[0];
     const data = snapshot.data();
