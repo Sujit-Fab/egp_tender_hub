@@ -1,5 +1,39 @@
 # Tender Radar acceptance handoff
 
+## Recovery on 2026-10-16: STD fix validated; full SPA stage added
+
+Recovered HEAD `01c3e03f6f17def27759df944dfa74e9b5302b0c` matches PR #36's
+published head. The PR remains draft. Git integrity checking found dangling
+blobs but no corruption; no metadata recovery or working-tree reset was needed.
+The deployment-workflow edit and all untracked files were preserved. The root
+lockfile matched HEAD on recovery and was left untouched. No acceptance Node or
+Java service remained; unrelated Codex and browser processes were preserved.
+
+Directly reviewed exact-head CI logs: PR Validation **38749251199** passed all
+**116 tests**, type checking and full frontend/PWA/postbuild (its normal PR
+merge ref includes this source head). Linux acceptance **38749251235** checked
+out that exact source head and passed **19/19**, zero failed/skipped/blocked,
+complete evidence and verified cleanup. The actual 345-row fixture finished in
+**1151.304 ms** including cleanup in Linux preflight, under the unchanged
+**45,000 ms** production deadline. The STD default-database regression fix is
+therefore pushed and validated; existing legacy STD authorization remains a
+separate issue and is not claimed fixed.
+
+The unfinished local full-app demo tooling was reviewed and extended with a
+headless Linux CI mode and 12 required full SPA/PWA assertions. See
+[the full-app checklist and commands](../manual-spa/README.md). The existing
+19-check suite and its security/isolation/deadline criteria remain unchanged.
+The new stage must pass on its published source commit; the results above are
+historical evidence for `01c3e03`, not proof that the added stage passed.
+Fresh run/source/build identity, exact rules hash, all required checks, zero
+credential/socket fallback counters and cleanup are required by its gate.
+Human visual/mobile, profile/STD persistence and installation checks remain
+explicitly pending. Do not equate automated shell checks with those manual rows.
+
+No production Firebase operation, live claim, scheduling, email, deployment or
+merge is authorized. Keep PR #36 draft. Windows acceptance diagnostics are
+finished; use Linux CI for new browser and bounded-worker acceptance evidence.
+
 ## Resume on 2026-10-15: Linux browser failures diagnosed
 
 Recovered artifact **11911377318** from Linux run **38597573330**, source

@@ -51,6 +51,16 @@ jobs:
         run: bash scripts/tender-radar/acceptance-linux.sh
       - name: Require completed acceptance and verified cleanup
         run: node test/acceptance/verify-results.mjs
+      - name: Verify full SPA demo bootstrap and evidence gate
+        run: node --test test/manual-spa/isolation.test.mjs
+      - name: Prepare Storage emulator for the full SPA demo
+        run: node scripts/tender-radar/manual-spa.mjs prepare-storage
+      - name: Build the actual SPA and PWA with demo-only Firebase services
+        run: node scripts/tender-radar/manual-spa.mjs build
+      - name: Exercise the built SPA and offline shell in loopback-only namespace
+        run: bash scripts/tender-radar/manual-spa-linux.sh ci
+      - name: Require full SPA evidence for this source commit and fresh run
+        run: node test/manual-spa/verify.mjs
       - name: Preserve sanitized evidence even on failure
         if: always()
         uses: actions/upload-artifact@v4
@@ -64,3 +74,6 @@ jobs:
             .cache/tender-radar/current-run.json
             .cache/tender-radar/worker-repro-*/results.json
             .cache/tender-radar/worker-repro-*/*.jsonl
+            .cache/tender-radar/manual-spa/build.json
+            .cache/tender-radar/manual-spa/launch.json
+            .cache/tender-radar/manual-spa/latest-session.json
