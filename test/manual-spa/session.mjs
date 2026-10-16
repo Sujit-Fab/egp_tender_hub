@@ -39,6 +39,11 @@ if (report.sourceRevision !== report.build.sourceRevision) throw new Error('SPA 
 report.automated = automated;
 report.runId = process.env.TENDER_RADAR_SPA_RUN_ID;
 if (!report.runId) throw new Error('Fresh launcher identity is required.');
+report.evidenceDirectory = path.relative(process.cwd(), directory);
+report.visual = { sourceRevision: report.sourceRevision, runId: report.runId, captures: [] };
+report.coverage = { stdOwnerFiltering: 'UI-only; not authorization or confidentiality',
+  storageRules: 'demo-only permissive signed-in stds access; production policy unverified',
+  profileBehavior: 'not tested or changed', humanVisualReview: 'not_run', pwaInstallation: 'not_run' };
 report.complete = false;
 await writeFile(path.join(root, 'latest-session.json'), JSON.stringify(report, null, 2));
 const record = value => appendFile(path.join(directory, 'events.jsonl'), JSON.stringify({ at: new Date().toISOString(), ...value }) + '\n');
@@ -58,13 +63,13 @@ try {
   const auth = getAuth(sdkApp);
   db = getFirestore(sdkApp, DATABASE_ID);
   db.settings({ host: FIRESTORE_HOST, ssl: false });
-  for (const account of ['admin', 'ordinary', 'other']) {
+  for (const account of ['admin', 'ordinary', 'other', 'owner-a', 'owner-b']) {
     await auth.createUser({ uid: account, email: `${account}@example.invalid`, emailVerified: true,
       displayName: `Demo ${account}`, password: 'Emulator-only-password-2026' });
     if (account === 'admin') await auth.setCustomUserClaims(account, { admin: true });
     await db.doc(`users/${account}`).set({ uid: account, email: `${account}@example.invalid`,
       displayName: `Demo ${account}`, role: account === 'admin' ? 'admin' : 'user',
-      subscriptionTier: account === 'admin' ? 'enterprise' : 'free', scansThisMonth: 0,
+      subscriptionTier: account === 'admin' || account.startsWith('owner-') ? 'enterprise' : 'free', scansThisMonth: 0,
       createdAt: FieldValue.serverTimestamp() });
   }
   const app = express();
@@ -121,11 +126,12 @@ try {
   await record({ type: 'spa-mounted-and-service-worker-ready' });
   if (automated) {
     const { runSpaChecks } = await import('./checks.mjs');
-    report.checks = await runSpaChecks({ page, context, db, directory, record, pageErrors, blockedRequests });
+    report.checks = await runSpaChecks({ page, context, db, auth, directory, record, pageErrors, blockedRequests,
+      visual: report.visual });
     report.complete = true;
     if (report.checks.some(check => check.status !== 'passed')) process.exitCode = 1;
   } else {
-  console.log(`DEMO manual SPA ready: http://127.0.0.1:4179 (use ONLY the Chromium window opened here).\nEvidence and synthetic PDF: ${directory}\nSign in button prompts for admin, ordinary or other. Close every manual browser window to stop.\nDo not use real documents or accounts. Live AI/email/support endpoints are disabled.`);
+  console.log(`DEMO manual SPA ready: http://127.0.0.1:4179 (use ONLY the Chromium window opened here).\nEvidence and synthetic PDF: ${directory}\nSign in prompts for admin, ordinary, other, owner-a or owner-b. Close every manual browser window to stop.\nDo not use real documents or accounts. Live AI/email/support endpoints are disabled.`);
   await new Promise(resolve => context.once('close', resolve));
   context = undefined;
   }

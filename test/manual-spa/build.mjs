@@ -27,8 +27,8 @@ const firebaseConfig = { projectId: 'demo-tender-radar', apiKey: 'demo-only-key'
     ['export const auth = getAuth(app);', "export const auth = getAuth(app);\nconnectAuthEmulator(auth, 'http://127.0.0.1:9098');"],
     ['export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);', "export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);\nconnectFirestoreEmulator(db, '127.0.0.1', 8085);"],
     ['export const storage = getStorage(app);', "export const storage = getStorage(app);\nconnectStorageEmulator(storage, '127.0.0.1', 9198);"],
-    ['return await signInWithPopup(auth, googleProvider);', `const account = window.prompt('DEMO ONLY: enter admin, ordinary, or other', 'admin');
-    if (!['admin', 'ordinary', 'other'].includes(account ?? '')) throw new Error('Choose a demo account.');
+    ['return await signInWithPopup(auth, googleProvider);', `const account = window.prompt('DEMO ONLY: enter admin, ordinary, other, owner-a, or owner-b', 'admin');
+    if (!['admin', 'ordinary', 'other', 'owner-a', 'owner-b'].includes(account ?? '')) throw new Error('Choose a demo account.');
     return await signInWithEmailAndPassword(auth, account + '@example.invalid', 'Emulator-only-password-2026');`],
   ];
   for (const [before, after] of replacements) {

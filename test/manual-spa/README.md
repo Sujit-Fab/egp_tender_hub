@@ -11,13 +11,14 @@ external analytics are removed from this build, and external fonts/images are bl
 ## Automated Linux CI
 
 The existing Linux acceptance workflow additionally builds this full app and runs
-12 required SPA/PWA checks headlessly in a separate loopback-only namespace.
+14 required SPA/PWA checks headlessly in a separate loopback-only namespace.
 It reuses the job's installed dependencies and browser/Firestore caches; only
 the additional Storage emulator is prepared. It retains all 19 existing security
 and ingestion acceptance checks. Run identity, source/build commit, exact rules
 hash, complete counts, zero Node socket/credential fallback attempts and verified
-cleanup must pass `node test/manual-spa/verify.mjs`. The three sanitized build,
-launch and result JSON files are uploaded; browser profiles and PDFs are excluded.
+cleanup must pass `node test/manual-spa/verify.mjs`. Sanitized build, launch and
+result JSON files plus eight fixed synthetic screenshots and their SHA-256
+manifest are uploaded; browser profiles, raw traces, token URLs and PDFs are excluded.
 
 On an already prepared Linux checkout:
 
@@ -28,11 +29,21 @@ bash scripts/tender-radar/manual-spa-linux.sh ci
 node test/manual-spa/verify.mjs
 ```
 
-These 12 checks cover real app mounting/styles/privacy navigation, ordinary/admin
+The original 12 checks cover real app mounting/styles/privacy navigation, ordinary/admin
 access, English import/repeat/invalid input, Bengali repeat/invalid input, account
 switching, refresh, narrow viewport shell, manifest/service-worker control and
-offline reload. They do not establish visual quality, browser installation,
-profile/STD persistence or production Storage policy. Complete the manual rows
+offline reload. One added test uses two enterprise **non-admin** users to upload
+synthetic STDs through the actual UI, reload, independently read Firestore and
+download the exact Storage bytes from loopback, check both owner-filtered lists,
+then delete both documents and independently require absent metadata and HTTP 404
+for their objects. Downloads reject non-demo origins, unexpected paths and redirects.
+This establishes persistence and UI filtering, **not authorization or confidentiality**.
+The other added check captures Radar preview and populated STD management in
+English/Bengali, at 1440x1000 and 390x844. The gate requires all eight PNGs, their
+hashes, exact view metadata and matching source/run identity. Capturing screenshots
+does not mean a human reviewed them; screenshots cannot prove persistence or installation.
+These checks do not establish visual quality, browser installation,
+profile behavior or production Storage policy. Complete the applicable manual rows
 below before marking full UI review complete. A failed or unrun CI stage is a
 blocker, even if the existing 19 component acceptance checks pass.
 
@@ -75,14 +86,35 @@ An unexpected occupied port or changed bootstrap/configuration stops startup.
 | `admin` | `admin@example.invalid` | admin / enterprise; Auth admin claim | Visible, preview/confirm permitted |
 | `ordinary` | `ordinary@example.invalid` | user / free; no admin claim | Admin upload hidden |
 | `other` | `other@example.invalid` | separate user / free; no admin claim | Admin upload hidden; separate profile |
+| `owner-a` | `owner-a@example.invalid` | user / enterprise; no admin claim | Admin upload hidden; STD management permitted |
+| `owner-b` | `owner-b@example.invalid` | user / enterprise; no admin claim | Admin upload hidden; STD management permitted |
 
 All use `Emulator-only-password-2026`; the adapter supplies it. No real account
 is valid. Firestore rules are loaded and read back exactly on both databases.
 Radar and frontend use the confirmed named database within **demo-tender-radar**.
 The existing legacy STD HTTP routes are not started by this harness; the frontend
 continues using the real client SDK. Manual Storage rules allow signed-in STD
-file operations only; no production Storage rules are available here, so Storage
-authorization parity is **not** claimed. Other `/api` calls return explicit 503.
+file operations only; any signed-in demo user can read/write those paths. No
+production Storage rules are available here, so production authorization parity
+is **not** claimed. Existing Firestore rules allow authenticated STD reads;
+absence from an owner-filtered list is not a security boundary. Other `/api` calls return explicit 503.
+
+## Remote visual review
+
+Download the artifact for the exact accepted source commit. Under
+`manual-spa/run-.../screenshots/`, inspect `manifest.json` and:
+
+- `radar-en-desktop.png`, `radar-en-mobile.png`, `radar-bn-desktop.png`, `radar-bn-mobile.png`
+- `std-management-en-desktop.png`, `std-management-en-mobile.png`, `std-management-bn-desktop.png`, `std-management-bn-mobile.png`
+
+Record language, viewport, clipping/overlap, readable labels and reachable visible
+controls as PASS/FAIL/BLOCKED. These are viewport captures, not physical-device
+touch tests. Static STD form labels currently remain English when the app is set
+to Bengali; this pre-existing localization limit is not changed by the harness.
+Use CI assertions and independent service reads for persistence; images alone do
+not prove it. A supported interactive desktop is still required for actual PWA
+installation and OS integration. **PWA installation remains explicitly NOT RUN**.
+No new Ubuntu installation on the Windows workstation is needed for reviewing PNGs.
 
 ## Short checklist
 
@@ -99,9 +131,12 @@ Record every row PASS / FAIL / BLOCKED / NOT RUN, in both languages where releva
    confirm imports **2** once. Repeat the same file: duplicates/already-imported,
    no extra records. Wrong count, non-PDF, and editing count/file require a new
    valid preview. Double-click cannot create a second import. Repeat in Bengali.
-4. **Full-app persistence:** save a synthetic profile, refresh, and verify it
-   persists for that account only. As `admin`, upload a synthetic STD, refresh,
-   then delete it; another account must not see it in its owner-filtered list.
+4. **Full-app persistence:** profile save/reload/account switching remains unrun;
+   use synthetic data only and do not infer a successful server write from the
+   save banner. Existing shared profile-cache behavior is separately recorded in
+   [RELEASE-REVIEW.md](RELEASE-REVIEW.md). The two-user STD test above now covers
+   upload/reload/object bytes/list filtering/deletion automatically. A manual repeat
+   can use `owner-a` and `owner-b`, both entitled and neither an administrator.
    Record any client/rules/schema/Storage errors; do not relax rules to pass.
 5. **PWA:** DevTools Application shows the local manifest and activated worker;
    reload once so the page is controlled. Check installability/install if the

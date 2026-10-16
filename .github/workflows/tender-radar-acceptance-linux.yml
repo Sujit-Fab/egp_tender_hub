@@ -77,3 +77,5 @@ jobs:
             .cache/tender-radar/manual-spa/build.json
             .cache/tender-radar/manual-spa/launch.json
             .cache/tender-radar/manual-spa/latest-session.json
+            .cache/tender-radar/manual-spa/run-*/screenshots/*.png
+            .cache/tender-radar/manual-spa/run-*/screenshots/manifest.json

@@ -6,6 +6,8 @@ import ts from 'typescript';
 import { demoBootstrap, assertLoopbackLinks } from './build.mjs';
 import { validateSpaReport } from './verify.mjs';
 import { requiredSpaChecks } from './checks.mjs';
+import { requiredScreenshots, validateVisualManifest } from './screenshots.mjs';
+import { demoStorageUrl } from './std-persistence.mjs';
 
 const source = readFileSync('src/firebase.ts', 'utf8');
 test('namespace guard requires exactly one active loopback link and rejects all additional interfaces', () => {
@@ -17,7 +19,7 @@ test('namespace guard requires exactly one active loopback link and rejects all 
     assert.throws(() => assertLoopbackLinks(links), /loopback-only/);
   }
 });
-function load(origin = 'http://127.0.0.1:4179') {
+function load(origin = 'http://127.0.0.1:4179', account = 'admin') {
   const calls = [];
   const transformed = ts.transpileModule(demoBootstrap(source), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
@@ -35,7 +37,7 @@ function load(origin = 'http://127.0.0.1:4179') {
     signInWithPopup() { assert.fail('Google OAuth is forbidden'); },
   };
   vm.runInNewContext(transformed, { module, exports: module.exports, location: { origin },
-    window: { prompt: () => 'admin' }, console: { log() {}, error() {} },
+    window: { prompt: () => account }, console: { log() {}, error() {} },
     require(name) { assert.ok(['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/storage'].includes(name)); return sdk; },
   });
   return { calls, exports: module.exports };
@@ -50,6 +52,11 @@ test('full SPA connects every Firebase service to demo emulators before its firs
   ]);
   await loaded.exports.loginWithGoogle();
   assert.deepEqual(loaded.calls.at(-1), ['sign-in', 'admin@example.invalid']);
+  for (const account of ['owner-a', 'owner-b']) {
+    const owner = load('http://127.0.0.1:4179', account);
+    await owner.exports.loginWithGoogle();
+    assert.deepEqual(owner.calls.at(-1), ['sign-in', `${account}@example.invalid`]);
+  }
 });
 
 test('manual bootstrap rejects another origin before initializing Firebase', () => {
@@ -65,7 +72,9 @@ test('SPA evidence gate rejects stale, incomplete, skipped, unsafe and wrong-sou
   const report = { ...launch, build: { sourceRevision: 'source' }, finishedAt: '2026-10-16T00:01:00Z',
     project: 'demo-tender-radar', database: 'ai-studio-7e6a1daf-95b8-46d0-a6ba-7cf295cd1701', rulesHash: 'rules',
     automated: true, complete: true, cleanupVerified: true, isolationStats: { blockedSockets: 0, credentialAttempts: 0 },
-    checks: requiredSpaChecks.map(name => ({ name, status: 'passed' })) };
+    checks: requiredSpaChecks.map(name => ({ name, status: 'passed' })),
+    visual: { sourceRevision: 'source', runId: launch.runId,
+      captures: requiredScreenshots.map(item => ({ ...item, sha256: 'a'.repeat(64) })) } };
   assert.equal(validateSpaReport(report, launch, 'source', 'rules').accepted, true);
   for (const mutate of [
     r => { r.runId = 'old-run'; }, r => { r.sourceRevision = 'old-source'; },
@@ -73,8 +82,35 @@ test('SPA evidence gate rejects stale, incomplete, skipped, unsafe and wrong-sou
     r => { r.cleanupVerified = false; }, r => { r.checks[0].status = 'skipped'; },
     r => { r.checks.pop(); }, r => { r.project = 'production'; }, r => { r.rulesHash = 'different'; },
     r => { r.isolationStats.blockedSockets = 1; }, r => { r.isolationStats.credentialAttempts = 1; },
+    r => { r.visual.captures.pop(); }, r => { r.visual.runId = 'stale'; },
   ]) {
     const changed = structuredClone(report); mutate(changed);
     assert.throws(() => validateSpaReport(changed, launch, 'source', 'rules'));
+  }
+});
+
+test('Storage persistence observer rejects non-demo origins and unexpected object paths', () => {
+  const data = { storagePath: 'stds/123-synthetic-two-rows.pdf',
+    url: 'http://127.0.0.1:9198/v0/b/demo-tender-radar.appspot.com/o/stds%2F123-synthetic-two-rows.pdf?alt=media&token=synthetic' };
+  assert.equal(demoStorageUrl(data).origin, 'http://127.0.0.1:9198');
+  for (const changed of [
+    { ...data, url: data.url.replace('127.0.0.1', 'example.invalid') },
+    { ...data, url: data.url.replace(':9198', ':9199') },
+    { ...data, url: data.url.replace('demo-tender-radar', 'another-project') },
+    { ...data, storagePath: '../unexpected' },
+    { ...data, url: data.url.replace('alt=media', 'alt=metadata') },
+  ]) assert.throws(() => demoStorageUrl(changed));
+});
+
+test('visual manifest requires all eight fixed views, exact identity and digests', () => {
+  const visual = { sourceRevision: 'source', runId: 'run',
+    captures: requiredScreenshots.map(item => ({ ...item, sha256: 'a'.repeat(64) })) };
+  assert.doesNotThrow(() => validateVisualManifest(visual, 'source', 'run'));
+  for (const mutate of [v => { v.sourceRevision = 'stale'; }, v => { v.runId = 'stale'; },
+    v => { v.captures.pop(); }, v => { v.captures[0].file = '../profile.png'; },
+    v => { v.captures[0].width = 10; }, v => { v.captures[0].sha256 = ''; },
+    v => { v.captures[0] = v.captures[1]; }]) {
+    const changed = structuredClone(visual); mutate(changed);
+    assert.throws(() => validateVisualManifest(changed, 'source', 'run'));
   }
 });

@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import path from 'node:path';
+import { checkStdPersistence } from './std-persistence.mjs';
+import { captureSyntheticView, validateVisualManifest } from './screenshots.mjs';
 
 export const requiredSpaChecks = [
   'Built SPA mounts with real styles and landing navigation',
@@ -13,10 +15,12 @@ export const requiredSpaChecks = [
   'Narrow viewport renders the full app shell',
   'Local manifest and activated service worker control the built SPA',
   'Offline reload renders the precached app shell',
+  'Two non-admin enterprise users: STD persistence, owner-filtered UI lists and independent deletion',
+  'Eight synthetic English/Bengali desktop/mobile screenshots have source and run identity',
   'No uncaught browser errors or production connection attempts',
 ];
 
-export async function runSpaChecks({ page, context, db, directory, record, pageErrors, blockedRequests }) {
+export async function runSpaChecks({ page, context, db, auth, directory, record, pageErrors, blockedRequests, visual }) {
   const results = [];
   const check = async (name, action) => {
     try { await action(); results.push({ name, status: 'passed' }); }
@@ -50,8 +54,17 @@ export async function runSpaChecks({ page, context, db, directory, record, pageE
     await header.getByRole('button', { name: lang === 'en' ? 'Tender Radar' : 'টেন্ডার রাডার', exact: true }).click();
     await page.getByRole('heading', { name: 'Tender Radar', exact: true }).waitFor();
     if (account === 'admin') await admin.waitFor();
-    else await page.getByText('Category preferences are available on Pro and Enterprise plans.', { exact: true }).waitFor();
+    else if (account.startsWith('owner-')) {
+      await page.getByRole('button', { name: 'Save preferences', exact: true }).waitFor();
+      assert.equal(await admin.count(), 0);
+    } else await page.getByText('Category preferences are available on Pro and Enterprise plans.', { exact: true }).waitFor();
   }
+  async function manage() {
+    await header.getByAltText('Profile', { exact: true }).waitFor({ state: 'visible' });
+    await menu(); await header.getByText('Manage STDs', { exact: true }).click();
+    await page.getByRole('heading', { name: 'Upload New STD', exact: true }).waitFor();
+  }
+  const uploaded = () => page.locator('section').filter({ has: page.getByRole('heading', { name: 'Uploaded Documents', exact: true }) });
   const choose = async (count = '2', invalid = false) => {
     await page.locator('#radar-admin-file').setInputFiles(invalid ? {
       name: 'invalid.pdf', mimeType: 'application/pdf', buffer: Buffer.from('invalid PDF'),
@@ -143,6 +156,23 @@ export async function runSpaChecks({ page, context, db, directory, record, pageE
     } finally { await context.setOffline(false); }
   });
   await check(requiredSpaChecks[11], async () => {
+    await checkStdPersistence({ page, db, auth, directory, login, manage, uploaded,
+      async captureManagement() {
+        await captureSyntheticView(page, directory, visual, 'std-management', 'en');
+        await header.getByRole('button', { name: 'বাংলা', exact: true }).click();
+        await captureSyntheticView(page, directory, visual, 'std-management', 'bn');
+        await header.getByRole('button', { name: 'English', exact: true }).click();
+      },
+    });
+  });
+  await check(requiredSpaChecks[12], async () => {
+    for (const lang of ['en', 'bn']) {
+      await login('admin', lang); await choose(); await preview(lang);
+      await captureSyntheticView(page, directory, visual, 'radar', lang);
+    }
+    validateVisualManifest(visual, visual.sourceRevision, visual.runId);
+  });
+  await check(requiredSpaChecks[13], async () => {
     assert.deepEqual(pageErrors, []);
     assert.equal(blockedRequests.some(origin => /gen-lang-client|(?:firebasestorage|firestore|identitytoolkit|securetoken)\.googleapis\.com/.test(origin)), false,
       'production service requests are forbidden even when blocked');
