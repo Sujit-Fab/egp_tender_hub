@@ -9,6 +9,46 @@ import { withDemoAccountPrompt, guardUnexpectedDialogs, DEMO_PROMPT,
 import { waitForCommittedDeletion, waitForCommittedUpload } from './std-persistence.mjs';
 import { createDiagnosticPhaseReporter } from './diagnostic-phases.mjs';
 import { createUploadFetchObserver } from './upload-fetch-observer.mjs';
+import { createRequire } from 'node:module';
+import { clearOwnedEmulatorRegistration } from './owned-emulator-registration.mjs';
+
+test('pinned registry startup enables bucket metadata and owned cleanup handles partial startup', async () => {
+  const requireTool = createRequire(new URL('../acceptance/package.json', import.meta.url));
+  const { EmulatorRegistry } = requireTool('firebase-tools/lib/emulator/registry.js');
+  const { CloudStorageBucketMetadata } = requireTool('firebase-tools/lib/emulator/storage/metadata.js');
+  assert.equal(EmulatorRegistry.get('storage'), undefined);
+  assert.throws(() => new CloudStorageBucketMetadata('demo-tender-radar.appspot.com'),
+    { message: 'Cannot determine host and port of storage' });
+  const interrupted = new Error('Synthetic startup interruption');
+  const instance = {
+    getName: () => 'storage',
+    getInfo: () => ({ name: 'storage', host: '127.0.0.1', port: 9198 }),
+    async start() {
+      assert.equal(EmulatorRegistry.get('storage'), instance);
+      assert.equal(new CloudStorageBucketMetadata('demo-tender-radar.appspot.com').name, 'demo-tender-radar.appspot.com');
+      throw interrupted; // Before any server, port probe or Java process starts.
+    },
+  };
+  try {
+    await assert.rejects(EmulatorRegistry.start(instance), error => error === interrupted);
+    assert.equal(EmulatorRegistry.get('storage'), instance);
+  } finally { clearOwnedEmulatorRegistration(EmulatorRegistry, instance); }
+  assert.equal(EmulatorRegistry.get('storage'), undefined);
+});
+
+test('owned registry cleanup is idempotent and preserves another session registration', () => {
+  const owned = { getName: () => 'storage' };
+  const other = { getName: () => 'storage' };
+  const entries = new Map([['storage', owned], ['unrelated', other]]);
+  const registry = { get: key => entries.get(key), clear: key => entries.delete(key) };
+  clearOwnedEmulatorRegistration(registry, owned);
+  clearOwnedEmulatorRegistration(registry, owned);
+  assert.equal(entries.has('storage'), false);
+  assert.equal(entries.get('unrelated'), other);
+  entries.set('storage', other);
+  clearOwnedEmulatorRegistration(registry, owned);
+  assert.equal(entries.get('storage'), other);
+});
 
 test('upload Fetch observation preserves arguments, receiver, response and unread bodies', async () => {
   const records = [];

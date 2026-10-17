@@ -8,13 +8,14 @@ import path from 'node:path';
 import assert from 'node:assert/strict';
 import { createDiagnosticPhaseReporter } from './diagnostic-phases.mjs';
 import { createUploadFetchObserver } from './upload-fetch-observer.mjs';
+import { clearOwnedEmulatorRegistration } from './owned-emulator-registration.mjs';
 
 const results = [];
 const phase = createDiagnosticPhaseReporter();
 const output = path.resolve('.cache/tender-radar/std-delete-diagnostic.json');
 const ownDirectory = path.resolve('.cache/tender-radar/std-delete-diagnostic-' + randomUUID());
 const require = createRequire(import.meta.url);
-let emulator, app, deleteApp, guard;
+let emulator, app, deleteApp, guard, EmulatorRegistry;
 let failed = false;
 const bounded = async (work, ms) => {
   let timer;
@@ -41,13 +42,14 @@ try {
   const base = '../acceptance/node_modules/firebase-tools/lib/';
   require(base + 'logger.js').logger.silent = true;
   const { StorageEmulator } = require(base + 'emulator/storage/index.js');
+  ({ EmulatorRegistry } = require(base + 'emulator/registry.js'));
   class DiagnosticStorage extends StorageEmulator {
     getPersistenceTmpDir() { return ownDirectory; }
   }
   emulator = new DiagnosticStorage({ projectId: 'demo-tender-radar', host: '127.0.0.1', port: 9198,
     auto_download: false, rules: { name: path.resolve('test/manual-spa/storage.rules'),
       content: await readFile('test/manual-spa/storage.rules', 'utf8') } });
-  await bounded(() => emulator.start(), 30000);
+  await bounded(() => EmulatorRegistry.start(emulator), 30000);
   phase.enter('authentication');
   const firebase = await import('firebase/app');
   deleteApp = firebase.deleteApp;
@@ -120,8 +122,10 @@ try {
       if (!child.kill('SIGKILL')) reject(new Error());
     }), 5000).catch(() => { failed = true; });
   }
+  if (emulator && EmulatorRegistry) clearOwnedEmulatorRegistration(EmulatorRegistry, emulator);
   const cleanupVerified = outcomes.every(result => result.status === 'fulfilled') &&
-    (!child || child.exitCode !== null || child.signalCode !== null);
+    (!child || child.exitCode !== null || child.signalCode !== null) &&
+    (!emulator || EmulatorRegistry?.get(emulator.getName()) !== emulator);
   if (!cleanupVerified) failed = true;
   results.push({ status: 0, code: cleanupVerified ? 'cleanup-verified' : 'cleanup-failed' });
   await mkdir(path.dirname(output), { recursive: true });
