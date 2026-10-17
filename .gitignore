@@ -7,3 +7,8 @@ coverage/
 .env*
 !.env.example
 stds.json
+functions/tender-radar/runtime/
+.cache/tender-radar/
+*-debug.log
+test-results/
+playwright-report/

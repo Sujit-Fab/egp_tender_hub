@@ -1,8 +1,8 @@
-import { extractPdfPages } from './pdf.ts';
+import { extractPdfPages, type PdfExtractionLimits } from './pdf.ts';
 import { parseTenderPages } from './parser.ts';
 
-export async function parseAllTendersPdf(bytes: Uint8Array) {
-  return parseTenderPages(await extractPdfPages(bytes));
+export async function parseAllTendersPdf(bytes: Uint8Array, limits?: PdfExtractionLimits) {
+  return parseTenderPages(await extractPdfPages(bytes, limits));
 }
 
 export { extractPdfPages } from './pdf.ts';

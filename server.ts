@@ -9,6 +9,7 @@ import { GoogleGenAI } from "@google/genai";
 import Parser from "rss-parser";
 import * as cheerio from "cheerio";
 import axios from "axios";
+import { createRequire } from "node:module";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,6 +17,13 @@ const __dirname = path.dirname(__filename);
 async function startServer() {
   const app = express();
   const PORT = 3000;
+
+  // Use the same authorized Radar routes in development and Firebase Functions.
+  const require = createRequire(import.meta.url);
+  const admin = require('firebase-admin');
+  const { PROJECT_ID } = require('./functions/database-config');
+  if (!admin.apps.length) admin.initializeApp({ projectId: PROJECT_ID });
+  require('./functions/tender-radar/routes').registerTenderRadarRoutes(app, { express, admin });
 
   app.use(express.json({ limit: "50mb" }));
 
