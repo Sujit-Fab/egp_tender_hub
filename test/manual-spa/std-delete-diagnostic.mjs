@@ -7,6 +7,7 @@ import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import { createDiagnosticPhaseReporter } from './diagnostic-phases.mjs';
+import { createUploadFetchObserver } from './upload-fetch-observer.mjs';
 
 const results = [];
 const phase = createDiagnosticPhaseReporter();
@@ -57,8 +58,16 @@ try {
   const storage = getStorage(app);
   connectStorageEmulator(storage, '127.0.0.1', 9198, { mockUserToken: { sub: 'owner-a' } });
   const object = ref(storage, 'stds/diagnostic-synthetic.pdf');
+  const expectedUploadToken = createMockUserToken({ sub: 'owner-a' }, 'demo-tender-radar');
   phase.enter('upload');
-  await bounded(() => uploadBytes(object, new Uint8Array([1, 2, 3])), 10000);
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = createUploadFetchObserver(originalFetch, expectedUploadToken, results);
+  try {
+    await bounded(() => uploadBytes(object, new Uint8Array([1, 2, 3])), 10000);
+  } finally {
+    globalThis.fetch = originalFetch;
+    results.push({ status: 0, code: 'socket-guard-count', blockedSockets: isolationStats.blockedSockets });
+  }
   phase.enter('downloadReference');
   const url = new URL(await bounded(() => getDownloadURL(object), 10000));
   assert.equal(url.origin, 'http://127.0.0.1:9198');

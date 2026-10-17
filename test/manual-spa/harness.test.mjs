@@ -8,6 +8,55 @@ import { withDemoAccountPrompt, guardUnexpectedDialogs, DEMO_PROMPT,
   HarnessError, createCheckProgress, createDemoAccountSession } from './harness.mjs';
 import { waitForCommittedDeletion, waitForCommittedUpload } from './std-persistence.mjs';
 import { createDiagnosticPhaseReporter } from './diagnostic-phases.mjs';
+import { createUploadFetchObserver } from './upload-fetch-observer.mjs';
+
+test('upload Fetch observation preserves arguments, receiver, response and unread bodies', async () => {
+  const records = [];
+  const receiver = {};
+  const input = 'PRIVATE_URL_SENTINEL';
+  const options = { headers: { Authorization: 'Firebase PRIVATE_TOKEN_SENTINEL' }, body: 'PRIVATE_BODY_SENTINEL' };
+  const response = { status: 200, get body() { throw new Error('Body must remain unread'); } };
+  const observed = createUploadFetchObserver(function (...args) {
+    assert.equal(this, receiver); assert.equal(args.length, 2);
+    assert.equal(args[0], input); assert.equal(args[1], options);
+    return Promise.resolve(response);
+  }, 'PRIVATE_TOKEN_SENTINEL', records);
+  assert.equal(await observed.call(receiver, input, options), response);
+  assert.deepEqual(records, [{ status: 0, code: 'upload-auth-match' }, { status: 200, code: null }]);
+  assert.ok(!JSON.stringify(records).includes('PRIVATE_'));
+});
+
+test('upload auth observation emits only fixed missing and mismatch codes', async () => {
+  for (const [headers, expected] of [[undefined, 'upload-auth-missing'],
+    [{ authorization: 'PRIVATE_SENTINEL' }, 'upload-auth-mismatch']]) {
+    const records = [];
+    await createUploadFetchObserver(async () => ({ status: 403 }), 'EXPECTED', records)('', { headers });
+    assert.deepEqual(records, [{ status: 0, code: expected }, { status: 403, code: null }]);
+  }
+});
+
+test('upload transport observation allowlists codes and rethrows the original error', async () => {
+  for (const [causeCode, expected] of [['ECONNREFUSED', 'ECONNREFUSED'],
+    ['UND_ERR_SOCKET', 'UND_ERR_SOCKET'], ['PRIVATE_SENTINEL', 'transport-error-other']]) {
+    const records = [];
+    const error = Object.assign(new Error('PRIVATE_SENTINEL'), { cause: { code: causeCode } });
+    const observed = createUploadFetchObserver(async () => { throw error; }, 'EXPECTED', records);
+    await assert.rejects(observed('', {}), actual => actual === error);
+    assert.deepEqual(records, [{ status: 0, code: 'upload-auth-missing' }, { status: 0, code: expected }]);
+    assert.ok(!JSON.stringify(records).includes('PRIVATE_SENTINEL'));
+  }
+});
+
+test('upload Fetch observation forwards each retry without adding or suppressing attempts', async () => {
+  const records = [];
+  let calls = 0;
+  const observed = createUploadFetchObserver(async () => ({ status: ++calls === 1 ? 503 : 200 }), 'EXPECTED', records);
+  assert.equal((await observed('', {})).status, 503);
+  assert.equal(calls, 1);
+  assert.equal((await observed('', {})).status, 200);
+  assert.equal(calls, 2);
+  assert.deepEqual(records.filter(record => record.status > 0).map(record => record.status), [503, 200]);
+});
 
 test('diagnostic failure reporting identifies each fixed phase without exception data', async () => {
   const reporter = createDiagnosticPhaseReporter();
