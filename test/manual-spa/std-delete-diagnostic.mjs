@@ -6,8 +6,10 @@ import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import assert from 'node:assert/strict';
+import { createDiagnosticPhaseReporter } from './diagnostic-phases.mjs';
 
 const results = [];
+const phase = createDiagnosticPhaseReporter();
 const output = path.resolve('.cache/tender-radar/std-delete-diagnostic.json');
 const ownDirectory = path.resolve('.cache/tender-radar/std-delete-diagnostic-' + randomUUID());
 const require = createRequire(import.meta.url);
@@ -45,6 +47,7 @@ try {
     auto_download: false, rules: { name: path.resolve('test/manual-spa/storage.rules'),
       content: await readFile('test/manual-spa/storage.rules', 'utf8') } });
   await bounded(() => emulator.start(), 30000);
+  phase.enter('authentication');
   const firebase = await import('firebase/app');
   deleteApp = firebase.deleteApp;
   const { getStorage, connectStorageEmulator, ref, uploadBytes, getDownloadURL, deleteObject } = await import('firebase/storage');
@@ -54,11 +57,14 @@ try {
   const storage = getStorage(app);
   connectStorageEmulator(storage, '127.0.0.1', 9198, { mockUserToken: { sub: 'owner-a' } });
   const object = ref(storage, 'stds/diagnostic-synthetic.pdf');
+  phase.enter('upload');
   await bounded(() => uploadBytes(object, new Uint8Array([1, 2, 3])), 10000);
+  phase.enter('downloadReference');
   const url = new URL(await bounded(() => getDownloadURL(object), 10000));
   assert.equal(url.origin, 'http://127.0.0.1:9198');
   assert.equal(url.pathname, '/v0/b/demo-tender-radar.appspot.com/o/' + encodeURIComponent(object.fullPath));
   const metadataUrl = new URL(url); metadataUrl.search = '';
+  phase.enter('authentication');
   const token = createMockUserToken({ sub: 'owner-a' }, 'demo-tender-radar');
   const headers = { Authorization: `Bearer ${token}` };
   const observe = async (target, authorization) => {
@@ -76,13 +82,16 @@ try {
   // token read after deletion, authenticated read after deletion.
   assert.equal(await observe(url), 200);
   assert.equal(await observe(metadataUrl, headers), 200);
+  phase.enter('delete');
   await bounded(() => deleteObject(object), 10000);
+  phase.enter('absenceCheck');
   await observe(url); // Capture the unknown status; do not assume the hypothesis.
   assert.equal(await observe(metadataUrl, headers), 404); // Independent absence.
   assert.equal(isolationStats.blockedSockets, 0);
   assert.equal(isolationStats.credentialAttempts, 0);
 } catch (error) {
   failed = true;
+  results.push(phase.failureRecord());
   results.push({ status: 0, code: safeCode(error) });
 } finally {
   // Pinned emulator internals are used only to clean up partial startup.

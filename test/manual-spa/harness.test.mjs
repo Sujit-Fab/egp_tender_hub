@@ -7,6 +7,29 @@ import test from 'node:test';
 import { withDemoAccountPrompt, guardUnexpectedDialogs, DEMO_PROMPT,
   HarnessError, createCheckProgress, createDemoAccountSession } from './harness.mjs';
 import { waitForCommittedDeletion, waitForCommittedUpload } from './std-persistence.mjs';
+import { createDiagnosticPhaseReporter } from './diagnostic-phases.mjs';
+
+test('diagnostic failure reporting identifies each fixed phase without exception data', async () => {
+  const reporter = createDiagnosticPhaseReporter();
+  assert.deepEqual(reporter.failureRecord(), { status: 0, code: 'phase-readiness' });
+  for (const [phase, code] of Object.entries({ readiness: 'phase-readiness', authentication: 'phase-authentication',
+    upload: 'phase-upload', downloadReference: 'phase-download-reference', delete: 'phase-delete', absenceCheck: 'phase-absence-check' })) {
+    reporter.enter(phase);
+    let record;
+    try { await Promise.reject(new Error('PRIVATE_SENTINEL')); } catch { record = reporter.failureRecord(); }
+    assert.deepEqual(record, { status: 0, code });
+    assert.ok(!JSON.stringify(record).includes('PRIVATE_SENTINEL'));
+  }
+});
+
+test('diagnostic phase reporting rejects arbitrary labels and preserves the active phase', () => {
+  const reporter = createDiagnosticPhaseReporter();
+  reporter.enter('upload');
+  for (const label of ['PRIVATE_SENTINEL', '__proto__', 'toString', undefined]) {
+    assert.throws(() => reporter.enter(label), { name: 'TypeError', message: 'Unknown diagnostic phase' });
+    assert.deepEqual(reporter.failureRecord(), { status: 0, code: 'phase-upload' });
+  }
+});
 
 function deferred() {
   let resolve, reject;
