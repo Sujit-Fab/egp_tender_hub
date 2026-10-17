@@ -55,6 +55,18 @@ jobs:
         run: node --test test/manual-spa/isolation.test.mjs test/manual-spa/harness.test.mjs
       - name: Prepare Storage emulator for the full SPA demo
         run: node scripts/tender-radar/manual-spa.mjs prepare-storage
+      - name: Diagnose STD Storage deletion in a loopback-only namespace
+        timeout-minutes: 3
+        run: |
+          diagnostic_home="$(mktemp -d "$PWD/.cache/tender-radar/std-diagnostic-home-XXXXXXXX")"
+          sudo -- unshare --net -- bash -c '
+            set -euo pipefail
+            ip link set lo up
+            [[ "$(ip -o link show | cut -d : -f 2)" == " lo" ]] || exit 1
+            exec setpriv --reuid="$1" --regid="$2" --init-groups \
+              env -i PATH="$4" HOME="$5" JAVA_HOME="$6" \
+              timeout --signal=TERM --kill-after=5s 120s "$3" test/manual-spa/std-delete-diagnostic.mjs
+          ' _ "$(id -u)" "$(id -g)" "$(command -v node)" "$PATH" "$diagnostic_home" "$JAVA_HOME"
       - name: Build the actual SPA and PWA with demo-only Firebase services
         run: node scripts/tender-radar/manual-spa.mjs build
       - name: Exercise the built SPA and offline shell in loopback-only namespace
@@ -72,6 +84,7 @@ jobs:
             .cache/tender-radar/progress-*.json
             .cache/tender-radar/compatibility.json
             .cache/tender-radar/current-run.json
+            .cache/tender-radar/std-delete-diagnostic.json
             .cache/tender-radar/worker-repro-*/results.json
             .cache/tender-radar/worker-repro-*/*.jsonl
             .cache/tender-radar/manual-spa/build.json
